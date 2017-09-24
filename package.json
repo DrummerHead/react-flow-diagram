@@ -28,7 +28,8 @@
     "nwb": "0.18.x",
     "prettier": "^1.7.0",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react-dom": "^15.6.1",
+    "styled-components": "^2.1.2"
   },
   "author": "DrummerHead <drummerhead@gmail.com>",
   "homepage": "",
