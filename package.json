@@ -17,6 +17,7 @@
     "test": "nwb test-react",
     "test:coverage": "nwb test-react --coverage",
     "test:watch": "nwb test-react --server",
+    "lintjs": "prettier --single-quote --trailing-comma es5 --write \"{src,demo}/**/*.js\"",
     "flow": "flow"
   },
   "dependencies": {},
@@ -26,6 +27,7 @@
   "devDependencies": {
     "flow-bin": "^0.55.0",
     "nwb": "0.18.x",
+    "prettier": "^1.7.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
   },
