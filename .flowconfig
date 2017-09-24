@@ -1,0 +1,15 @@
+[ignore]
+.*/coverage/.*
+.*/demo/dist/.*
+.*/es/.*
+.*/lib/.*
+.*/node_modules/.*
+.*/umd/.*
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
