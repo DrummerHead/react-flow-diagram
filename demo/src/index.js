@@ -1,15 +1,31 @@
-import React, {Component} from 'react'
-import {render} from 'react-dom'
+// @flow
 
-import Example from '../../src'
+import React, { Component } from 'react';
+import { render } from 'react-dom';
+import styled, { injectGlobal } from 'styled-components';
 
-class Demo extends Component {
-  render() {
-    return <div>
-      <h1>react-diagram Demo</h1>
-      <Example/>
-    </div>
+import Diagram from '../../src';
+
+injectGlobal`
+  * {
+    box-sizing: border-box;
   }
-}
+  body {
+    margin: 0;
+  }
+`;
+const Main = styled.main`
+  max-width: 62em;
+  padding: 1em;
+  margin: 0 auto;
+  font-family: sans-serif;
+`;
 
-render(<Demo/>, document.querySelector('#demo'))
+const Demo = () => (
+  <Main>
+    <h1>react-diagram Demo</h1>
+    <Diagram />
+  </Main>
+);
+
+render(<Demo />, document.querySelector('#demo'));
