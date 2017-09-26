@@ -1,9 +1,6 @@
-import React, {Component} from 'react'
+// @flow
 
-export default class extends Component {
-  render() {
-    return <div>
-      <h2>Welcome to React components</h2>
-    </div>
-  }
-}
+import Diagram from './diagram/component';
+import { setEntities } from './entity/reducer';
+
+export { Diagram, setEntities };
