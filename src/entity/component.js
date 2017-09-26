@@ -22,6 +22,8 @@ const EntityStyle = style.div`
   align-items: center;
   border-radius: .5rem;
   border: .1rem solid #888;
+  user-select: none;
+  cursor: move;
 `;
 
 const Name = style.span`
@@ -30,6 +32,7 @@ const Name = style.span`
 `;
 
 type EntityProps = EntityModel & {
+  selected: boolean,
   onMouseDown: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseLeave: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
@@ -38,7 +41,11 @@ type EntityProps = EntityModel & {
 
 const Entity = (props: EntityProps) => (
   <EntityStyle
-    style={{ top: props.y, left: props.x }}
+    style={{
+      top: props.y,
+      left: props.x,
+      zIndex: props.selected ? '100' : '10',
+    }}
     onMouseDown={props.onMouseDown}
     onMouseLeave={props.onMouseLeave}
     onMouseMove={props.onMouseMove}
@@ -124,6 +131,7 @@ class EntityContainer extends React.PureComponent<
         onMouseLeave={this.onMouseLeave}
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
+        selected={this.state.isMoving}
       />
     );
   }
