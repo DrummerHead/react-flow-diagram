@@ -1,8 +1,6 @@
 // @flow
 
-import type { Action } from '../diagram/types';
-
-export type EntityState = Array<EntityModel>;
+import type { ActionShape, Action } from '../diagram/reducer';
 
 export type EntityModel = {
   id: string,
@@ -11,19 +9,21 @@ export type EntityModel = {
   y: number,
 };
 
-type MovePayload = {
+export type EntityState = Array<EntityModel>;
+
+export type MovePayload = {
   x: number,
   y: number,
   id: string,
 };
 
 export type EntityAction =
-  | Action<'rd/entity/SET', EntityState>
-  | Action<'rd/entity/MOVE', MovePayload>;
+  | ActionShape<'rd/entity/SET', EntityState>
+  | ActionShape<'rd/entity/MOVE', MovePayload>;
 
 const entityReducer = (
   state: EntityState = [],
-  action: EntityAction
+  action: Action
 ): EntityState => {
   switch (action.type) {
     case 'rd/entity/SET':

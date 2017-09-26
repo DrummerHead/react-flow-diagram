@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import Entity from '../entity/component';
 import { setEntities } from '../entity/reducer';
 
+import type { CanvasState, CanvasAction } from '../canvas/reducer';
 import type { EntityState, EntityAction } from '../entity/reducer';
 import type { State } from '../diagram/reducer';
 
@@ -45,6 +46,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   componentDidMount() {
     this.props.setEntities(this.props.model);
   }
+
   render() {
     return <Canvas entities={this.props.entities} />;
   }
