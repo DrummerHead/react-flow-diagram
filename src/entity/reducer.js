@@ -19,7 +19,8 @@ export type MovePayload = {
 
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
-  | ActionShape<'rd/entity/MOVE', MovePayload>;
+  | ActionShape<'rd/entity/MOVE', MovePayload>
+  | ActionShape<'rd/entity/ADD', EntityModel>;
 
 const entityReducer = (
   state: EntityState = [],
@@ -28,6 +29,9 @@ const entityReducer = (
   switch (action.type) {
     case 'rd/entity/SET':
       return action.payload;
+
+    case 'rd/entity/ADD':
+      return [...state, action.payload];
 
     case 'rd/entity/MOVE':
       const { id, x, y } = action.payload;
@@ -54,6 +58,11 @@ export const setEntities = (entities: EntityState): EntityAction => ({
 export const move = (movePayload: MovePayload): EntityAction => ({
   type: 'rd/entity/MOVE',
   payload: movePayload,
+});
+
+export const addEntity = (entity: EntityModel): EntityAction => ({
+  type: 'rd/entity/ADD',
+  payload: entity,
 });
 
 export default entityReducer;
