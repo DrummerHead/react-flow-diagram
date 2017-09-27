@@ -7,24 +7,23 @@ export type CanvasState = {
   offsetY: number,
 };
 
-export type CanvasAction = ActionShape<'rd/canvas/SET', CanvasState>;
+export type CanvasAction = ActionShape<'rd/canvas/SET_OFFSET', CanvasState>;
 
 const canvasReducer = (
   state: CanvasState = { offsetX: 0, offsetY: 0 },
   action: Action
 ) => {
   switch (action.type) {
-    case 'rd/canvas/SET':
+    case 'rd/canvas/SET_OFFSET':
       return action.payload;
     default:
       return state;
   }
 };
 
-// Potentially deletable. If current date is beyond 2017/10/03 and you haven't
-// used this action, delete it :D (and all associated stuff)
-export const setOffset = (offset: CanvasState): CanvasAction => ({
-  type: 'rd/canvas/SET',
+export type setOffsetProps = CanvasState;
+export const setOffset = (offset: setOffsetProps): CanvasAction => ({
+  type: 'rd/canvas/SET_OFFSET',
   payload: offset,
 });
 

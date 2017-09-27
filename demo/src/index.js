@@ -23,7 +23,7 @@ const Main = styled.main`
   font-family: sans-serif;
   display: flex;
   flex-flow: column nowrap;
-  min-height: 100vh;
+  min-height: 150vh;
 `;
 
 const magicEntities: Array<EntityModel> = [

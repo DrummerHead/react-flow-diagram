@@ -51,7 +51,9 @@ const Entity = (props: EntityProps) => (
     onMouseMove={props.onMouseMove}
     onMouseUp={props.onMouseUp}
   >
-    <Name>{props.name}</Name>
+    <Name>
+      {props.name} {props.x}, {props.y}
+    </Name>
   </EntityStyle>
 );
 
@@ -80,8 +82,8 @@ class EntityContainer extends React.PureComponent<
     super(props);
     this.state = {
       isMoving: false,
-      initialX: 0,
-      initialY: 0,
+      initialX: this.props.x,
+      initialY: this.props.y,
     };
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseLeave = this.onMouseLeave.bind(this);
@@ -92,8 +94,8 @@ class EntityContainer extends React.PureComponent<
   onMouseDown(ev: SyntheticMouseEvent<HTMLElement>) {
     this.setState({
       isMoving: true,
-      initialX: ev.clientX,
-      initialY: ev.clientY,
+      initialX: ev.pageX,
+      initialY: ev.pageY,
     });
   }
 
@@ -102,13 +104,14 @@ class EntityContainer extends React.PureComponent<
       isMoving: false,
     });
   }
+
   onMouseMove(ev: SyntheticMouseEvent<HTMLElement>) {
     if (this.state.isMoving) {
-      const deltaX = ev.clientX - this.state.initialX;
-      const deltaY = ev.clientY - this.state.initialY;
+      const deltaX = ev.pageX - this.state.initialX;
+      const deltaY = ev.pageY - this.state.initialY;
       this.setState({
-        initialX: ev.clientX,
-        initialY: ev.clientY,
+        initialX: ev.pageX,
+        initialY: ev.pageY,
       });
       this.props.move({
         x: this.props.x + deltaX,
@@ -117,6 +120,7 @@ class EntityContainer extends React.PureComponent<
       });
     }
   }
+
   onMouseUp(ev: SyntheticMouseEvent<HTMLElement>) {
     this.setState({
       isMoving: false,
