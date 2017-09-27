@@ -6,7 +6,7 @@ import styled, { injectGlobal } from 'styled-components';
 
 import type { EntityModel } from '../../src/entity/reducer';
 
-import { Diagram } from '../../src';
+import { Diagram, store } from '../../src';
 
 injectGlobal`
   * {
@@ -51,5 +51,13 @@ class Demo extends React.Component<{}> {
     );
   }
 }
+
+/*
+ * this is how you'd get the modified model back
+store.subscribe(() => {
+  const model = store.getState();
+  console.log(model)
+});
+*/
 
 render(<Demo />, document.querySelector('#demo'));

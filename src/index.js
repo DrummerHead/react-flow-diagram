@@ -1,6 +1,6 @@
 // @flow
 
-import Diagram from './diagram/component';
+import Diagram, { store } from './diagram/component';
 import { setEntities } from './entity/reducer';
 
-export { Diagram, setEntities };
+export { Diagram, store };

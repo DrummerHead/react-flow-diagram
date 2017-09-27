@@ -10,7 +10,7 @@ import Entity from '../entity/component';
 
 import type { EntityModel } from '../entity/reducer';
 
-const store = createStore(
+export const store = createStore(
   reducer,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
