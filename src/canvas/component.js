@@ -64,11 +64,18 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
 
   componentDidMount() {
     this.props.setEntities(this.props.model);
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
   }
 
   setOffset() {
     if (this.canvasDOM) {
-      const { left, top } = this.canvasDOM.getBoundingClientRect();
+      const cd = this.canvasDOM;
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+      const { left, top } = cd.getBoundingClientRect();
       this.props.setOffset({
         offsetX: parseInt(left, 10),
         offsetY: parseInt(top, 10),
