@@ -31,7 +31,7 @@ type PanelProps = {};
 const Panel = props => (
   <PanelStyle>
     <PanelTools>
-      <PanelTool onClick={props.addEntity}>Add entity</PanelTool>
+      <PanelTool onMouseDown={props.addEntity}>Add entity</PanelTool>
     </PanelTools>
   </PanelStyle>
 );
@@ -56,8 +56,9 @@ class PanelContainer extends React.PureComponent<PanelContainerProps> {
     this.props.addEntity({
       id: window.Date.now().toString(36),
       name: 'test',
-      x: ev.pageX - this.props.canvas.offsetX,
-      y: ev.pageY - this.props.canvas.offsetY,
+      x: ev.pageX - this.props.canvas.offsetX - 60, // 60 and 40 are distances
+      y: ev.pageY - this.props.canvas.offsetY - 40, // from anchor to center of
+      isAnchored: true, // entity, should be calculted
     });
   }
 

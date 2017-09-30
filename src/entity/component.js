@@ -5,7 +5,14 @@ import style from 'styled-components';
 import { connect } from 'react-redux';
 import { move } from './reducer';
 
-import type { EntityModel, MovePayload, EntityAction } from './reducer';
+import type {
+  EntityModel,
+  MetaEntityModel,
+  MovePayload,
+  EntityAction,
+} from './reducer';
+import type { CanvasState } from '../canvas/reducer';
+import type { State } from '../diagram/reducer';
 
 /*
  * Presentational
@@ -62,12 +69,15 @@ const Entity = (props: EntityProps) => (
  * ==================================== */
 
 type EntityContainerState = {
-  isMoving: boolean,
-  initialX: number,
-  initialY: number,
+  anchorX: number,
+  anchorY: number,
+  isAnchored: boolean,
+  bornHeld: boolean,
 };
 type EntityContainerProps = EntityModel & {
   move: MovePayload => EntityAction,
+  canvas: CanvasState,
+  meta: MetaEntityModel,
 };
 class EntityContainer extends React.PureComponent<
   EntityContainerProps,
@@ -81,9 +91,10 @@ class EntityContainer extends React.PureComponent<
   constructor(props: EntityContainerProps) {
     super(props);
     this.state = {
-      isMoving: false,
-      initialX: this.props.x,
-      initialY: this.props.y,
+      anchorX: 60,
+      anchorY: 40,
+      isAnchored: this.props.meta.isAnchored,
+      bornHeld: this.props.meta.isAnchored,
     };
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseLeave = this.onMouseLeave.bind(this);
@@ -93,38 +104,35 @@ class EntityContainer extends React.PureComponent<
 
   onMouseDown(ev: SyntheticMouseEvent<HTMLElement>) {
     this.setState({
-      isMoving: true,
-      initialX: ev.pageX,
-      initialY: ev.pageY,
+      anchorX: ev.pageX - this.props.canvas.offsetX - this.props.x,
+      anchorY: ev.pageY - this.props.canvas.offsetY - this.props.y,
+      isAnchored: true,
+      bornHeld: false,
     });
   }
 
   onMouseLeave(ev: SyntheticMouseEvent<HTMLElement>) {
     this.setState({
-      isMoving: false,
+      isAnchored: false,
     });
   }
 
   onMouseMove(ev: SyntheticMouseEvent<HTMLElement>) {
-    if (this.state.isMoving) {
-      const deltaX = ev.pageX - this.state.initialX;
-      const deltaY = ev.pageY - this.state.initialY;
-      this.setState({
-        initialX: ev.pageX,
-        initialY: ev.pageY,
-      });
+    if (this.state.isAnchored) {
       this.props.move({
-        x: this.props.x + deltaX,
-        y: this.props.y + deltaY,
+        x: ev.pageX - this.props.canvas.offsetX - this.state.anchorX,
+        y: ev.pageY - this.props.canvas.offsetY - this.state.anchorY,
         id: this.props.id,
       });
     }
   }
 
   onMouseUp(ev: SyntheticMouseEvent<HTMLElement>) {
-    this.setState({
-      isMoving: false,
-    });
+    if (!this.state.bornHeld) {
+      this.setState({
+        isAnchored: false,
+      });
+    }
   }
 
   render() {
@@ -135,10 +143,15 @@ class EntityContainer extends React.PureComponent<
         onMouseLeave={this.onMouseLeave}
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
-        selected={this.state.isMoving}
+        selected={this.state.isAnchored}
       />
     );
   }
 }
 
-export default connect(null, { move })(EntityContainer);
+const mapStateToProps = (state: State, ownProps) => ({
+  canvas: state.canvas,
+  meta: state.metaEntity.find(metaEntity => metaEntity.id === ownProps.id),
+});
+
+export default connect(mapStateToProps, { move })(EntityContainer);
