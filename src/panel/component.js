@@ -27,8 +27,10 @@ const PanelTool = style.li`
   cursor: pointer;
 `;
 
-type PanelProps = {};
-const Panel = props => (
+type PanelProps = {
+  addEntity: (SyntheticMouseEvent<HTMLElement>) => void,
+};
+const Panel = (props: PanelProps) => (
   <PanelStyle>
     <PanelTools>
       <PanelTool onMouseDown={props.addEntity}>Add entity</PanelTool>

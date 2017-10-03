@@ -72,7 +72,7 @@ type EntityContainerState = {
   anchorX: number,
   anchorY: number,
   isAnchored: boolean,
-  bornHeld: boolean,
+  onMouseUpWouldBeClick: boolean,
 };
 type EntityContainerProps = EntityModel & {
   move: MovePayload => EntityAction,
@@ -94,7 +94,7 @@ class EntityContainer extends React.PureComponent<
       anchorX: 60,
       anchorY: 40,
       isAnchored: this.props.meta.isAnchored,
-      bornHeld: this.props.meta.isAnchored,
+      onMouseUpWouldBeClick: true,
     };
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseLeave = this.onMouseLeave.bind(this);
@@ -102,12 +102,20 @@ class EntityContainer extends React.PureComponent<
     this.onMouseUp = this.onMouseUp.bind(this);
   }
 
+  componentDidMount() {
+    const wouldBeClick = () => this.setState({ onMouseUpWouldBeClick: false });
+    if (this.state.isAnchored) {
+      setTimeout(wouldBeClick, 16 * 12);
+    } else {
+      wouldBeClick();
+    }
+  }
+
   onMouseDown(ev: SyntheticMouseEvent<HTMLElement>) {
     this.setState({
       anchorX: ev.pageX - this.props.canvas.offsetX - this.props.x,
       anchorY: ev.pageY - this.props.canvas.offsetY - this.props.y,
       isAnchored: true,
-      bornHeld: false,
     });
   }
 
@@ -128,11 +136,16 @@ class EntityContainer extends React.PureComponent<
   }
 
   onMouseUp(ev: SyntheticMouseEvent<HTMLElement>) {
-    if (!this.state.bornHeld) {
+    if (!this.state.onMouseUpWouldBeClick) {
+      // Behaves as if it was spawned with a mouse drag
+      // meaning that when you release the mouse button,
+      // the element will de-anchor
       this.setState({
         isAnchored: false,
       });
     }
+    // else it behaves as if it was spawned with a mouse click
+    // meaning it needs another click to de-anchor from mouse
   }
 
   render() {
