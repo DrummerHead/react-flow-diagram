@@ -26,7 +26,7 @@ const Name = style.span`
   font-size: .8rem;
 `;
 
-type TaskProps = {
+export type TaskProps = {
   model: EntityModel,
 };
 const Task = (props: TaskProps) => (
