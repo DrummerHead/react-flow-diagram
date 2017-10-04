@@ -7,6 +7,8 @@ import { setOffset } from './reducer';
 import Entity from '../entity/component';
 import { setEntities } from '../entity/reducer';
 import Panel from '../panel/component';
+import Links from '../links/component';
+import ArrowMarker from '../arrowMarker/component';
 
 import type { setOffsetProps, CanvasAction } from '../canvas/reducer';
 import type { EntityState, EntityAction } from '../entity/reducer';
@@ -32,14 +34,26 @@ const CanvasStyle = style.div`
   }
 `;
 
+const SvgLand = style.svg`
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
 type CanvasProps = {
   entities: EntityState,
   handleRef: HTMLElement => void,
 };
 const Canvas = (props: CanvasProps) => (
   <CanvasStyle innerRef={div => props.handleRef(div)}>
-    <Panel />
+    <SvgLand width="100%" height="100%">
+      {props.entities
+        .filter(entity => entity.hasOwnProperty('linksTo'))
+        .map(entity => <Links key={entity.id} model={entity} />)}
+      <ArrowMarker />
+    </SvgLand>
     {props.entities.map(entity => <Entity key={entity.id} {...entity} />)}
+    <Panel />
   </CanvasStyle>
 );
 

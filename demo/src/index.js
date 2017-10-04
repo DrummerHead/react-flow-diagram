@@ -31,13 +31,33 @@ const magicEntities: Array<EntityModel> = [
     id: 'QWxwaGE=',
     name: 'Alpha',
     x: 50,
-    y: 50,
+    y: 150,
+    linksTo: ['QnJhdm8='],
   },
   {
     id: 'QnJhdm8=',
     name: 'Bravo',
-    x: 110,
-    y: 90,
+    x: 150,
+    y: 50,
+  },
+  {
+    id: 'Q2hhcmxpZQ==',
+    name: 'Charlie',
+    x: 150,
+    y: 350,
+    linksTo: ['RGVsdGE=', 'RWNobw=='],
+  },
+  {
+    id: 'RGVsdGE=',
+    name: 'Delta',
+    x: 300,
+    y: 150,
+  },
+  {
+    id: 'RWNobw==',
+    name: 'Echo',
+    x: 350,
+    y: 300,
   },
 ];
 

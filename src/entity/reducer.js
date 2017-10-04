@@ -2,11 +2,14 @@
 
 import type { ActionShape, Action } from '../diagram/reducer';
 
+export type Id = string;
+
 export type EntityModel = {
-  id: string,
+  id: Id,
   name: string,
   x: number,
   y: number,
+  linksTo?: Array<Id>,
 };
 
 export type MetaEntityModel = {
