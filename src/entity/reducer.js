@@ -4,11 +4,14 @@ import type { ActionShape, Action } from '../diagram/reducer';
 
 export type Id = string;
 
+type EntityType = 'Task';
+
 export type EntityModel = {
   id: Id,
-  name: string,
+  type: EntityType,
   x: number,
   y: number,
+  name: string,
   linksTo?: Array<Id>,
 };
 
@@ -45,9 +48,10 @@ const entityReducer = (
         ...state,
         {
           id: action.payload.id,
-          name: action.payload.name,
+          type: action.payload.type,
           x: action.payload.x,
           y: action.payload.y,
+          name: action.payload.name,
         },
       ];
 

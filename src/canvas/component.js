@@ -52,7 +52,7 @@ const Canvas = (props: CanvasProps) => (
         .map(entity => <Links key={entity.id} model={entity} />)}
       <ArrowMarker />
     </SvgLand>
-    {props.entities.map(entity => <Entity key={entity.id} {...entity} />)}
+    {props.entities.map(entity => <Entity key={entity.id} model={entity} />)}
     <Panel />
   </CanvasStyle>
 );

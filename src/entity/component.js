@@ -4,6 +4,7 @@ import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
 import { move } from './reducer';
+import Task from '../task/component';
 
 import type {
   EntityModel,
@@ -19,26 +20,17 @@ import type { State } from '../diagram/reducer';
  * ==================================== */
 
 const EntityStyle = style.div`
-  background-color: #fff;
   position: absolute;
-  min-width: 8rem;
   text-align: center;
-  min-height: 5rem;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  border-radius: .5rem;
-  border: .1rem solid #888;
   user-select: none;
   cursor: move;
 `;
 
-const Name = style.span`
-  flex: 1 0;
-  padding: 1rem;
-`;
-
-type EntityProps = EntityModel & {
+type EntityProps = {
+  model: EntityModel,
   selected: boolean,
   onMouseDown: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseLeave: (SyntheticMouseEvent<HTMLElement>) => void,
@@ -49,8 +41,8 @@ type EntityProps = EntityModel & {
 const Entity = (props: EntityProps) => (
   <EntityStyle
     style={{
-      top: props.y,
-      left: props.x,
+      top: props.model.y,
+      left: props.model.x,
       zIndex: props.selected ? '100' : '10',
     }}
     onMouseDown={props.onMouseDown}
@@ -58,9 +50,14 @@ const Entity = (props: EntityProps) => (
     onMouseMove={props.onMouseMove}
     onMouseUp={props.onMouseUp}
   >
-    <Name>
-      {props.name} {props.x}, {props.y}
-    </Name>
+    {(type => {
+      switch (type) {
+        case 'Task':
+          return <Task model={props.model} />;
+        default:
+          return <Task model={props.model} />;
+      }
+    })(props.model.type)}
   </EntityStyle>
 );
 
@@ -74,7 +71,8 @@ type EntityContainerState = {
   isAnchored: boolean,
   onMouseUpWouldBeClick: boolean,
 };
-type EntityContainerProps = EntityModel & {
+type EntityContainerProps = {
+  model: EntityModel,
   move: MovePayload => EntityAction,
   canvas: CanvasState,
   meta: MetaEntityModel,
@@ -113,8 +111,8 @@ class EntityContainer extends React.PureComponent<
 
   onMouseDown(ev: SyntheticMouseEvent<HTMLElement>) {
     this.setState({
-      anchorX: ev.pageX - this.props.canvas.offsetX - this.props.x,
-      anchorY: ev.pageY - this.props.canvas.offsetY - this.props.y,
+      anchorX: ev.pageX - this.props.canvas.offsetX - this.props.model.x,
+      anchorY: ev.pageY - this.props.canvas.offsetY - this.props.model.y,
       isAnchored: true,
     });
   }
@@ -130,7 +128,7 @@ class EntityContainer extends React.PureComponent<
       this.props.move({
         x: ev.pageX - this.props.canvas.offsetX - this.state.anchorX,
         y: ev.pageY - this.props.canvas.offsetY - this.state.anchorY,
-        id: this.props.id,
+        id: this.props.model.id,
       });
     }
   }
@@ -157,6 +155,7 @@ class EntityContainer extends React.PureComponent<
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
         selected={this.state.isAnchored}
+        model={this.props.model}
       />
     );
   }
@@ -164,7 +163,9 @@ class EntityContainer extends React.PureComponent<
 
 const mapStateToProps = (state: State, ownProps) => ({
   canvas: state.canvas,
-  meta: state.metaEntity.find(metaEntity => metaEntity.id === ownProps.id),
+  meta: state.metaEntity.find(
+    metaEntity => metaEntity.id === ownProps.model.id
+  ),
 });
 
 export default connect(mapStateToProps, { move })(EntityContainer);

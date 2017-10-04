@@ -57,10 +57,11 @@ class PanelContainer extends React.PureComponent<PanelContainerProps> {
   addEntity(ev: SyntheticMouseEvent<HTMLElement>) {
     this.props.addEntity({
       id: window.Date.now().toString(36),
-      name: 'test',
+      type: 'Task',
       x: ev.pageX - this.props.canvas.offsetX - 60, // 60 and 40 are distances
       y: ev.pageY - this.props.canvas.offsetY - 40, // from anchor to center of
-      isAnchored: true, // entity, should be calculted
+      name: 'test', // entity, should be calculted
+      isAnchored: true,
     });
   }
 

@@ -29,35 +29,40 @@ const Main = styled.main`
 const magicEntities: Array<EntityModel> = [
   {
     id: 'QWxwaGE=',
-    name: 'Alpha',
+    type: 'Task',
     x: 50,
     y: 150,
+    name: 'Alpha',
     linksTo: ['QnJhdm8='],
   },
   {
     id: 'QnJhdm8=',
-    name: 'Bravo',
+    type: 'Task',
     x: 150,
     y: 50,
+    name: 'Bravo',
   },
   {
     id: 'Q2hhcmxpZQ==',
-    name: 'Charlie',
+    type: 'Task',
     x: 150,
     y: 350,
+    name: 'Charlie',
     linksTo: ['RGVsdGE=', 'RWNobw=='],
   },
   {
     id: 'RGVsdGE=',
-    name: 'Delta',
+    type: 'Task',
     x: 300,
     y: 150,
+    name: 'Delta',
   },
   {
     id: 'RWNobw==',
-    name: 'Echo',
+    type: 'Task',
     x: 350,
     y: 300,
+    name: 'Echo',
   },
 ];
 
