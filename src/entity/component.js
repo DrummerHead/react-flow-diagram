@@ -85,8 +85,8 @@ const EntityContainerHOC = WrappedComponent =>
     constructor(props: EntityContainerProps) {
       super(props);
       this.state = {
-        anchorX: 60,
-        anchorY: 40,
+        anchorX: 25,
+        anchorY: 25,
         isAnchored: this.props.meta.isAnchored,
         onMouseUpWouldBeClick: true,
       };
