@@ -49,9 +49,9 @@ type PanelContainerProps = {
   addEntity: EntityModel => EntityAction,
 };
 class PanelContainer extends React.PureComponent<PanelContainerProps> {
-  addEntity: *;
-  addTask: *;
-  addEvent: *;
+  addEntity: (EntityType, SyntheticMouseEvent<HTMLElement>) => void;
+  addTask: SyntheticMouseEvent<HTMLElement> => void;
+  addEvent: SyntheticMouseEvent<HTMLElement> => void;
 
   constructor() {
     super();
