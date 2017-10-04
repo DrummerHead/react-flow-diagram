@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { setOffset } from './reducer';
 import EntityHOC from '../entity/component';
 import Task from '../task/component';
+import Event from '../event/component';
 import { setEntities } from '../entity/reducer';
 import Panel from '../panel/component';
 import Links from '../links/component';
@@ -13,7 +14,7 @@ import ArrowMarker from '../arrowMarker/component';
 
 import type { ComponentType } from 'react';
 import type { setOffsetProps, CanvasAction } from '../canvas/reducer';
-import type { EntityState, EntityAction } from '../entity/reducer';
+import type { EntityState, EntityAction, EntityType } from '../entity/reducer';
 import type { State } from '../diagram/reducer';
 import type { TaskProps } from '../task/component';
 
@@ -49,7 +50,8 @@ type CanvasProps = {
 };
 
 const EntitiesHOCList = {
-  task: EntityHOC(Task),
+  Task: EntityHOC(Task),
+  Event: EntityHOC(Event),
 };
 const Canvas = (props: CanvasProps) => (
   <CanvasStyle innerRef={div => props.handleRef(div)}>
@@ -62,9 +64,11 @@ const Canvas = (props: CanvasProps) => (
     {props.entities.map(entity => {
       switch (entity.type) {
         case 'Task':
-          return <EntitiesHOCList.task key={entity.id} model={entity} />;
+          return <EntitiesHOCList.Task key={entity.id} model={entity} />;
+        case 'Event':
+          return <EntitiesHOCList.Event key={entity.id} model={entity} />;
         default:
-          return <EntitiesHOCList.task key={entity.id} model={entity} />;
+          return <EntitiesHOCList.Task key={entity.id} model={entity} />;
       }
     })}
     <Panel />

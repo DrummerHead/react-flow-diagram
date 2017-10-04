@@ -64,6 +64,20 @@ const magicEntities: Array<EntityModel> = [
     y: 300,
     name: 'Echo',
   },
+  {
+    id: 'GjklsSSgj',
+    type: 'Event',
+    x: 50,
+    y: 250,
+    name: 'Zulu',
+  },
+  {
+    id: 'OjklscSgj',
+    type: 'Event',
+    x: 350,
+    y: 50,
+    name: 'Yankee',
+  },
 ];
 
 class Demo extends React.Component<{}> {

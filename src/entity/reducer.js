@@ -4,7 +4,7 @@ import type { ActionShape, Action } from '../diagram/reducer';
 
 export type Id = string;
 
-type EntityType = 'Task';
+export type EntityType = 'Task' | 'Event';
 
 export type EntityModel = {
   id: Id,
