@@ -22,6 +22,8 @@ import type { State } from '../diagram/reducer';
 
 const EntityStyle = style.div`
   position: absolute;
+  top: 0;
+  left: 0;
   text-align: center;
   display: flex;
   flex-flow: row nowrap;
@@ -43,8 +45,7 @@ type EntityProps = {
 const Entity = (props: EntityProps) => (
   <EntityStyle
     style={{
-      top: props.model.y,
-      left: props.model.x,
+      transform: `translate(${props.model.x}px, ${props.model.y}px)`,
       zIndex: props.selected ? '100' : '10',
     }}
     onMouseDown={props.onMouseDown}
