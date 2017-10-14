@@ -68,9 +68,9 @@ type EntityContainerState = {
 };
 type EntityContainerProps = {
   model: EntityModel,
+  meta: MetaEntityModel,
   move: MovePayload => EntityAction,
   canvas: CanvasState,
-  meta: MetaEntityModel,
 };
 const EntityContainerHOC = WrappedComponent =>
   class extends React.PureComponent<
@@ -85,8 +85,8 @@ const EntityContainerHOC = WrappedComponent =>
     constructor(props: EntityContainerProps) {
       super(props);
       this.state = {
-        anchorX: 25,
-        anchorY: 25,
+        anchorX: this.props.meta.width / 2,
+        anchorY: this.props.meta.height / 2,
         isAnchored: this.props.meta.isAnchored,
         onMouseUpWouldBeClick: true,
       };
@@ -154,7 +154,7 @@ const EntityContainerHOC = WrappedComponent =>
           selected={this.state.isAnchored}
           model={this.props.model}
         >
-          <WrappedComponent model={this.props.model} />
+          <WrappedComponent model={this.props.model} meta={this.props.meta} />
         </Entity>
       );
     }

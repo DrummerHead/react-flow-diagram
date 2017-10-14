@@ -17,10 +17,11 @@ export const store = createStore(
 
 type DiagramProps = {
   model: Array<EntityModel>,
+  config: Array<{ type: string, width: number, height: number }>,
 };
 const Diagram = (props: DiagramProps) => (
   <Provider store={store}>
-    <Canvas model={props.model} />
+    <Canvas model={props.model} config={props.config} />
   </Provider>
 );
 

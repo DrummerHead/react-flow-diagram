@@ -3,7 +3,7 @@
 import React from 'react';
 import style from 'styled-components';
 
-import type { EntityModel } from '../entity/reducer';
+import type { EntityModel, MetaEntityModel } from '../entity/reducer';
 
 /*
  * Presentational
@@ -14,8 +14,8 @@ const TaskStyle = style.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  width: 120px;
-  height: 75px;
+  width: ${props => props.width}px;
+  height: ${props => props.height}px;
   border-radius: .5rem;
   border: 2px solid #888;
 `;
@@ -28,11 +28,12 @@ const Name = style.span`
 
 export type TaskProps = {
   model: EntityModel,
+  meta: MetaEntityModel,
 };
-const Task = (props: TaskProps) => (
-  <TaskStyle>
+const Task = ({ model, meta }: TaskProps) => (
+  <TaskStyle width={meta.width} height={meta.height}>
     <Name>
-      {props.model.name} {props.model.x}, {props.model.y}
+      {model.name} {model.x}, {model.y}
     </Name>
   </TaskStyle>
 );

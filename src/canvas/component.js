@@ -7,14 +7,20 @@ import { setOffset } from './reducer';
 import EntityHOC from '../entity/component';
 import Task from '../task/component';
 import Event from '../event/component';
-import { setEntities } from '../entity/reducer';
+import { setEntities, setConfig } from '../entity/reducer';
 import Panel from '../panel/component';
 import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
 
 import type { ComponentType } from 'react';
 import type { setOffsetProps, CanvasAction } from '../canvas/reducer';
-import type { EntityState, EntityAction, EntityType } from '../entity/reducer';
+import type {
+  EntityState,
+  EntityAction,
+  EntityType,
+  MetaConfig,
+  MetaEntityAction,
+} from '../entity/reducer';
 import type { State } from '../diagram/reducer';
 import type { TaskProps } from '../task/component';
 
@@ -82,8 +88,10 @@ const Canvas = (props: CanvasProps) => (
 type CanvasContainerProps = {
   entities: EntityState,
   model: EntityState,
+  config: MetaConfig,
   setEntities: EntityState => EntityAction,
   setOffset: setOffsetProps => CanvasAction,
+  setConfig: MetaConfig => MetaEntityAction,
 };
 class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   canvasDOM: ?HTMLElement;
@@ -96,6 +104,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
 
   componentDidMount() {
     this.props.setEntities(this.props.model);
+    this.props.setConfig(this.props.config);
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
@@ -129,6 +138,6 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
 
 const mapStateToProps = (state: State) => ({ entities: state.entity });
 
-export default connect(mapStateToProps, { setEntities, setOffset })(
+export default connect(mapStateToProps, { setEntities, setOffset, setConfig })(
   CanvasContainer
 );

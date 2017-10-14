@@ -15,25 +15,24 @@ export type EntityModel = {
   linksTo?: Array<Id>,
 };
 
-export type MetaEntityModel = {
-  id: string,
-  isAnchored: boolean,
-};
-
 export type EntityState = Array<EntityModel>;
 
-export type MetaEntityState = Array<MetaEntityModel>;
-
-export type MovePayload = {
-  x: number,
-  y: number,
+export type MetaEntityModel = {
   id: string,
+  type: EntityType,
+  isAnchored: boolean,
+  width: number,
+  height: number,
 };
+
+export type MetaEntityState = Array<MetaEntityModel>;
 
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
   | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
   | ActionShape<'rd/entity/MOVE', MovePayload>;
+
+export type MetaEntityAction = ActionShape<'rd/entity/CONFIG', MetaConfig>;
 
 const entityReducer = (
   state: EntityState = [],
@@ -72,6 +71,9 @@ const entityReducer = (
   }
 };
 
+const defaultWidth = 50;
+const defaultHeight = 50;
+
 export const metaEntityReducer = (
   state: MetaEntityState = [],
   action: Action
@@ -80,15 +82,36 @@ export const metaEntityReducer = (
     case 'rd/entity/SET':
       return action.payload.map(entity => ({
         id: entity.id,
+        type: entity.type,
         isAnchored: false,
+        width: defaultWidth,
+        height: defaultHeight,
       }));
+
+    case 'rd/entity/CONFIG':
+      const configs: MetaConfig = action.payload;
+      return state.map(metaModel => {
+        const relevantConfig = configs.find(
+          metaConfig => metaConfig.type === metaModel.type
+        );
+        return relevantConfig
+          ? {
+              ...metaModel,
+              width: relevantConfig.width,
+              height: relevantConfig.height,
+            }
+          : metaModel;
+      });
 
     case 'rd/entity/ADD':
       return [
         ...state,
         {
           id: action.payload.id,
+          type: action.payload.type,
           isAnchored: action.payload.isAnchored,
+          width: action.payload.width,
+          height: action.payload.height,
         },
       ];
 
@@ -109,9 +132,20 @@ export const addEntity = (
   payload: entity,
 });
 
+export type MovePayload = { x: number, y: number, id: string };
 export const move = (movePayload: MovePayload): EntityAction => ({
   type: 'rd/entity/MOVE',
   payload: movePayload,
+});
+
+export type MetaConfig = Array<{
+  type: EntityType,
+  width: number,
+  height: number,
+}>;
+export const setConfig = (config: MetaConfig): MetaEntityAction => ({
+  type: 'rd/entity/CONFIG',
+  payload: config,
 });
 
 export default entityReducer;
