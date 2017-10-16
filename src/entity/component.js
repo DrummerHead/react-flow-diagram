@@ -116,9 +116,39 @@ const EntityContainerHOC = WrappedComponent =>
     }
 
     onMouseLeave(ev: SyntheticMouseEvent<HTMLElement>) {
-      this.setState({
-        isAnchored: false,
-      });
+      if (this.state.isAnchored) {
+        // If the entity is still being dragged while leaving (mouse movement
+        // faster than state refresh on DOM) then (discussing only X
+        // coordinate, calculations the same with Y):
+        //
+        // This is where the anchor point was (in relation to diagram coordinates):
+        // this.state.anchorX + this.props.model.x
+        //
+        // This is where the mouse was (in relation to diagram coordinates)
+        // ev.pageX - this.props.canvas.offsetX
+        //
+        // This is the difference:
+        // (ev.pageX - this.props.canvas.offsetX) - (this.state.anchorX + this.props.model.x)
+        //
+        // The above number signifies by how much has the mouse left the original
+        // anchor point. If we add this difference to where we would have
+        // calculated our original location, we're left with:
+        // (ev.pageX - this.props.canvas.offsetX - this.state.anchorX) +
+        // ((ev.pageX - this.props.canvas.offsetX) - (this.state.anchorX + this.props.model.x))
+        //
+        // Which simplified leaves us with:
+        // 2 * (ev.pageX - this.props.canvas.offsetX - this.state.anchorX) - this.props.model.x
+        //
+        this.props.move({
+          x:
+            2 * (ev.pageX - this.props.canvas.offsetX - this.state.anchorX) -
+            this.props.model.x,
+          y:
+            2 * (ev.pageY - this.props.canvas.offsetY - this.state.anchorY) -
+            this.props.model.y,
+          id: this.props.model.id,
+        });
+      }
     }
 
     onMouseMove(ev: SyntheticMouseEvent<HTMLElement>) {
