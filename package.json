@@ -19,7 +19,7 @@
     "test:watch": "nwb test-react --server",
     "lintjs": "prettier --single-quote --trailing-comma es5 --write \"{src,demo/src}/**/*.js\"",
     "flow": "flow",
-    "postinstall": "flow-typed install"
+    "fti": "flow-typed install"
   },
   "dependencies": {
     "react-redux": "^5.0.6",
