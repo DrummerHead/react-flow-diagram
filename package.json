@@ -1,7 +1,7 @@
 {
-  "name": "react-diagram",
+  "name": "react-flow-diagram",
   "version": "1.0.0",
-  "description": "react-diagram React component",
+  "description": "react-flow-diagram React component",
   "main": "lib/index.js",
   "module": "es/index.js",
   "files": [
@@ -37,7 +37,7 @@
   "author": "DrummerHead <drummerhead@gmail.com>",
   "homepage": "",
   "license": "MIT",
-  "repository": "",
+  "repository": "https://github.com/DrummerHead/react-flow-diagram",
   "keywords": [
     "react-component"
   ]

@@ -30,7 +30,7 @@ class Demo extends React.Component<{}> {
   render() {
     return (
       <Main>
-        <h1>react-diagram Demo</h1>
+        <h1>react-flow-diagram Demo</h1>
         <Diagram model={model} config={config} />
       </Main>
     );
