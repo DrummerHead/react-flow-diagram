@@ -3,15 +3,18 @@
 import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
-import { move } from './reducer';
+import { move, removeEntity, selectEntity } from './reducer';
 import Task from '../task/component';
+import ContextMenu from '../contextMenu/component';
 
 import type { ComponentType, Node } from 'react';
 import type {
+  Id,
   EntityModel,
   MetaEntityModel,
   MovePayload,
   EntityAction,
+  MetaEntityAction,
 } from './reducer';
 import type { CanvasState } from '../canvas/reducer';
 import type { State } from '../diagram/reducer';
@@ -34,26 +37,42 @@ const EntityStyle = style.div`
 
 type EntityProps = {
   model: EntityModel,
-  selected: boolean,
+  isAnchored: boolean,
+  isSelected: boolean,
   onMouseDown: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseLeave: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseUp: (SyntheticMouseEvent<HTMLElement>) => void,
   children: Node,
+  removeEntity: Id => EntityAction,
 };
 
 const Entity = (props: EntityProps) => (
   <EntityStyle
     style={{
       transform: `translate(${props.model.x}px, ${props.model.y}px)`,
-      zIndex: props.selected ? '100' : '10',
+      zIndex: props.isAnchored ? '100' : '10',
     }}
-    onMouseDown={props.onMouseDown}
-    onMouseLeave={props.onMouseLeave}
-    onMouseMove={props.onMouseMove}
-    onMouseUp={props.onMouseUp}
   >
-    {props.children}
+    <div
+      onMouseDown={props.onMouseDown}
+      onMouseLeave={props.onMouseLeave}
+      onMouseMove={props.onMouseMove}
+      onMouseUp={props.onMouseUp}
+    >
+      {props.children}
+    </div>
+    {props.isSelected && (
+      <ContextMenu
+        actions={[
+          {
+            action: () => props.removeEntity(props.model.id),
+            iconVariety: 'delete',
+            label: 'Remove',
+          },
+        ]}
+      />
+    )}
   </EntityStyle>
 );
 
@@ -71,6 +90,8 @@ type EntityContainerProps = {
   model: EntityModel,
   meta: MetaEntityModel,
   move: MovePayload => EntityAction,
+  removeEntity: Id => EntityAction,
+  selectEntity: (Id, isSelected?: boolean) => MetaEntityAction,
   canvas: CanvasState,
 };
 const EntityContainerHOC = WrappedComponent =>
@@ -169,6 +190,7 @@ const EntityContainerHOC = WrappedComponent =>
         this.setState({
           isAnchored: false,
         });
+        this.props.selectEntity(this.props.model.id);
       }
       // else it behaves as if it was spawned with a mouse click
       // meaning it needs another click to de-anchor from mouse
@@ -177,13 +199,14 @@ const EntityContainerHOC = WrappedComponent =>
     render() {
       return (
         <Entity
-          {...this.props}
+          model={this.props.model}
+          isAnchored={this.state.isAnchored}
+          isSelected={this.props.meta.isSelected}
+          removeEntity={this.props.removeEntity}
           onMouseDown={this.onMouseDown}
           onMouseLeave={this.onMouseLeave}
           onMouseMove={this.onMouseMove}
           onMouseUp={this.onMouseUp}
-          selected={this.state.isAnchored}
-          model={this.props.model}
         >
           <WrappedComponent model={this.props.model} meta={this.props.meta} />
         </Entity>
@@ -199,4 +222,6 @@ const mapStateToProps = (state: State, ownProps) => ({
 });
 
 export default (WrappedComponent: ComponentType<*>) =>
-  connect(mapStateToProps, { move })(EntityContainerHOC(WrappedComponent));
+  connect(mapStateToProps, { move, removeEntity, selectEntity })(
+    EntityContainerHOC(WrappedComponent)
+  );

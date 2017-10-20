@@ -78,6 +78,7 @@ class PanelContainer extends React.PureComponent<PanelContainerProps> {
       height,
       name: 'test',
       isAnchored: true,
+      isSelected: false,
     });
   }
 

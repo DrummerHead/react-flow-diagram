@@ -20,9 +20,10 @@ export type EntityState = Array<EntityModel>;
 export type MetaEntityModel = {
   id: string,
   type: EntityType,
-  isAnchored: boolean,
   width: number,
   height: number,
+  isAnchored: boolean,
+  isSelected: boolean,
 };
 
 export type MetaEntityState = Array<MetaEntityModel>;
@@ -30,10 +31,13 @@ export type MetaEntityState = Array<MetaEntityModel>;
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
   | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
+  | ActionShape<'rd/entity/REMOVE', Id>
   | ActionShape<'rd/entity/MOVE', MovePayload>
   | ActionShape<'rd/entity/SET_NAME', SetNamePayload>;
 
-export type MetaEntityAction = ActionShape<'rd/entity/CONFIG', MetaConfig>;
+export type MetaEntityAction =
+  | ActionShape<'rd/entity/CONFIG', MetaConfig>
+  | ActionShape<'rd/entity/SELECT', { id: Id, isSelected: boolean }>;
 
 const entityReducer = (
   state: EntityState = [],
@@ -55,8 +59,21 @@ const entityReducer = (
         },
       ];
 
-    case 'rd/entity/MOVE':
-      var { id, x, y } = action.payload;
+    case 'rd/entity/REMOVE':
+      return state.filter(entity => entity.id !== action.payload).map(
+        entity =>
+          entity.linksTo
+            ? {
+                ...entity,
+                linksTo: entity.linksTo.filter(
+                  entityId => entityId !== action.payload
+                ),
+              }
+            : entity
+      );
+
+    case 'rd/entity/MOVE': {
+      const { id, x, y } = action.payload;
       return state.map(
         entity =>
           entity.id === id
@@ -67,8 +84,9 @@ const entityReducer = (
               }
             : entity
       );
-    case 'rd/entity/SET_NAME':
-      var { id, name } = action.payload;
+    }
+    case 'rd/entity/SET_NAME': {
+      const { id, name } = action.payload;
       return state.map(
         entity =>
           entity.id === id
@@ -78,6 +96,7 @@ const entityReducer = (
               }
             : entity
       );
+    }
     default:
       return state;
   }
@@ -95,9 +114,10 @@ export const metaEntityReducer = (
       return action.payload.map(entity => ({
         id: entity.id,
         type: entity.type,
-        isAnchored: false,
         width: defaultWidth,
         height: defaultHeight,
+        isAnchored: false,
+        isSelected: false,
       }));
 
     case 'rd/entity/CONFIG':
@@ -121,11 +141,25 @@ export const metaEntityReducer = (
         {
           id: action.payload.id,
           type: action.payload.type,
-          isAnchored: action.payload.isAnchored,
           width: action.payload.width,
           height: action.payload.height,
+          isAnchored: action.payload.isAnchored,
+          isSelected: action.payload.isSelected,
         },
       ];
+
+    case 'rd/entity/SELECT': {
+      const { id, isSelected } = action.payload;
+      return state.map(
+        metaEntity =>
+          metaEntity.id === id
+            ? { ...metaEntity, isSelected }
+            : { ...metaEntity, isSelected: false }
+      );
+    }
+
+    case 'rd/entity/REMOVE':
+      return state.filter(entity => entity.id !== action.payload);
 
     default:
       return state;
@@ -142,6 +176,11 @@ export const addEntity = (
 ): EntityAction => ({
   type: 'rd/entity/ADD',
   payload: entity,
+});
+
+export const removeEntity = (id: Id): EntityAction => ({
+  type: 'rd/entity/REMOVE',
+  payload: id,
 });
 
 export type MovePayload = { x: number, y: number, id: string };
@@ -164,6 +203,14 @@ export type MetaConfig = Array<{
 export const setConfig = (config: MetaConfig): MetaEntityAction => ({
   type: 'rd/entity/CONFIG',
   payload: config,
+});
+
+export const selectEntity = (
+  id: Id,
+  isSelected?: boolean = true
+): MetaEntityAction => ({
+  type: 'rd/entity/SELECT',
+  payload: { id, isSelected },
 });
 
 export default entityReducer;
