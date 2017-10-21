@@ -31,6 +31,7 @@ export type MetaEntityState = Array<MetaEntityModel>;
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
   | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
+  | ActionShape<'rd/entity/ADD_LINKED', AddLinkedEntityPayload>
   | ActionShape<'rd/entity/REMOVE', Id>
   | ActionShape<'rd/entity/MOVE', MovePayload>
   | ActionShape<'rd/entity/SET_NAME', SetNamePayload>;
@@ -58,6 +59,31 @@ const entityReducer = (
           name: action.payload.name,
         },
       ];
+
+    case 'rd/entity/ADD_LINKED': {
+      const { entity, id } = action.payload;
+      return [
+        ...state.map(
+          existingEntity =>
+            existingEntity.id === id
+              ? {
+                  ...existingEntity,
+                  linksTo: [
+                    ...(existingEntity.linksTo ? existingEntity.linksTo : []),
+                    entity.id,
+                  ],
+                }
+              : existingEntity
+        ),
+        {
+          id: entity.id,
+          type: entity.type,
+          x: entity.x,
+          y: entity.y,
+          name: entity.name,
+        },
+      ];
+    }
 
     case 'rd/entity/REMOVE':
       return state.filter(entity => entity.id !== action.payload).map(
@@ -147,6 +173,18 @@ export const metaEntityReducer = (
           isSelected: action.payload.isSelected,
         },
       ];
+    case 'rd/entity/ADD_LINKED':
+      return [
+        ...state,
+        {
+          id: action.payload.entity.id,
+          type: action.payload.entity.type,
+          width: action.payload.entity.width,
+          height: action.payload.entity.height,
+          isAnchored: action.payload.entity.isAnchored,
+          isSelected: action.payload.entity.isSelected,
+        },
+      ];
 
     case 'rd/entity/SELECT': {
       const { id, isSelected } = action.payload;
@@ -176,6 +214,17 @@ export const addEntity = (
 ): EntityAction => ({
   type: 'rd/entity/ADD',
   payload: entity,
+});
+
+export type AddLinkedEntityPayload = {
+  entity: EntityModel & MetaEntityModel,
+  id: Id,
+};
+export const addLinkedEntity = (
+  payload: AddLinkedEntityPayload
+): EntityAction => ({
+  type: 'rd/entity/ADD_LINKED',
+  payload,
 });
 
 export const removeEntity = (id: Id): EntityAction => ({

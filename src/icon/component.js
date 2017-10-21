@@ -28,6 +28,16 @@ const iconList: IconList = {
     ),
     size: 16,
   },
+  task: {
+    path: (
+      <Path d="M14 0H2C1 0 0 1 0 2v12c0 1 1 2 2 2h12c1 0 2-1 2-2V2c0-1-1-2-2-2z" />
+    ),
+    size: 16,
+  },
+  event: {
+    path: <Path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8z" />,
+    size: 16,
+  },
 };
 
 export type IconVariety = $Keys<typeof iconList>;

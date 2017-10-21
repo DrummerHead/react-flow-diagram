@@ -3,7 +3,8 @@
 import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
-import { move, removeEntity, selectEntity } from './reducer';
+import { move, addLinkedEntity, removeEntity, selectEntity } from './reducer';
+import defaultEntity from './defaultEntity';
 import Task from '../task/component';
 import ContextMenu from '../contextMenu/component';
 
@@ -13,11 +14,13 @@ import type {
   EntityModel,
   MetaEntityModel,
   MovePayload,
+  AddLinkedEntityPayload,
   EntityAction,
   MetaEntityAction,
 } from './reducer';
 import type { CanvasState } from '../canvas/reducer';
 import type { State } from '../diagram/reducer';
+import type { DefaultEntityProps } from './defaultEntity';
 
 /*
  * Presentational
@@ -44,7 +47,9 @@ type EntityProps = {
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseUp: (SyntheticMouseEvent<HTMLElement>) => void,
   children: Node,
+  addLinkedEntity: AddLinkedEntityPayload => EntityAction,
   removeEntity: Id => EntityAction,
+  defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
 
 const Entity = (props: EntityProps) => (
@@ -70,6 +75,24 @@ const Entity = (props: EntityProps) => (
             iconVariety: 'delete',
             label: 'Remove',
           },
+          {
+            action: ev =>
+              props.addLinkedEntity({
+                entity: props.defaultEntity({ entityType: 'Task', ev }),
+                id: props.model.id,
+              }),
+            iconVariety: 'task',
+            label: 'Add Task',
+          },
+          {
+            action: ev =>
+              props.addLinkedEntity({
+                entity: props.defaultEntity({ entityType: 'Event', ev }),
+                id: props.model.id,
+              }),
+            iconVariety: 'event',
+            label: 'Add Event',
+          },
         ]}
       />
     )}
@@ -90,9 +113,11 @@ type EntityContainerProps = {
   model: EntityModel,
   meta: MetaEntityModel,
   move: MovePayload => EntityAction,
+  addLinkedEntity: AddLinkedEntityPayload => EntityAction,
   removeEntity: Id => EntityAction,
   selectEntity: (Id, isSelected?: boolean) => MetaEntityAction,
   canvas: CanvasState,
+  defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
 const EntityContainerHOC = WrappedComponent =>
   class extends React.PureComponent<
@@ -202,7 +227,9 @@ const EntityContainerHOC = WrappedComponent =>
           model={this.props.model}
           isAnchored={this.state.isAnchored}
           isSelected={this.props.meta.isSelected}
+          addLinkedEntity={this.props.addLinkedEntity}
           removeEntity={this.props.removeEntity}
+          defaultEntity={this.props.defaultEntity}
           onMouseDown={this.onMouseDown}
           onMouseLeave={this.onMouseLeave}
           onMouseMove={this.onMouseMove}
@@ -219,9 +246,13 @@ const mapStateToProps = (state: State, ownProps) => ({
   meta: state.metaEntity.find(
     metaEntity => metaEntity.id === ownProps.model.id
   ),
+  defaultEntity: defaultEntity(state),
 });
 
 export default (WrappedComponent: ComponentType<*>) =>
-  connect(mapStateToProps, { move, removeEntity, selectEntity })(
-    EntityContainerHOC(WrappedComponent)
-  );
+  connect(mapStateToProps, {
+    move,
+    addLinkedEntity,
+    removeEntity,
+    selectEntity,
+  })(EntityContainerHOC(WrappedComponent));
