@@ -11,6 +11,7 @@ import { setEntities, setConfig } from '../entity/reducer';
 import Panel from '../panel/component';
 import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
+import Debug from '../debug/component';
 
 import type { ComponentType } from 'react';
 import type { setOffsetProps, CanvasAction } from '../canvas/reducer';
@@ -61,6 +62,7 @@ const EntitiesHOCList = {
 };
 const Canvas = (props: CanvasProps) => (
   <CanvasStyle innerRef={div => props.handleRef(div)}>
+    <Debug />
     <SvgLand width="100%" height="100%">
       {props.entities
         .filter(entity => entity.hasOwnProperty('linksTo'))
