@@ -18,6 +18,7 @@ const history = (reducer: Reducer<State, Action>) => (
   const nextState = reducer(state, action);
   switch (action.type) {
     case '@@INIT':
+    case '@@redux/INIT':
       return nextState;
 
     case 'rd/history/UNDO':
