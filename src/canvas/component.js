@@ -4,11 +4,12 @@ import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
 import { setOffset } from './reducer';
+import { setEntities } from '../entity/reducer';
+import { setConfig } from '../config/reducer';
+import { undo, redo } from '../history/reducer';
 import EntityHOC from '../entity/component';
 import Task from '../task/component';
 import Event from '../event/component';
-import { setEntities } from '../entity/reducer';
-import { setConfig } from '../config/reducer';
 import Panel from '../panel/component';
 import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
@@ -25,6 +26,7 @@ import type {
 import type { ConfigState, ConfigAction } from '../config/reducer';
 import type { State } from '../diagram/reducer';
 import type { TaskProps } from '../task/component';
+import type { HistoryAction } from '../history/reducer';
 
 /*
  * Presentational
@@ -95,14 +97,18 @@ type CanvasContainerProps = {
   setEntities: EntityState => EntityAction,
   setOffset: setOffsetProps => CanvasAction,
   setConfig: ConfigState => ConfigAction,
+  undo: () => HistoryAction,
+  redo: () => HistoryAction,
 };
 class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   canvasDOM: ?HTMLElement;
   handleRef: HTMLElement => void;
+  handleKey: (SyntheticKeyboardEvent<HTMLElement>) => void;
 
   constructor() {
     super();
     this.handleRef = this.handleRef.bind(this);
+    this.handleKey = this.handleKey.bind(this);
   }
 
   componentDidMount() {
@@ -110,6 +116,26 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     this.props.setConfig(this.props.config);
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
+    }
+    window.document.addEventListener('keydown', this.handleKey);
+  }
+
+  componentWillUnmount() {
+    window.document.removeEventListener('keydown', this.handleKey);
+  }
+
+  handleKey(ev: SyntheticKeyboardEvent<HTMLElement>) {
+    if (ev.getModifierState('Meta')) {
+      switch (ev.key) {
+        case 'z':
+          ev.preventDefault();
+          this.props.undo();
+          break;
+        case 'y':
+          ev.preventDefault();
+          this.props.redo();
+          break;
+      }
     }
   }
 
@@ -141,6 +167,10 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
 
 const mapStateToProps = (state: State) => ({ entities: state.entity });
 
-export default connect(mapStateToProps, { setEntities, setOffset, setConfig })(
-  CanvasContainer
-);
+export default connect(mapStateToProps, {
+  setEntities,
+  setOffset,
+  setConfig,
+  undo,
+  redo,
+})(CanvasContainer);
