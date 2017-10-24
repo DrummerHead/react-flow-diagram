@@ -125,7 +125,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   }
 
   handleKey(ev: SyntheticKeyboardEvent<HTMLElement>) {
-    if (ev.getModifierState('Meta')) {
+    if (ev.getModifierState('Meta') || ev.getModifierState('Control')) {
       switch (ev.key) {
         case 'z':
           ev.preventDefault();
