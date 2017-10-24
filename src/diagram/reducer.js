@@ -2,7 +2,7 @@
 
 import entityReducer, { metaEntityReducer } from '../entity/reducer';
 import canvasReducer from '../canvas/reducer';
-import configReducer from './configReducer';
+import configReducer from '../config/reducer';
 import history from '../history/reducer';
 
 import type {
@@ -11,7 +11,7 @@ import type {
   EntityAction,
 } from '../entity/reducer';
 import type { CanvasState, CanvasAction } from '../canvas/reducer';
-import type { ConfigState } from './configReducer';
+import type { ConfigState } from '../config/reducer';
 import type { HistoryState, HistoryAction } from '../history/reducer';
 
 export type State = {
