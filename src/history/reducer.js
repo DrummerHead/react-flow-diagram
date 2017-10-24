@@ -9,6 +9,8 @@ export type HistoryAction =
   | ActionShape<'rd/history/UNDO', void>
   | ActionShape<'rd/history/REDO', void>;
 
+const historyLimit = 50;
+
 const history = (reducer: Reducer<State, Action>) => (
   state: State,
   action: Action
@@ -63,16 +65,17 @@ const history = (reducer: Reducer<State, Action>) => (
         : nextState;
 
     default:
+      const newPast = [
+        ...nextState.history.past,
+        {
+          entity: state.entity,
+          metaEntity: state.metaEntity,
+        },
+      ];
       return {
         ...nextState,
         history: {
-          past: [
-            ...nextState.history.past,
-            {
-              entity: state.entity,
-              metaEntity: state.metaEntity,
-            },
-          ],
+          past: newPast.length > historyLimit ? newPast.slice(1) : newPast,
           future: [],
         },
       };
