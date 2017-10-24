@@ -36,9 +36,10 @@ export type EntityAction =
   | ActionShape<'rd/entity/MOVE', MovePayload>
   | ActionShape<'rd/entity/SET_NAME', SetNamePayload>;
 
-export type MetaEntityAction =
-  | ActionShape<'rd/entity/CONFIG', MetaConfig>
-  | ActionShape<'rd/entity/SELECT', { id: Id, isSelected: boolean }>;
+export type MetaEntityAction = ActionShape<
+  'rd/entity/SELECT',
+  { id: Id, isSelected: boolean }
+>;
 
 const entityReducer = (
   state: EntityState = [],
@@ -146,12 +147,10 @@ export const metaEntityReducer = (
         isSelected: false,
       }));
 
-    case 'rd/entity/CONFIG':
-      const configs: MetaConfig = action.payload;
+    case 'rd/config/SET':
+      const configs = action.payload;
       return state.map(metaModel => {
-        const relevantConfig = configs.find(
-          metaConfig => metaConfig.type === metaModel.type
-        );
+        const relevantConfig = configs.entityTypes[metaModel.type];
         return relevantConfig
           ? {
               ...metaModel,
@@ -242,16 +241,6 @@ export type SetNamePayload = { id: Id, name: string };
 export const setName = (payload: SetNamePayload): EntityAction => ({
   type: 'rd/entity/SET_NAME',
   payload,
-});
-
-export type MetaConfig = Array<{
-  type: EntityType,
-  width: number,
-  height: number,
-}>;
-export const setConfig = (config: MetaConfig): MetaEntityAction => ({
-  type: 'rd/entity/CONFIG',
-  payload: config,
 });
 
 export const selectEntity = (

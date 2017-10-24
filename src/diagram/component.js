@@ -8,7 +8,8 @@ import reducer from './reducer';
 import Canvas from '../canvas/component';
 import Entity from '../entity/component';
 
-import type { EntityModel } from '../entity/reducer';
+import type { EntityState } from '../entity/reducer';
+import type { ConfigState } from '../config/reducer';
 
 export const store = createStore(
   reducer,
@@ -16,8 +17,8 @@ export const store = createStore(
 );
 
 type DiagramProps = {
-  model: Array<EntityModel>,
-  config: Array<{ type: string, width: number, height: number }>,
+  model: EntityState,
+  config: ConfigState,
 };
 const Diagram = (props: DiagramProps) => (
   <Provider store={store}>

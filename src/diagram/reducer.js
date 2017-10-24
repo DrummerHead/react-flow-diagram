@@ -11,7 +11,7 @@ import type {
   EntityAction,
 } from '../entity/reducer';
 import type { CanvasState, CanvasAction } from '../canvas/reducer';
-import type { ConfigState } from '../config/reducer';
+import type { ConfigState, ConfigAction } from '../config/reducer';
 import type { HistoryState, HistoryAction } from '../history/reducer';
 
 export type State = {
@@ -24,7 +24,7 @@ export type State = {
 
 export type ActionShape<S, P> = { type: S, payload: P };
 
-export type Action = EntityAction | CanvasAction | HistoryAction;
+export type Action = EntityAction | CanvasAction | ConfigAction | HistoryAction;
 
 const initialState = {
   entity: [],

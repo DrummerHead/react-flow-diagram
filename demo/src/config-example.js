@@ -1,16 +1,18 @@
 // @flow
 
-const config = [
-  {
-    type: 'Task',
-    width: 120,
-    height: 75,
+import type { ConfigState } from '../../src/config/reducer';
+
+const config: ConfigState = {
+  entityTypes: {
+    Task: {
+      width: 120,
+      height: 75,
+    },
+    Event: {
+      width: 50,
+      height: 50,
+    },
   },
-  {
-    type: 'Event',
-    width: 50,
-    height: 50,
-  },
-];
+};
 
 export default config;

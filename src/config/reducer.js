@@ -1,7 +1,7 @@
 //@flow
 
-import type { Action } from '../diagram/reducer';
-import type { EntityType, MetaConfig } from '../entity/reducer';
+import type { ActionShape, Action } from '../diagram/reducer';
+import type { EntityType } from '../entity/reducer';
 
 export type ConfigState = {
   entityTypes: {
@@ -12,27 +12,21 @@ export type ConfigState = {
   },
 };
 
-const returnConfig = (payload: MetaConfig): ConfigState => ({
-  entityTypes: payload.reduce(
-    (acc, curr) => ({
-      ...acc,
-      [curr.type]: {
-        width: curr.width,
-        height: curr.height,
-      },
-    }),
-    {}
-  ),
-});
+export type ConfigAction = ActionShape<'rd/config/SET', ConfigState>;
 
 const configReducer = (state: ConfigState, action: Action): ConfigState => {
   switch (action.type) {
-    case 'rd/entity/CONFIG':
-      return returnConfig(action.payload);
+    case 'rd/config/SET':
+      return action.payload;
 
     default:
       return state;
   }
 };
+
+export const setConfig = (config: ConfigState): ConfigAction => ({
+  type: 'rd/config/SET',
+  payload: config,
+});
 
 export default configReducer;

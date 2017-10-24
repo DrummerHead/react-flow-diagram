@@ -7,7 +7,8 @@ import { setOffset } from './reducer';
 import EntityHOC from '../entity/component';
 import Task from '../task/component';
 import Event from '../event/component';
-import { setEntities, setConfig } from '../entity/reducer';
+import { setEntities } from '../entity/reducer';
+import { setConfig } from '../config/reducer';
 import Panel from '../panel/component';
 import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
@@ -19,9 +20,9 @@ import type {
   EntityState,
   EntityAction,
   EntityType,
-  MetaConfig,
   MetaEntityAction,
 } from '../entity/reducer';
+import type { ConfigState, ConfigAction } from '../config/reducer';
 import type { State } from '../diagram/reducer';
 import type { TaskProps } from '../task/component';
 
@@ -90,10 +91,10 @@ const Canvas = (props: CanvasProps) => (
 type CanvasContainerProps = {
   entities: EntityState,
   model: EntityState,
-  config: MetaConfig,
+  config: ConfigState,
   setEntities: EntityState => EntityAction,
   setOffset: setOffsetProps => CanvasAction,
-  setConfig: MetaConfig => MetaEntityAction,
+  setConfig: ConfigState => ConfigAction,
 };
 class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   canvasDOM: ?HTMLElement;
