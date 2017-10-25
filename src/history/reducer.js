@@ -1,9 +1,23 @@
 // @flow
 
 import type { Reducer } from 'redux';
-import type { State, Action, ActionShape } from '../diagram/reducer';
+import type { EntityState, MetaEntityState } from '../entity/reducer';
+import type {
+  State,
+  Action,
+  ActionShape,
+  ActionType,
+} from '../diagram/reducer';
 
-export type HistoryState<T> = { past: Array<T>, future: Array<T> };
+export type HistoryStateShape<T> = {
+  past: Array<T>,
+  future: Array<T>,
+  lastAction: ActionType,
+};
+export type HistoryState = HistoryStateShape<{
+  entity: EntityState,
+  metaEntity: MetaEntityState,
+}>;
 
 export type HistoryAction =
   | ActionShape<'rd/history/UNDO', void>
@@ -41,6 +55,7 @@ const history = (reducer: Reducer<State, Action>) => (
                 },
                 ...nextState.history.future,
               ],
+              lastAction: nextState.history.lastAction,
             },
           }
         : nextState;
@@ -61,25 +76,31 @@ const history = (reducer: Reducer<State, Action>) => (
                 },
               ],
               future: nextState.history.future.slice(1),
+              lastAction: nextState.history.lastAction,
             },
           }
         : nextState;
 
     default:
-      const newPast = [
-        ...nextState.history.past,
-        {
-          entity: state.entity,
-          metaEntity: state.metaEntity,
-        },
-      ];
-      return {
-        ...nextState,
-        history: {
-          past: newPast.length > historyLimit ? newPast.slice(1) : newPast,
-          future: [],
-        },
-      };
+      if (action.type === state.history.lastAction) {
+        return nextState;
+      } else {
+        const newPast = [
+          ...nextState.history.past,
+          {
+            entity: state.entity,
+            metaEntity: state.metaEntity,
+          },
+        ];
+        return {
+          ...nextState,
+          history: {
+            past: newPast.length > historyLimit ? newPast.slice(1) : newPast,
+            future: [],
+            lastAction: action.type,
+          },
+        };
+      }
   }
 };
 

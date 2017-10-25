@@ -19,12 +19,18 @@ export type State = {
   metaEntity: MetaEntityState,
   canvas: CanvasState,
   config: ConfigState,
-  history: HistoryState<{ entity: EntityState, metaEntity: MetaEntityState }>,
+  history: HistoryState,
 };
 
 export type ActionShape<S, P> = { type: S, payload: P };
-
-export type Action = EntityAction | CanvasAction | ConfigAction | HistoryAction;
+type InitAction = ActionShape<'@@INIT', void>;
+export type Action =
+  | InitAction
+  | EntityAction
+  | CanvasAction
+  | ConfigAction
+  | HistoryAction;
+export type ActionType = $PropertyType<Action, 'type'>;
 
 const initialState = {
   entity: [],
@@ -39,6 +45,7 @@ const initialState = {
   history: {
     past: [],
     future: [],
+    lastAction: '@@INIT',
   },
 };
 
