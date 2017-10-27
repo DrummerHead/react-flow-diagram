@@ -3,7 +3,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import styled, { injectGlobal } from 'styled-components';
-import { Diagram, store } from '../../src';
+import { Diagram, store, setEntities, setConfig } from '../../src';
 import model from './model-example.js';
 import config from './config-example.js';
 
@@ -26,12 +26,16 @@ const Main = styled.main`
   min-height: 150vh;
 `;
 
-class Demo extends React.Component<{}> {
+class Demo extends React.PureComponent<{}> {
+  componentWillMount() {
+    store.dispatch(setEntities(model));
+    store.dispatch(setConfig(config));
+  }
   render() {
     return (
       <Main>
         <h1>react-flow-diagram Demo</h1>
-        <Diagram model={model} config={config} />
+        <Diagram />
       </Main>
     );
   }

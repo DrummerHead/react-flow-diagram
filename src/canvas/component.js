@@ -92,8 +92,6 @@ const Canvas = (props: CanvasProps) => (
 
 type CanvasContainerProps = {
   entities: EntityState,
-  model: EntityState,
-  config: ConfigState,
   setEntities: EntityState => EntityAction,
   setOffset: setOffsetProps => CanvasAction,
   setConfig: ConfigState => ConfigAction,
@@ -112,8 +110,6 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   }
 
   componentDidMount() {
-    this.props.setEntities(this.props.model);
-    this.props.setConfig(this.props.config);
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }

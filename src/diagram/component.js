@@ -16,13 +16,9 @@ export const store = createStore(
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 
-type DiagramProps = {
-  model: EntityState,
-  config: ConfigState,
-};
-const Diagram = (props: DiagramProps) => (
+const Diagram = () => (
   <Provider store={store}>
-    <Canvas model={props.model} config={props.config} />
+    <Canvas />
   </Provider>
 );
 
