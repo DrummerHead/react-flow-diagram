@@ -1,6 +1,7 @@
 // @flow
 
 import type { ActionShape, Action } from '../diagram/reducer';
+import type { ConfigState } from '../config/reducer';
 
 export type Id = string;
 
@@ -129,23 +130,30 @@ const entityReducer = (
   }
 };
 
-const defaultWidth = 50;
-const defaultHeight = 50;
-
+const defaultConfig = {
+  width: 50,
+  height: 50,
+};
 export const metaEntityReducer = (
   state: MetaEntityState = [],
-  action: Action
+  action: Action,
+  config: ConfigState
 ): MetaEntityState => {
   switch (action.type) {
     case 'rd/entity/SET':
-      return action.payload.map(entity => ({
-        id: entity.id,
-        type: entity.type,
-        width: defaultWidth,
-        height: defaultHeight,
-        isAnchored: false,
-        isSelected: false,
-      }));
+      return action.payload.map(entity => {
+        const conf = config.entityTypes[entity.type]
+          ? config.entityTypes[entity.type]
+          : defaultConfig;
+        return {
+          id: entity.id,
+          type: entity.type,
+          width: conf.width,
+          height: conf.height,
+          isAnchored: false,
+          isSelected: false,
+        };
+      });
 
     case 'rd/config/SET':
       const configs = action.payload;

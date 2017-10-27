@@ -28,8 +28,8 @@ const Main = styled.main`
 
 class Demo extends React.PureComponent<{}> {
   componentWillMount() {
-    store.dispatch(setEntities(model));
     store.dispatch(setConfig(config));
+    store.dispatch(setEntities(model));
   }
   render() {
     return (
