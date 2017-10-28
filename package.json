@@ -19,6 +19,8 @@
     "test:watch": "nwb test-react --server",
     "preversion": "yarn build",
     "lintjs": "prettier --single-quote --trailing-comma es5 --write \"{src,demo/src}/**/*.js\"",
+    "air": "eslint \"{src,demo/src}/**/*.js\"",
+    "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check",
     "flow": "flow",
     "fti": "flow-typed install"
   },
@@ -28,6 +30,14 @@
     "styled-components": "^2.2.1"
   },
   "devDependencies": {
+    "babel-eslint": "^8.0.1",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-prettier": "^2.6.0",
+    "eslint-plugin-flowtype": "^2.39.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0",
     "flow-bin": "^0.55.0",
     "flow-typed": "^2.1.5",
     "nwb": "0.18.x",
