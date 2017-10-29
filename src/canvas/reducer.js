@@ -21,8 +21,8 @@ const canvasReducer = (
   }
 };
 
-export type setOffsetProps = CanvasState;
-export const setOffset = (offset: setOffsetProps): CanvasAction => ({
+export type SetOffsetProps = CanvasState;
+export const setOffset = (offset: SetOffsetProps): CanvasAction => ({
   type: 'rd/canvas/SET_OFFSET',
   payload: offset,
 });

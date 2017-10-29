@@ -118,6 +118,7 @@ class TaskComponent extends React.PureComponent<
         this.toggleEdit(false);
         this.setState({ name: this.props.model.name });
         break;
+      // no default
     }
   }
 

@@ -35,7 +35,7 @@ const history = (reducer: Reducer<State, Action>) => (
     case '@@redux/INIT':
       return nextState;
 
-    case 'rd/history/UNDO':
+    case 'rd/history/UNDO': {
       const pastStep =
         nextState.history.past[nextState.history.past.length - 1];
       return pastStep
@@ -59,8 +59,9 @@ const history = (reducer: Reducer<State, Action>) => (
             },
           }
         : nextState;
+    }
 
-    case 'rd/history/REDO':
+    case 'rd/history/REDO': {
       const futureStep = nextState.history.future[0];
       return futureStep
         ? {
@@ -80,6 +81,7 @@ const history = (reducer: Reducer<State, Action>) => (
             },
           }
         : nextState;
+    }
 
     default:
       if (action.type === state.history.lastAction) {

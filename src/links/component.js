@@ -4,12 +4,7 @@ import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
 
-import type {
-  EntityModel,
-  MetaEntityModel,
-  EntityState,
-  Id,
-} from '../entity/reducer';
+import type { EntityModel, MetaEntityModel, Id } from '../entity/reducer';
 import type { State } from '../diagram/reducer';
 
 type MergedModel = EntityModel & MetaEntityModel;
@@ -111,11 +106,11 @@ const Line = style.polyline`
   marker-end: url("#arrow-end");
 `;
 
-type LinkProps = {
+type ArrowBodyProps = {
   from: MergedModel,
   to: MergedModel,
 };
-const Link = ({ from, to }: LinkProps) => (
+const ArrowBody = ({ from, to }: ArrowBodyProps) => (
   <Line points={calculatePoints(from, to)} />
 );
 
@@ -123,14 +118,14 @@ const Link = ({ from, to }: LinkProps) => (
  * Container
  * ==================================== */
 
-type LinksContainerProps = {
+type ArrowBodyContainerProps = {
   fromModel: MergedModel,
   toModels: Array<MergedModel>,
 };
-const LinksContainer = (props: LinksContainerProps) => (
+const ArrowBodyContainer = (props: ArrowBodyContainerProps) => (
   <g>
     {props.toModels.map(toModel => (
-      <Link key={toModel.id} from={props.fromModel} to={toModel} />
+      <ArrowBody key={toModel.id} from={props.fromModel} to={toModel} />
     ))}
   </g>
 );
@@ -146,4 +141,4 @@ const mapStateToProps = (state: State, ownProps) => ({
   ),
 });
 
-export default connect(mapStateToProps, {})(LinksContainer);
+export default connect(mapStateToProps, {})(ArrowBodyContainer);

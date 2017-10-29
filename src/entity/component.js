@@ -5,7 +5,6 @@ import style from 'styled-components';
 import { connect } from 'react-redux';
 import { move, addLinkedEntity, removeEntity, selectEntity } from './reducer';
 import defaultEntity from './defaultEntity';
-import Task from '../task/component';
 import ContextMenu from '../contextMenu/component';
 
 import type { ComponentType, Node } from 'react';
@@ -45,13 +44,12 @@ type EntityProps = {
   onMouseDown: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseLeave: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
-  onMouseUp: (SyntheticMouseEvent<HTMLElement>) => void,
+  onMouseUp: () => void,
   children: Node,
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
   removeEntity: Id => EntityAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
-
 const Entity = (props: EntityProps) => (
   <EntityStyle
     style={{
@@ -64,6 +62,7 @@ const Entity = (props: EntityProps) => (
       onMouseLeave={props.onMouseLeave}
       onMouseMove={props.onMouseMove}
       onMouseUp={props.onMouseUp}
+      role="presentation"
     >
       {props.children}
     </div>
@@ -127,7 +126,7 @@ const EntityContainerHOC = WrappedComponent =>
     onMouseDown: (SyntheticMouseEvent<HTMLElement>) => void;
     onMouseLeave: (SyntheticMouseEvent<HTMLElement>) => void;
     onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void;
-    onMouseUp: (SyntheticMouseEvent<HTMLElement>) => void;
+    onMouseUp: () => void;
 
     constructor(props: EntityContainerProps) {
       super(props);
@@ -207,7 +206,7 @@ const EntityContainerHOC = WrappedComponent =>
       }
     }
 
-    onMouseUp(ev: SyntheticMouseEvent<HTMLElement>) {
+    onMouseUp(/* ev: SyntheticMouseEvent<HTMLElement> */) {
       if (!this.state.onMouseUpWouldBeClick) {
         // Behaves as if it was spawned with a mouse drag
         // meaning that when you release the mouse button,

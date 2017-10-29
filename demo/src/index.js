@@ -4,8 +4,8 @@ import React from 'react';
 import { render } from 'react-dom';
 import styled, { injectGlobal } from 'styled-components';
 import { Diagram, store, setEntities, setConfig } from '../../src';
-import model from './model-example.js';
-import config from './config-example.js';
+import model from './model-example';
+import config from './config-example';
 
 injectGlobal`
   * {

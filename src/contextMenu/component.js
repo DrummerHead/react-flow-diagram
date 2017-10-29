@@ -21,14 +21,14 @@ const Action = style.li`
   cursor: pointer;
 `;
 
-type contextMenuProps = {
+type ContextMenuProps = {
   actions: Array<{
     action: Function,
     iconVariety: IconVariety,
     label: string,
   }>,
 };
-const ContextMenu = (props: contextMenuProps) => (
+const ContextMenu = (props: ContextMenuProps) => (
   <ContextMenuStyle>
     {props.actions.map(action => (
       <Action key={action.label} onClick={action.action}>

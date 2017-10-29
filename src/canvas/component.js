@@ -4,8 +4,6 @@ import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
 import { setOffset } from './reducer';
-import { setEntities } from '../entity/reducer';
-import { setConfig } from '../config/reducer';
 import { undo, redo } from '../history/reducer';
 import EntityHOC from '../entity/component';
 import Task from '../task/component';
@@ -15,17 +13,9 @@ import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
 import Debug from '../debug/component';
 
-import type { ComponentType } from 'react';
-import type { setOffsetProps, CanvasAction } from '../canvas/reducer';
-import type {
-  EntityState,
-  EntityAction,
-  EntityType,
-  MetaEntityAction,
-} from '../entity/reducer';
-import type { ConfigState, ConfigAction } from '../config/reducer';
+import type { SetOffsetProps, CanvasAction } from '../canvas/reducer';
+import type { EntityState } from '../entity/reducer';
 import type { State } from '../diagram/reducer';
-import type { TaskProps } from '../task/component';
 import type { HistoryAction } from '../history/reducer';
 
 /*
@@ -68,7 +58,7 @@ const Canvas = (props: CanvasProps) => (
     <Debug />
     <SvgLand width="100%" height="100%">
       {props.entities
-        .filter(entity => entity.hasOwnProperty('linksTo'))
+        .filter(entity => 'linksTo' in entity)
         .map(entity => <Links key={entity.id} model={entity} />)}
       <ArrowMarker />
     </SvgLand>
@@ -92,9 +82,7 @@ const Canvas = (props: CanvasProps) => (
 
 type CanvasContainerProps = {
   entities: EntityState,
-  setEntities: EntityState => EntityAction,
-  setOffset: setOffsetProps => CanvasAction,
-  setConfig: ConfigState => ConfigAction,
+  setOffset: SetOffsetProps => CanvasAction,
   undo: () => HistoryAction,
   redo: () => HistoryAction,
 };
@@ -131,6 +119,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
           ev.preventDefault();
           this.props.redo();
           break;
+        // no default
       }
     }
   }
@@ -164,9 +153,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
 const mapStateToProps = (state: State) => ({ entities: state.entity });
 
 export default connect(mapStateToProps, {
-  setEntities,
   setOffset,
-  setConfig,
   undo,
   redo,
 })(CanvasContainer);

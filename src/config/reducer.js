@@ -1,4 +1,4 @@
-//@flow
+// @flow
 
 import type { ActionShape, Action } from '../diagram/reducer';
 import type { EntityType } from '../entity/reducer';

@@ -29,6 +29,12 @@ export type MetaEntityModel = {
 
 export type MetaEntityState = Array<MetaEntityModel>;
 
+export type AddLinkedEntityPayload = {
+  entity: EntityModel & MetaEntityModel,
+  id: Id,
+};
+export type MovePayload = { x: number, y: number, id: string };
+export type SetNamePayload = { id: Id, name: string };
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
   | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
@@ -155,7 +161,7 @@ export const metaEntityReducer = (
         };
       });
 
-    case 'rd/config/SET':
+    case 'rd/config/SET': {
       const configs = action.payload;
       return state.map(metaModel => {
         const relevantConfig = configs.entityTypes[metaModel.type];
@@ -167,6 +173,7 @@ export const metaEntityReducer = (
             }
           : metaModel;
       });
+    }
 
     case 'rd/entity/ADD':
       return [
@@ -223,10 +230,6 @@ export const addEntity = (
   payload: entity,
 });
 
-export type AddLinkedEntityPayload = {
-  entity: EntityModel & MetaEntityModel,
-  id: Id,
-};
 export const addLinkedEntity = (
   payload: AddLinkedEntityPayload
 ): EntityAction => ({
@@ -239,13 +242,11 @@ export const removeEntity = (id: Id): EntityAction => ({
   payload: id,
 });
 
-export type MovePayload = { x: number, y: number, id: string };
 export const move = (movePayload: MovePayload): EntityAction => ({
   type: 'rd/entity/MOVE',
   payload: movePayload,
 });
 
-export type SetNamePayload = { id: Id, name: string };
 export const setName = (payload: SetNamePayload): EntityAction => ({
   type: 'rd/entity/SET_NAME',
   payload,
