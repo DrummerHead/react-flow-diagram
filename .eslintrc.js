@@ -6,6 +6,7 @@ module.exports = {
     browser: true,
   },
   rules: {
+    'no-else-return': 0,
     'flowtype/boolean-style': [2, 'boolean'],
     'flowtype/define-flow-type': 1,
     'flowtype/no-primitive-constructor-types': 2,
@@ -25,6 +26,41 @@ module.exports = {
       },
     ],
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
+    'react/sort-comp': [
+      1,
+      {
+        order: [
+          'type-annotations',
+          'static-methods',
+          'lifecycle',
+          'everything-else',
+          'render',
+        ],
+        groups: {
+          lifecycle: [
+            'displayName',
+            'propTypes',
+            'contextTypes',
+            'childContextTypes',
+            'mixins',
+            'statics',
+            'defaultProps',
+            'constructor',
+            'getDefaultProps',
+            'getInitialState',
+            'state',
+            'getChildContext',
+            'componentWillMount',
+            'componentDidMount',
+            'componentWillReceiveProps',
+            'shouldComponentUpdate',
+            'componentWillUpdate',
+            'componentDidUpdate',
+            'componentWillUnmount',
+          ],
+        },
+      },
+    ],
   },
   settings: {
     flowtype: {
