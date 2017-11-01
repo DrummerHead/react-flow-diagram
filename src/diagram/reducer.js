@@ -49,7 +49,7 @@ const initialState = {
   },
 };
 
-const appReducer = (state: State = initialState, action: Action) => ({
+const appReducer = (state: State = initialState, action: Action): State => ({
   entity: entityReducer(state.entity, action),
   canvas: canvasReducer(state.canvas, action),
   metaEntity: metaEntityReducer(state.metaEntity, action, state.config),

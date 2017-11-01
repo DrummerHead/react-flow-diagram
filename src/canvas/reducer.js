@@ -12,7 +12,7 @@ export type CanvasAction = ActionShape<'rd/canvas/SET_OFFSET', CanvasState>;
 const canvasReducer = (
   state: CanvasState = { offsetX: 0, offsetY: 0 },
   action: Action
-) => {
+): CanvasState => {
   switch (action.type) {
     case 'rd/canvas/SET_OFFSET':
       return action.payload;
