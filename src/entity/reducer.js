@@ -43,6 +43,15 @@ export type EntityAction =
   | ActionShape<'rd/entity/MOVE', MovePayload>
   | ActionShape<'rd/entity/SET_NAME', SetNamePayload>;
 
+export const EntityActionTypeOpen = 'rd/entity/SET';
+export const EntityActionTypesModify = [
+  'rd/entity/ADD',
+  'rd/entity/ADD_LINKED',
+  'rd/entity/REMOVE',
+  'rd/entity/MOVE',
+  'rd/entity/SET_NAME',
+];
+
 export type MetaEntityAction = ActionShape<
   'rd/entity/SELECT',
   { id: Id, isSelected: boolean }

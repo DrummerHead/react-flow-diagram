@@ -49,4 +49,5 @@ store.subscribe(() => {
 });
 */
 
+// $FlowFixMe
 render(<Demo />, document.querySelector('#demo'));

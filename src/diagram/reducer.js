@@ -20,6 +20,7 @@ export type State = {
   canvas: CanvasState,
   config: ConfigState,
   history: HistoryState,
+  lastAction: ActionType,
 };
 
 export type ActionShape<S, P> = { type: S, payload: P };
@@ -34,11 +35,11 @@ export type ActionType = $PropertyType<Action, 'type'>;
 
 const initialState = {
   entity: [],
+  metaEntity: [],
   canvas: {
     offsetX: 0,
     offsetY: 0,
   },
-  metaEntity: [],
   config: {
     entityTypes: {},
   },
@@ -47,14 +48,16 @@ const initialState = {
     future: [],
     lastAction: '@@INIT',
   },
+  lastAction: '@@INIT',
 };
 
 const appReducer = (state: State = initialState, action: Action): State => ({
   entity: entityReducer(state.entity, action),
-  canvas: canvasReducer(state.canvas, action),
   metaEntity: metaEntityReducer(state.metaEntity, action, state.config),
+  canvas: canvasReducer(state.canvas, action),
   config: configReducer(state.config, action),
   history: state.history,
+  lastAction: action.type,
 });
 
 export default history(appReducer);
