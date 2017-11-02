@@ -10,7 +10,7 @@ import type { ActionType } from '../diagram/reducer';
 import type { EntityState } from '../entity/reducer';
 
 type DiagramOnAction = ActionType | Array<ActionType>;
-type DiagramOnCallback = EntityState => void;
+type DiagramOnCallback = EntityState => any;
 type DiagramOnReturn = () => void;
 
 // ['a','b','c'].indexOf('a') > -1 === ['a','b','c'].includes('a')
@@ -33,7 +33,7 @@ const isLastAction = (
 const lastActionMatchesAction = (
   lastAction: ActionType,
   action: DiagramOnAction | 'anyChange' | 'open'
-) => {
+): boolean => {
   switch (action) {
     case 'anyChange':
       return EntityActionTypesModify.indexOf(lastAction) > -1;
