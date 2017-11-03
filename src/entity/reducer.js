@@ -227,33 +227,27 @@ export const metaEntityReducer = (
   }
 };
 
-export const setEntities = (entities: EntityState): EntityAction => ({
+export const setEntities = (payload: EntityState): EntityAction => ({
   type: 'rd/entity/SET',
-  payload: entities,
-});
-
-export const addEntity = (
-  entity: EntityModel & MetaEntityModel
-): EntityAction => ({
-  type: 'rd/entity/ADD',
-  payload: entity,
-});
-
-export const addLinkedEntity = (
-  payload: AddLinkedEntityPayload
-): EntityAction => ({
-  type: 'rd/entity/ADD_LINKED',
   payload,
 });
 
-export const removeEntity = (id: Id): EntityAction => ({
+export const addEntity = (
+  payload: EntityModel & MetaEntityModel
+): EntityAction => ({ type: 'rd/entity/ADD', payload });
+
+export const addLinkedEntity = (
+  payload: AddLinkedEntityPayload
+): EntityAction => ({ type: 'rd/entity/ADD_LINKED', payload });
+
+export const removeEntity = (payload: Id): EntityAction => ({
   type: 'rd/entity/REMOVE',
-  payload: id,
+  payload,
 });
 
-export const move = (movePayload: MovePayload): EntityAction => ({
+export const move = (payload: MovePayload): EntityAction => ({
   type: 'rd/entity/MOVE',
-  payload: movePayload,
+  payload,
 });
 
 export const setName = (payload: SetNamePayload): EntityAction => ({

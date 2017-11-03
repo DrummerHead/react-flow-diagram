@@ -7,7 +7,9 @@ export type CanvasState = {
   offsetY: number,
 };
 
-export type CanvasAction = ActionShape<'rd/canvas/SET_OFFSET', CanvasState>;
+export type CanvasAction =
+  | ActionShape<'rd/canvas/SET_OFFSET', CanvasState>
+  | ActionShape<'rd/canvas/TRACK', TrackMovementProps>;
 
 const canvasReducer = (
   state: CanvasState = { offsetX: 0, offsetY: 0 },
@@ -22,9 +24,15 @@ const canvasReducer = (
 };
 
 export type SetOffsetProps = CanvasState;
-export const setOffset = (offset: SetOffsetProps): CanvasAction => ({
+export const setOffset = (payload: SetOffsetProps): CanvasAction => ({
   type: 'rd/canvas/SET_OFFSET',
-  payload: offset,
+  payload,
+});
+
+export type TrackMovementProps = { x: number, y: number };
+export const trackMovement = (payload: TrackMovementProps): CanvasAction => ({
+  type: 'rd/canvas/TRACK',
+  payload,
 });
 
 export default canvasReducer;

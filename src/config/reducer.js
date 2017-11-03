@@ -24,9 +24,9 @@ const configReducer = (state: ConfigState, action: Action): ConfigState => {
   }
 };
 
-export const setConfig = (config: ConfigState): ConfigAction => ({
+export const setConfig = (payload: ConfigState): ConfigAction => ({
   type: 'rd/config/SET',
-  payload: config,
+  payload,
 });
 
 export default configReducer;
