@@ -14,15 +14,6 @@ import type { CanvasState, CanvasAction } from '../canvas/reducer';
 import type { ConfigState, ConfigAction } from '../config/reducer';
 import type { HistoryState, HistoryAction } from '../history/reducer';
 
-export type State = {
-  entity: EntityState,
-  metaEntity: MetaEntityState,
-  canvas: CanvasState,
-  config: ConfigState,
-  history: HistoryState,
-  lastAction: ActionType,
-};
-
 export type ActionShape<S, P> = { type: S, payload: P };
 type InitAction = ActionShape<'@@INIT', void>;
 export type Action =
@@ -32,6 +23,15 @@ export type Action =
   | ConfigAction
   | HistoryAction;
 export type ActionType = $PropertyType<Action, 'type'>;
+
+export type State = {
+  entity: EntityState,
+  metaEntity: MetaEntityState,
+  canvas: CanvasState,
+  config: ConfigState,
+  history: HistoryState,
+  lastAction: ActionType,
+};
 
 const initialState = {
   entity: [],

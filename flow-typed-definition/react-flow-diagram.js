@@ -110,7 +110,7 @@ declare module 'react-flow-diagram' {
   // diagramOn
   //
   declare type DiagramOnAction = ActionType | Array<ActionType>;
-  declare type DiagramOnCallback = (EntityState) => any;
+  declare type DiagramOnCallback = (EntityState) => *;
   declare type DiagramOnReturn = () => void;
 
   // Redux

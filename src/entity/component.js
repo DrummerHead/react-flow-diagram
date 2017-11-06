@@ -14,6 +14,7 @@ import { connecting } from '../canvas/reducer';
 import defaultEntity from './defaultEntity';
 import ContextMenu from '../contextMenu/component';
 
+// eslint-disable-next-line import/first
 import type { ComponentType, Node } from 'react';
 import type {
   Id,

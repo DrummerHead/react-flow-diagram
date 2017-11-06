@@ -7,6 +7,7 @@ import { Diagram, store, setEntities, setConfig } from '../../src';
 import model from './model-example';
 import config from './config-example';
 
+// eslint-disable-next-line no-unused-expressions
 injectGlobal`
   * {
     box-sizing: border-box;

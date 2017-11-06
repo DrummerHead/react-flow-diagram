@@ -10,7 +10,7 @@ import type { ActionType } from '../diagram/reducer';
 import type { EntityState } from '../entity/reducer';
 
 type DiagramOnAction = ActionType | Array<ActionType>;
-type DiagramOnCallback = EntityState => any;
+type DiagramOnCallback = EntityState => *;
 type DiagramOnReturn = () => void;
 
 // ['a','b','c'].indexOf('a') > -1 === ['a','b','c'].includes('a')

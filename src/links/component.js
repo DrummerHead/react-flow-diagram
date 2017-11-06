@@ -59,6 +59,7 @@ const calculatePoints = (from: MergedModel, to: MergedModel): string => {
     }
   } else {
     // If vertical distance is greater than horizontal distance
+    // eslint-disable-next-line no-lonely-if
     if (from.x + from.width > to.x && from.x < to.x + to.width) {
       // If From and To are too close in the X axis
       const distanceY = (fromMidY + toMidY) / 2;

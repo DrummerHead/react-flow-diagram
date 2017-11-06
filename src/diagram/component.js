@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable no-underscore-dangle */
 
 import React from 'react';
 import { createStore } from 'redux';

@@ -23,7 +23,7 @@ const Action = style.li`
 
 type ContextMenuProps = {
   actions: Array<{
-    action: Function,
+    action: Function, // eslint-disable-line flowtype/no-weak-types
     iconVariety: IconVariety,
     label: string,
   }>,

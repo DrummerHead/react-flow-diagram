@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable react/require-default-props */
 
 import React from 'react';
 import style from 'styled-components';
