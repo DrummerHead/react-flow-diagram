@@ -139,7 +139,7 @@ const getModelAndMeta = (id: Id, state: State): MergedModel => ({
 // data in the case of (state.canvas.connecting.currently && model.id ===
 // state.canvas.connecting.from) ; I should create a model with less info or
 // create a dummy object with more properties... probably create a new type
-// that has only the info I need for arrow creation... sigh
+// that has only the info I need for arrow creation...
 
 // This function will return all the models to be used for linking to. In the
 // case that the user is in the process of linking to a new entitiy, another
@@ -147,9 +147,11 @@ const getModelAndMeta = (id: Id, state: State): MergedModel => ({
 // arrow that follows the mouse cursor.
 //
 const toModelDecider = (model: EntityModel, state: State) => [
-  ...(model.linksTo || ['nil']).map(entityId =>
-    getModelAndMeta(entityId, state)
-  ),
+  ...('linksTo' in model
+    ? (model.linksTo || ['nil']).map(entityId =>
+        getModelAndMeta(entityId, state)
+      )
+    : []),
   ...(state.canvas.connecting.currently &&
   model.id === state.canvas.connecting.from
     ? [
