@@ -2,6 +2,7 @@
 
 import type { ActionShape, Action } from '../diagram/reducer';
 import type { ConfigState } from '../config/reducer';
+import type { CanvasState } from '../canvas/reducer';
 
 export type Id = string;
 
@@ -38,6 +39,7 @@ export type SetNamePayload = { id: Id, name: string };
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
   | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
+  | ActionShape<'rd/entity/LINK_TO', Id>
   | ActionShape<'rd/entity/ADD_LINKED', AddLinkedEntityPayload>
   | ActionShape<'rd/entity/REMOVE', Id>
   | ActionShape<'rd/entity/MOVE', MovePayload>
@@ -59,7 +61,8 @@ export type MetaEntityAction = ActionShape<
 
 const entityReducer = (
   state: EntityState = [],
-  action: Action
+  action: Action,
+  canvas: CanvasState
 ): EntityState => {
   switch (action.type) {
     case 'rd/entity/SET':
@@ -76,6 +79,19 @@ const entityReducer = (
           name: action.payload.name,
         },
       ];
+
+    case 'rd/entity/LINK_TO': {
+      const { payload } = action;
+      return state.map(
+        entity =>
+          entity.id === canvas.connecting.from
+            ? {
+                ...entity,
+                linksTo: [...(entity.linksTo ? entity.linksTo : []), payload],
+              }
+            : entity
+      );
+    }
 
     case 'rd/entity/ADD_LINKED': {
       const { entity, id } = action.payload;
@@ -235,6 +251,11 @@ export const setEntities = (payload: EntityState): EntityAction => ({
 export const addEntity = (
   payload: EntityModel & MetaEntityModel
 ): EntityAction => ({ type: 'rd/entity/ADD', payload });
+
+export const linkTo = (payload: Id): EntityAction => ({
+  type: 'rd/entity/LINK_TO',
+  payload,
+});
 
 export const addLinkedEntity = (
   payload: AddLinkedEntityPayload

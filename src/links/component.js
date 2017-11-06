@@ -134,11 +134,39 @@ const getModelAndMeta = (id: Id, state: State): MergedModel => ({
   ...state.metaEntity.find(entity => entity.id === id),
   ...state.entity.find(entity => entity.id === id),
 });
-const mapStateToProps = (state: State, ownProps) => ({
-  fromModel: getModelAndMeta(ownProps.model.id, state),
-  toModels: (ownProps.model.linksTo || ['nil']).map(entityId =>
+
+// TODO: This should return Array<MergedModel> but it's actually returning less
+// data in the case of (state.canvas.connecting.currently && model.id ===
+// state.canvas.connecting.from) ; I should create a model with less info or
+// create a dummy object with more properties... probably create a new type
+// that has only the info I need for arrow creation... sigh
+
+// This function will return all the models to be used for linking to. In the
+// case that the user is in the process of linking to a new entitiy, another
+// intermediate model will be added with information sufficient to render an
+// arrow that follows the mouse cursor.
+//
+const toModelDecider = (model: EntityModel, state: State) => [
+  ...(model.linksTo || ['nil']).map(entityId =>
     getModelAndMeta(entityId, state)
   ),
+  ...(state.canvas.connecting.currently &&
+  model.id === state.canvas.connecting.from
+    ? [
+        {
+          id: 'will_connect',
+          x: state.canvas.cursor.x,
+          y: state.canvas.cursor.y,
+          width: 0,
+          height: 0,
+        },
+      ]
+    : []),
+];
+
+const mapStateToProps = (state: State, ownProps: { model: EntityModel }) => ({
+  fromModel: getModelAndMeta(ownProps.model.id, state),
+  toModels: toModelDecider(ownProps.model, state),
 });
 
 export default connect(mapStateToProps, {})(ArrowBodyContainer);

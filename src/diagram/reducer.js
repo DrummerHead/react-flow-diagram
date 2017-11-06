@@ -37,8 +37,18 @@ const initialState = {
   entity: [],
   metaEntity: [],
   canvas: {
-    offsetX: 0,
-    offsetY: 0,
+    offset: {
+      x: 0,
+      y: 0,
+    },
+    cursor: {
+      x: 0,
+      y: 0,
+    },
+    connecting: {
+      currently: false,
+      from: '',
+    },
   },
   config: {
     entityTypes: {},
@@ -52,7 +62,7 @@ const initialState = {
 };
 
 const appReducer = (state: State = initialState, action: Action): State => ({
-  entity: entityReducer(state.entity, action),
+  entity: entityReducer(state.entity, action, state.canvas),
   metaEntity: metaEntityReducer(state.metaEntity, action, state.config),
   canvas: canvasReducer(state.canvas, action),
   config: configReducer(state.config, action),

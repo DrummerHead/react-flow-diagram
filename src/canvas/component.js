@@ -3,7 +3,7 @@
 import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
-import { setOffset } from './reducer';
+import { setOffset, trackMovement } from './reducer';
 import { undo, redo } from '../history/reducer';
 import EntityHOC from '../entity/component';
 import Task from '../task/component';
@@ -13,8 +13,8 @@ import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
 import Debug from '../debug/component';
 
-import type { SetOffsetProps, CanvasAction } from '../canvas/reducer';
-import type { EntityState } from '../entity/reducer';
+import type { Coords, CanvasAction } from '../canvas/reducer';
+import type { EntityModel, EntityState } from '../entity/reducer';
 import type { State } from '../diagram/reducer';
 import type { HistoryAction } from '../history/reducer';
 
@@ -44,22 +44,31 @@ const SvgLand = style.svg`
   left: 0;
 `;
 
-type CanvasProps = {
-  entities: EntityState,
-  handleRef: HTMLElement => void,
-};
-
 const EntitiesHOCList = {
   Task: EntityHOC(Task),
   Event: EntityHOC(Event),
 };
+
+type CanvasProps = {
+  entities: EntityState,
+  isConnecting: boolean,
+  connectingEntity: EntityModel,
+  handleRef: HTMLElement => void,
+  onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
+};
 const Canvas = (props: CanvasProps) => (
-  <CanvasStyle innerRef={div => props.handleRef(div)}>
+  <CanvasStyle
+    innerRef={div => props.handleRef(div)}
+    onMouseMove={props.onMouseMove}
+  >
     <Debug />
     <SvgLand width="100%" height="100%">
       {props.entities
         .filter(entity => 'linksTo' in entity)
         .map(entity => <Links key={entity.id} model={entity} />)}
+
+      {props.isConnecting && <Links model={props.connectingEntity} />}
+
       <ArrowMarker />
     </SvgLand>
     {props.entities.map(entity => {
@@ -82,7 +91,11 @@ const Canvas = (props: CanvasProps) => (
 
 type CanvasContainerProps = {
   entities: EntityState,
-  setOffset: SetOffsetProps => CanvasAction,
+  isConnecting: boolean,
+
+  connectingEntity: EntityModel,
+  setOffset: Coords => CanvasAction,
+  trackMovement: Coords => CanvasAction,
   undo: () => HistoryAction,
   redo: () => HistoryAction,
 };
@@ -124,6 +137,13 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     }
   }
 
+  onMouseMove = (ev: SyntheticMouseEvent<HTMLElement>) => {
+    this.props.trackMovement({
+      x: ev.pageX,
+      y: ev.pageY,
+    });
+  };
+
   setOffset() {
     if (this.canvasDOM) {
       const cd = this.canvasDOM;
@@ -132,8 +152,8 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
       }
       const { left, top } = cd.getBoundingClientRect();
       this.props.setOffset({
-        offsetX: parseInt(left, 10),
-        offsetY: parseInt(top, 10),
+        x: parseInt(left, 10),
+        y: parseInt(top, 10),
       });
     }
   }
@@ -146,14 +166,29 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   }
 
   render() {
-    return <Canvas entities={this.props.entities} handleRef={this.handleRef} />;
+    return (
+      <Canvas
+        entities={this.props.entities}
+        handleRef={this.handleRef}
+        onMouseMove={this.onMouseMove}
+        isConnecting={this.props.isConnecting}
+        connectingEntity={this.props.connectingEntity}
+      />
+    );
   }
 }
 
-const mapStateToProps = (state: State) => ({ entities: state.entity });
+const mapStateToProps = (state: State) => ({
+  entities: state.entity,
+  connectingEntity: state.entity.find(
+    entity => entity.id === state.canvas.connecting.from
+  ),
+  isConnecting: state.canvas.connecting.currently,
+});
 
 export default connect(mapStateToProps, {
   setOffset,
+  trackMovement,
   undo,
   redo,
 })(CanvasContainer);

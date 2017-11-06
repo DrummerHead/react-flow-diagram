@@ -38,6 +38,10 @@ const iconList: IconList = {
     path: <Path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8z" />,
     size: 16,
   },
+  arrow: {
+    path: <Path d="M4.5 0l4 4L0 12.5 3.5 16 12 7.5l4 4V0H4.5z" />,
+    size: 16,
+  },
 };
 
 export type IconVariety = $Keys<typeof iconList>;

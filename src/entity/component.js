@@ -3,7 +3,14 @@
 import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
-import { move, addLinkedEntity, removeEntity, selectEntity } from './reducer';
+import {
+  move,
+  linkTo,
+  addLinkedEntity,
+  removeEntity,
+  selectEntity,
+} from './reducer';
+import { connecting } from '../canvas/reducer';
 import defaultEntity from './defaultEntity';
 import ContextMenu from '../contextMenu/component';
 
@@ -17,7 +24,11 @@ import type {
   EntityAction,
   MetaEntityAction,
 } from './reducer';
-import type { CanvasState } from '../canvas/reducer';
+import type {
+  CanvasState,
+  CanvasAction,
+  ConnectingPayload,
+} from '../canvas/reducer';
 import type { State } from '../diagram/reducer';
 import type { DefaultEntityProps } from './defaultEntity';
 
@@ -48,6 +59,7 @@ type EntityProps = {
   children: Node,
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
   removeEntity: Id => EntityAction,
+  connecting: ConnectingPayload => CanvasAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
 const Entity = (props: EntityProps) => (
@@ -92,6 +104,12 @@ const Entity = (props: EntityProps) => (
             iconVariety: 'event',
             label: 'Add Event',
           },
+          {
+            action: () =>
+              props.connecting({ currently: true, from: props.model.id }),
+            iconVariety: 'arrow',
+            label: 'connect',
+          },
         ]}
       />
     )}
@@ -108,12 +126,18 @@ type EntityContainerState = {
   isAnchored: boolean,
   onMouseUpWouldBeClick: boolean,
 };
+// TODO: These signatures are probably wrong. The original action does return
+// an EntityAction, but after we connect we're dispatching the action, so this
+// signature is probably incorrect. Gotta research what's the proper signature
+// after connecting the component
 type EntityContainerProps = {
   model: EntityModel,
   meta: MetaEntityModel,
   move: MovePayload => EntityAction,
+  linkTo: Id => EntityAction,
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
   removeEntity: Id => EntityAction,
+  connecting: ConnectingPayload => CanvasAction,
   selectEntity: (Id, isSelected?: boolean) => MetaEntityAction,
   canvas: CanvasState,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
@@ -136,6 +160,12 @@ const EntityContainerHOC = WrappedComponent =>
         isAnchored: this.props.meta.isAnchored,
         onMouseUpWouldBeClick: true,
       };
+      /* TODO: I should switch to:
+       * https://flow.org/en/docs/react/events/
+       * https://babeljs.io/docs/plugins/transform-class-properties/
+       * so I avoid having to duplicate bound function type on the class
+       * and also these bounding down here
+       */
       this.onMouseDown = this.onMouseDown.bind(this);
       this.onMouseLeave = this.onMouseLeave.bind(this);
       this.onMouseMove = this.onMouseMove.bind(this);
@@ -153,11 +183,22 @@ const EntityContainerHOC = WrappedComponent =>
     }
 
     onMouseDown(ev: SyntheticMouseEvent<HTMLElement>) {
-      this.setState({
-        anchorX: ev.pageX - this.props.canvas.offsetX - this.props.model.x,
-        anchorY: ev.pageY - this.props.canvas.offsetY - this.props.model.y,
-        isAnchored: true,
-      });
+      if (this.props.canvas.connecting.currently) {
+        // In this case we want to select an entity to be connected to a
+        // previously selected entity to connect from
+
+        // TODO: Should change css to show a hand instead of a move thingie
+        // according to this.props.canvas.connecting.currently
+        this.props.linkTo(this.props.model.id);
+      } else {
+        // Most common behavior is that when you click on an entity, your
+        // intention is to start dragging the entity
+        this.setState({
+          anchorX: ev.pageX - this.props.canvas.offset.x - this.props.model.x,
+          anchorY: ev.pageY - this.props.canvas.offset.y - this.props.model.y,
+          isAnchored: true,
+        });
+      }
     }
 
     onMouseLeave(ev: SyntheticMouseEvent<HTMLElement>) {
@@ -186,10 +227,10 @@ const EntityContainerHOC = WrappedComponent =>
         //
         this.props.move({
           x:
-            2 * (ev.pageX - this.props.canvas.offsetX - this.state.anchorX) -
+            2 * (ev.pageX - this.props.canvas.offset.x - this.state.anchorX) -
             this.props.model.x,
           y:
-            2 * (ev.pageY - this.props.canvas.offsetY - this.state.anchorY) -
+            2 * (ev.pageY - this.props.canvas.offset.y - this.state.anchorY) -
             this.props.model.y,
           id: this.props.model.id,
         });
@@ -199,8 +240,8 @@ const EntityContainerHOC = WrappedComponent =>
     onMouseMove(ev: SyntheticMouseEvent<HTMLElement>) {
       if (this.state.isAnchored) {
         this.props.move({
-          x: ev.pageX - this.props.canvas.offsetX - this.state.anchorX,
-          y: ev.pageY - this.props.canvas.offsetY - this.state.anchorY,
+          x: ev.pageX - this.props.canvas.offset.x - this.state.anchorX,
+          y: ev.pageY - this.props.canvas.offset.y - this.state.anchorY,
           id: this.props.model.id,
         });
       }
@@ -228,6 +269,7 @@ const EntityContainerHOC = WrappedComponent =>
           isSelected={this.props.meta.isSelected}
           addLinkedEntity={this.props.addLinkedEntity}
           removeEntity={this.props.removeEntity}
+          connecting={this.props.connecting}
           defaultEntity={this.props.defaultEntity}
           onMouseDown={this.onMouseDown}
           onMouseLeave={this.onMouseLeave}
@@ -251,7 +293,9 @@ const mapStateToProps = (state: State, ownProps) => ({
 export default (WrappedComponent: ComponentType<*>) =>
   connect(mapStateToProps, {
     move,
+    linkTo,
     addLinkedEntity,
     removeEntity,
     selectEntity,
+    connecting,
   })(EntityContainerHOC(WrappedComponent));
