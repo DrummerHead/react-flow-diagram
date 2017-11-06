@@ -45,13 +45,13 @@ const EntityStyle = style.div`
   flex-flow: row nowrap;
   align-items: center;
   user-select: none;
-  cursor: move;
 `;
 
 type EntityProps = {
   model: EntityModel,
   isAnchored: boolean,
   isSelected: boolean,
+  toBeConnected: boolean,
   onMouseDown: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseLeave: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
@@ -67,6 +67,7 @@ const Entity = (props: EntityProps) => (
     style={{
       transform: `translate(${props.model.x}px, ${props.model.y}px)`,
       zIndex: props.isAnchored ? '100' : '10',
+      cursor: props.toBeConnected ? 'pointer' : 'move',
     }}
   >
     <div
@@ -133,13 +134,13 @@ type EntityContainerState = {
 type EntityContainerProps = {
   model: EntityModel,
   meta: MetaEntityModel,
+  canvas: CanvasState,
   move: MovePayload => EntityAction,
   linkTo: Id => EntityAction,
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
   removeEntity: Id => EntityAction,
   connecting: ConnectingPayload => CanvasAction,
   selectEntity: (Id, isSelected?: boolean) => MetaEntityAction,
-  canvas: CanvasState,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
 const EntityContainerHOC = WrappedComponent =>
@@ -186,9 +187,6 @@ const EntityContainerHOC = WrappedComponent =>
       if (this.props.canvas.connecting.currently) {
         // In this case we want to select an entity to be connected to a
         // previously selected entity to connect from
-
-        // TODO: Should change css to show a hand instead of a move thingie
-        // according to this.props.canvas.connecting.currently
         this.props.linkTo(this.props.model.id);
       } else {
         // Most common behavior is that when you click on an entity, your
@@ -267,6 +265,7 @@ const EntityContainerHOC = WrappedComponent =>
           model={this.props.model}
           isAnchored={this.state.isAnchored}
           isSelected={this.props.meta.isSelected}
+          toBeConnected={this.props.canvas.connecting.currently}
           addLinkedEntity={this.props.addLinkedEntity}
           removeEntity={this.props.removeEntity}
           connecting={this.props.connecting}
