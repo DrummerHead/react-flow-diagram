@@ -92,7 +92,6 @@ const Canvas = (props: CanvasProps) => (
 type CanvasContainerProps = {
   entities: EntityState,
   isConnecting: boolean,
-
   connectingEntity: EntityModel,
   setOffset: Coords => CanvasAction,
   trackMovement: Coords => CanvasAction,
@@ -101,14 +100,6 @@ type CanvasContainerProps = {
 };
 class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   canvasDOM: ?HTMLElement;
-  handleRef: HTMLElement => void;
-  handleKey: (SyntheticKeyboardEvent<HTMLElement>) => void;
-
-  constructor() {
-    super();
-    this.handleRef = this.handleRef.bind(this);
-    this.handleKey = this.handleKey.bind(this);
-  }
 
   componentDidMount() {
     if ('scrollRestoration' in window.history) {
@@ -120,29 +111,6 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   componentWillUnmount() {
     window.document.removeEventListener('keydown', this.handleKey);
   }
-
-  handleKey(ev: SyntheticKeyboardEvent<HTMLElement>) {
-    if (ev.getModifierState('Meta') || ev.getModifierState('Control')) {
-      switch (ev.key) {
-        case 'z':
-          ev.preventDefault();
-          this.props.undo();
-          break;
-        case 'y':
-          ev.preventDefault();
-          this.props.redo();
-          break;
-        // no default
-      }
-    }
-  }
-
-  onMouseMove = (ev: SyntheticMouseEvent<HTMLElement>) => {
-    this.props.trackMovement({
-      x: ev.pageX,
-      y: ev.pageY,
-    });
-  };
 
   setOffset() {
     if (this.canvasDOM) {
@@ -158,12 +126,35 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     }
   }
 
-  handleRef(div: HTMLElement) {
+  handleKey = (ev: SyntheticKeyboardEvent<HTMLElement>) => {
+    if (ev.getModifierState('Meta') || ev.getModifierState('Control')) {
+      switch (ev.key) {
+        case 'z':
+          ev.preventDefault();
+          this.props.undo();
+          break;
+        case 'y':
+          ev.preventDefault();
+          this.props.redo();
+          break;
+        // no default
+      }
+    }
+  };
+
+  onMouseMove = (ev: SyntheticMouseEvent<HTMLElement>) => {
+    this.props.trackMovement({
+      x: ev.pageX,
+      y: ev.pageY,
+    });
+  };
+
+  handleRef = (div: HTMLElement) => {
     if (this.canvasDOM === undefined) {
       this.canvasDOM = div;
       this.setOffset();
     }
-  }
+  };
 
   render() {
     return (

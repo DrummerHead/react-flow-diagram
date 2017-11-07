@@ -88,27 +88,20 @@ class TaskComponent extends React.PureComponent<
   TaskComponentProps,
   TaskComponentState
 > {
-  toggleEdit: boolean => void;
-  refreshName: (SyntheticEvent<HTMLTextAreaElement>) => void;
-  handleKeyPress: (SyntheticKeyboardEvent<HTMLTextAreaElement>) => void;
+  state = {
+    isEditing: false,
+    name: this.props.model.name,
+  };
 
-  constructor(props: TaskComponentProps) {
-    super(props);
-    this.state = { isEditing: false, name: this.props.model.name };
-    this.toggleEdit = this.toggleEdit.bind(this);
-    this.refreshName = this.refreshName.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
-  }
-
-  toggleEdit(isEditing: boolean) {
+  toggleEdit = (isEditing: boolean) => {
     this.setState({ isEditing });
-  }
+  };
 
-  refreshName(ev: SyntheticEvent<HTMLTextAreaElement>) {
+  refreshName = (ev: SyntheticEvent<HTMLTextAreaElement>) => {
     this.setState({ name: ev.currentTarget.value });
-  }
+  };
 
-  handleKeyPress(ev: SyntheticKeyboardEvent<HTMLTextAreaElement>) {
+  handleKeyPress = (ev: SyntheticKeyboardEvent<HTMLTextAreaElement>) => {
     switch (ev.key) {
       case 'Enter':
         this.toggleEdit(false);
@@ -120,7 +113,7 @@ class TaskComponent extends React.PureComponent<
         break;
       // no default
     }
-  }
+  };
 
   render() {
     return (

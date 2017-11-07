@@ -149,30 +149,12 @@ const EntityContainerHOC = WrappedComponent =>
     EntityContainerProps,
     EntityContainerState
   > {
-    onMouseDown: (SyntheticMouseEvent<HTMLElement>) => void;
-    onMouseLeave: (SyntheticMouseEvent<HTMLElement>) => void;
-    onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void;
-    onMouseUp: () => void;
-
-    constructor(props: EntityContainerProps) {
-      super(props);
-      this.state = {
-        anchorX: this.props.meta.width / 2,
-        anchorY: this.props.meta.height / 2,
-        isAnchored: this.props.meta.isAnchored,
-        onMouseUpWouldBeClick: true,
-      };
-      /* TODO: I should switch to:
-       * https://flow.org/en/docs/react/events/
-       * https://babeljs.io/docs/plugins/transform-class-properties/
-       * so I avoid having to duplicate bound function type on the class
-       * and also these bounding down here
-       */
-      this.onMouseDown = this.onMouseDown.bind(this);
-      this.onMouseLeave = this.onMouseLeave.bind(this);
-      this.onMouseMove = this.onMouseMove.bind(this);
-      this.onMouseUp = this.onMouseUp.bind(this);
-    }
+    state = {
+      anchorX: this.props.meta.width / 2,
+      anchorY: this.props.meta.height / 2,
+      isAnchored: this.props.meta.isAnchored,
+      onMouseUpWouldBeClick: true,
+    };
 
     componentDidMount() {
       const wouldBeClick = () =>
@@ -184,7 +166,7 @@ const EntityContainerHOC = WrappedComponent =>
       }
     }
 
-    onMouseDown(ev: SyntheticMouseEvent<HTMLElement>) {
+    onMouseDown = (ev: SyntheticMouseEvent<HTMLElement>) => {
       if (this.props.canvas.connecting.currently) {
         // In this case we want to select an entity to be connected to a
         // previously selected entity to connect from
@@ -198,9 +180,9 @@ const EntityContainerHOC = WrappedComponent =>
           isAnchored: true,
         });
       }
-    }
+    };
 
-    onMouseLeave(ev: SyntheticMouseEvent<HTMLElement>) {
+    onMouseLeave = (ev: SyntheticMouseEvent<HTMLElement>) => {
       if (this.state.isAnchored) {
         // If the entity is still being dragged while leaving (mouse movement
         // faster than state refresh on DOM) then (discussing only X
@@ -234,9 +216,9 @@ const EntityContainerHOC = WrappedComponent =>
           id: this.props.model.id,
         });
       }
-    }
+    };
 
-    onMouseMove(ev: SyntheticMouseEvent<HTMLElement>) {
+    onMouseMove = (ev: SyntheticMouseEvent<HTMLElement>) => {
       if (this.state.isAnchored) {
         this.props.move({
           x: ev.pageX - this.props.canvas.offset.x - this.state.anchorX,
@@ -244,9 +226,9 @@ const EntityContainerHOC = WrappedComponent =>
           id: this.props.model.id,
         });
       }
-    }
+    };
 
-    onMouseUp(/* ev: SyntheticMouseEvent<HTMLElement> */) {
+    onMouseUp = (/* ev: SyntheticMouseEvent<HTMLElement> */) => {
       if (!this.state.onMouseUpWouldBeClick) {
         // Behaves as if it was spawned with a mouse drag
         // meaning that when you release the mouse button,
@@ -258,7 +240,7 @@ const EntityContainerHOC = WrappedComponent =>
       }
       // else it behaves as if it was spawned with a mouse click
       // meaning it needs another click to de-anchor from mouse
-    }
+    };
 
     render() {
       return (
