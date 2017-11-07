@@ -42,11 +42,6 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
        * and perhaps I should converge to always using the cursor position as
        * calculated in the canvas reducer */
 
-      /* TODO: History shouldn't be tracking mouse position. I should define
-        * explicitely what actions should history listen for or find some way
-        * to not track mouse position as something "undoable" 'cause that
-        * doesn't make sense for the user. Nor anyone. Capisce? */
-
       return {
         ...state,
         cursor: {

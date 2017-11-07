@@ -31,6 +31,7 @@ const history = (reducer: Reducer<State, Action>) => (
 ): State => {
   const nextState = reducer(state, action);
   switch (action.type) {
+    case 'rd/canvas/TRACK':
     case '@@INIT':
     case '@@redux/INIT':
       return nextState;
