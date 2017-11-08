@@ -7,7 +7,7 @@ declare module 'react-flow-diagram' {
 
   declare type EntityType = 'Task' | 'Event';
 
-  declare type EntityModel = {
+  declare export type EntityModel = {
     id: Id,
     type: EntityType,
     x: number,
@@ -18,7 +18,7 @@ declare module 'react-flow-diagram' {
 
   declare export type EntityState = Array<EntityModel>;
 
-  declare type MetaEntityModel = {
+  declare export type MetaEntityModel = {
     id: string,
     type: EntityType,
     width: number,
@@ -34,8 +34,8 @@ declare module 'react-flow-diagram' {
     id: Id,
   };
   declare type MovePayload = { x: number, y: number, id: string };
-  declare type SetNamePayload = { id: Id, name: string };
-  declare type EntityAction =
+  declare export type SetNamePayload = { id: Id, name: string };
+  declare export type EntityAction =
     | ActionShape<'rd/entity/SET', EntityState>
     | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
     | ActionShape<'rd/entity/ADD_LINKED', AddLinkedEntityPayload>
@@ -123,6 +123,14 @@ declare module 'react-flow-diagram' {
     getState(): S,
     subscribe(listener: () => void): () => void,
     replaceReducer(nextReducer: Reducer<S, A>): void,
+  };
+
+  // Helper types
+  //
+  declare export type DiagComponentProps = {
+    model: EntityModel,
+    meta: MetaEntityModel,
+    setName: SetNamePayload => EntityAction,
   };
 
   // Explicit export

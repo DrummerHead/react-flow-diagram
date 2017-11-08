@@ -2,15 +2,12 @@
 
 import React from 'react';
 import style from 'styled-components';
-import { connect } from 'react-redux';
-import { setName } from '../entity/reducer';
 
 import type {
   EntityModel,
   MetaEntityModel,
-  SetNamePayload,
-  EntityAction,
-} from '../entity/reducer';
+  DiagComponentProps,
+} from 'react-flow-diagram';
 
 /*
  * Presentational
@@ -75,11 +72,7 @@ const Task = (props: TaskProps) => (
  * Container
  * ==================================== */
 
-type TaskComponentProps = {
-  model: EntityModel,
-  meta: MetaEntityModel,
-  setName: SetNamePayload => EntityAction,
-};
+type TaskComponentProps = DiagComponentProps;
 type TaskComponentState = {
   isEditing: boolean,
   name: string,
@@ -129,4 +122,4 @@ class TaskComponent extends React.PureComponent<
   }
 }
 
-export default connect(null, { setName })(TaskComponent);
+export default TaskComponent;

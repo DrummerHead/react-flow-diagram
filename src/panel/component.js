@@ -14,6 +14,7 @@ import type {
 } from '../entity/reducer';
 import type { DefaultEntityProps } from '../entity/defaultEntity';
 import type { State } from '../diagram/reducer';
+import type { ConfigEntityTypes } from '../config/reducer';
 
 /*
  * Presentational
@@ -34,14 +35,20 @@ const PanelTool = style.li`
 `;
 
 type PanelProps = {
-  addTask: (SyntheticMouseEvent<HTMLElement>) => void,
-  addEvent: (SyntheticMouseEvent<HTMLElement>) => void,
+  addEntityHelper: (EntityType, SyntheticMouseEvent<HTMLElement>) => void,
+  entityTypeNames: Array<EntityType>,
 };
 const Panel = (props: PanelProps) => (
   <PanelStyle>
     <PanelTools>
-      <PanelTool onMouseDown={props.addTask}>Add Task</PanelTool>
-      <PanelTool onMouseDown={props.addEvent}>Add Event</PanelTool>
+      {props.entityTypeNames.map(entityTypeName => (
+        <PanelTool
+          key={entityTypeName}
+          onMouseDown={ev => props.addEntityHelper(entityTypeName, ev)}
+        >
+          Add {entityTypeName}
+        </PanelTool>
+      ))}
     </PanelTools>
   </PanelStyle>
 );
@@ -51,31 +58,32 @@ const Panel = (props: PanelProps) => (
  * ==================================== */
 
 type PanelContainerProps = {
+  entityTypes: ConfigEntityTypes,
   addEntity: (EntityModel & MetaEntityModel) => EntityAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
 class PanelContainer extends React.PureComponent<PanelContainerProps> {
-  addEntityHelper(
+  entityTypeNames = Object.keys(this.props.entityTypes);
+
+  addEntityHelper = (
     entityType: EntityType = 'Task',
     ev: SyntheticMouseEvent<HTMLElement>
-  ) {
+  ) => {
     this.props.addEntity(this.props.defaultEntity({ entityType, ev }));
-  }
-
-  addTask = (ev: SyntheticMouseEvent<HTMLElement>) => {
-    this.addEntityHelper('Task', ev);
-  };
-
-  addEvent = (ev: SyntheticMouseEvent<HTMLElement>) => {
-    this.addEntityHelper('Event', ev);
   };
 
   render() {
-    return <Panel addTask={this.addTask} addEvent={this.addEvent} />;
+    return (
+      <Panel
+        addEntityHelper={this.addEntityHelper}
+        entityTypeNames={this.entityTypeNames}
+      />
+    );
   }
 }
 
 const mapStateToProps = (state: State) => ({
+  entityTypes: state.config.entityTypes,
   defaultEntity: defaultEntity(state),
 });
 

@@ -21,12 +21,14 @@ const Action = style.li`
   cursor: pointer;
 `;
 
+export type ContextMenuActions = Array<{
+  action: Function, // eslint-disable-line flowtype/no-weak-types
+  iconVariety: IconVariety,
+  label: string,
+}>;
+
 type ContextMenuProps = {
-  actions: Array<{
-    action: Function, // eslint-disable-line flowtype/no-weak-types
-    iconVariety: IconVariety,
-    label: string,
-  }>,
+  actions: ContextMenuActions,
 };
 const ContextMenu = (props: ContextMenuProps) => (
   <ContextMenuStyle>

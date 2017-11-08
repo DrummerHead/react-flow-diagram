@@ -19,6 +19,7 @@ import type { ComponentType, Node } from 'react';
 import type {
   Id,
   EntityModel,
+  EntityType,
   MetaEntityModel,
   MovePayload,
   AddLinkedEntityPayload,
@@ -32,10 +33,38 @@ import type {
 } from '../canvas/reducer';
 import type { State } from '../diagram/reducer';
 import type { DefaultEntityProps } from './defaultEntity';
+import type { ContextMenuActions } from '../contextMenu/component';
+import type { ConfigEntityTypes } from '../config/reducer';
 
 /*
  * Presentational
  * ==================================== */
+
+const contextMenuActions = (props: EntityProps): ContextMenuActions => {
+  const remove = {
+    action: () => props.removeEntity(props.model.id),
+    iconVariety: 'delete',
+    label: 'Remove',
+  };
+
+  const connect = {
+    action: () => props.connecting({ currently: true, from: props.model.id }),
+    iconVariety: 'arrow',
+    label: 'Connect',
+  };
+
+  const addEntities = props.entityTypeNames.map(entityTypeName => ({
+    action: ev =>
+      props.addLinkedEntity({
+        entity: props.defaultEntity({ entityType: entityTypeName, ev }),
+        id: props.model.id,
+      }),
+    iconVariety: entityTypeName,
+    label: `Add ${entityTypeName}`,
+  }));
+
+  return [remove, ...addEntities, connect];
+};
 
 const EntityStyle = style.div`
   position: absolute;
@@ -50,6 +79,7 @@ const EntityStyle = style.div`
 
 type EntityProps = {
   model: EntityModel,
+  entityTypeNames: Array<EntityType>,
   isAnchored: boolean,
   isSelected: boolean,
   toBeConnected: boolean,
@@ -80,41 +110,7 @@ const Entity = (props: EntityProps) => (
     >
       {props.children}
     </div>
-    {props.isSelected && (
-      <ContextMenu
-        actions={[
-          {
-            action: () => props.removeEntity(props.model.id),
-            iconVariety: 'delete',
-            label: 'Remove',
-          },
-          {
-            action: ev =>
-              props.addLinkedEntity({
-                entity: props.defaultEntity({ entityType: 'Task', ev }),
-                id: props.model.id,
-              }),
-            iconVariety: 'task',
-            label: 'Add Task',
-          },
-          {
-            action: ev =>
-              props.addLinkedEntity({
-                entity: props.defaultEntity({ entityType: 'Event', ev }),
-                id: props.model.id,
-              }),
-            iconVariety: 'event',
-            label: 'Add Event',
-          },
-          {
-            action: () =>
-              props.connecting({ currently: true, from: props.model.id }),
-            iconVariety: 'arrow',
-            label: 'connect',
-          },
-        ]}
-      />
-    )}
+    {props.isSelected && <ContextMenu actions={contextMenuActions(props)} />}
   </EntityStyle>
 );
 
@@ -131,11 +127,23 @@ type EntityContainerState = {
 // TODO: These signatures are probably wrong. The original action does return
 // an EntityAction, but after we connect we're dispatching the action, so this
 // signature is probably incorrect. Gotta research what's the proper signature
-// after connecting the component
+// after connecting the component.
+//
+// NOTE: I tried wrapping them in Dispatch<> (e.g. Dispatch<Id => EntityAction>)
+// which seemed correct, but doing so eliminates type checking in practice
+// (i.e. I could name a method whatever or pass another type to an action and
+// the checked wouldn't complain). I need to research this. I also haven't
+// found any discussion about this or code examples. I'm either doing something
+// fundamentally wrong or being innovative :P
+//
+// Also notice I used both i.e. and e.g. in the same paragraph. Just bask in
+// that fact. Cherish it. Savour it. Ok, now keep reading code :D
+//
 type EntityContainerProps = {
   model: EntityModel,
   meta: MetaEntityModel,
   canvas: CanvasState,
+  entityTypes: ConfigEntityTypes,
   move: MovePayload => EntityAction,
   linkTo: Id => EntityAction,
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
@@ -155,6 +163,8 @@ const EntityContainerHOC = WrappedComponent =>
       isAnchored: this.props.meta.isAnchored,
       onMouseUpWouldBeClick: true,
     };
+
+    entityTypeNames = Object.keys(this.props.entityTypes);
 
     componentDidMount() {
       const wouldBeClick = () =>
@@ -246,6 +256,7 @@ const EntityContainerHOC = WrappedComponent =>
       return (
         <Entity
           model={this.props.model}
+          entityTypeNames={this.entityTypeNames}
           isAnchored={this.state.isAnchored}
           isSelected={this.props.meta.isSelected}
           toBeConnected={this.props.canvas.connecting.currently}
@@ -269,6 +280,7 @@ const mapStateToProps = (state: State, ownProps) => ({
   meta: state.metaEntity.find(
     metaEntity => metaEntity.id === ownProps.model.id
   ),
+  entityTypes: state.config.entityTypes,
   defaultEntity: defaultEntity(state),
 });
 

@@ -6,6 +6,8 @@ import styled, { injectGlobal } from 'styled-components';
 import { Diagram, store, setEntities, setConfig } from '../../src';
 import model from './model-example';
 import config from './config-example';
+import Task from './task/component';
+import Event from './event/component';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -27,6 +29,11 @@ const Main = styled.main`
   min-height: 150vh;
 `;
 
+const customEntities = {
+  Task: Task,
+  Event: Event,
+};
+
 class Demo extends React.PureComponent<{}> {
   componentWillMount() {
     store.dispatch(setConfig(config));
@@ -36,7 +43,7 @@ class Demo extends React.PureComponent<{}> {
     return (
       <Main>
         <h1>react-flow-diagram Demo</h1>
-        <Diagram />
+        <Diagram customEntities={customEntities} />
       </Main>
     );
   }

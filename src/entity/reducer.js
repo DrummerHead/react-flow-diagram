@@ -6,7 +6,11 @@ import type { CanvasState } from '../canvas/reducer';
 
 export type Id = string;
 
-export type EntityType = 'Task' | 'Event';
+// export type EntityType = 'Task' | 'Event';
+// I don't like that since the user can name any type of entity, now I lose on
+// the EntityType specificity. Will this be a problem in the future? Who knows!
+// Programming is full of surprises. The dragons approach.
+export type EntityType = string;
 
 export type EntityModel = {
   id: Id,

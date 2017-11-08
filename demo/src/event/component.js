@@ -3,7 +3,7 @@
 import React from 'react';
 import style from 'styled-components';
 
-import type { EntityModel, MetaEntityModel } from '../entity/reducer';
+import type { DiagComponentProps } from 'react-flow-diagram';
 
 /*
  * Presentational
@@ -20,13 +20,9 @@ const EventStyle = style.div`
   border: 2px solid #888;
   justify-content: center;
   font-size: .5rem;
-
 `;
 
-export type EventProps = {
-  model: EntityModel,
-  meta: MetaEntityModel,
-};
+export type EventProps = DiagComponentProps;
 const Event = ({ model, meta }: EventProps) => (
   <EventStyle width={meta.width} height={meta.height}>
     {model.x}, {model.y}

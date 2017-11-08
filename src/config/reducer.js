@@ -3,13 +3,15 @@
 import type { ActionShape, Action } from '../diagram/reducer';
 import type { EntityType } from '../entity/reducer';
 
-export type ConfigState = {
-  entityTypes: {
-    [EntityType]: {
-      width: number,
-      height: number,
-    },
+export type ConfigEntityTypes = {
+  [EntityType]: {
+    width: number,
+    height: number,
   },
+};
+
+export type ConfigState = {
+  entityTypes: ConfigEntityTypes,
 };
 
 export type ConfigAction = ActionShape<'rd/config/SET', ConfigState>;

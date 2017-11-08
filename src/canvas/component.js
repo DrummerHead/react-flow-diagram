@@ -5,16 +5,17 @@ import style from 'styled-components';
 import { connect } from 'react-redux';
 import { setOffset, trackMovement } from './reducer';
 import { undo, redo } from '../history/reducer';
+import { setName } from '../entity/reducer';
 import EntityHOC from '../entity/component';
-import Task from '../task/component';
-import Event from '../event/component';
 import Panel from '../panel/component';
 import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
 import Debug from '../debug/component';
 
+import type { ComponentType } from 'React';
 import type { Coords, CanvasAction } from '../canvas/reducer';
 import type { EntityModel, EntityState } from '../entity/reducer';
+import type { CustomEntities } from '../diagram/component';
 import type { State } from '../diagram/reducer';
 import type { HistoryAction } from '../history/reducer';
 
@@ -44,13 +45,9 @@ const SvgLand = style.svg`
   left: 0;
 `;
 
-const EntitiesHOCList = {
-  Task: EntityHOC(Task),
-  Event: EntityHOC(Event),
-};
-
 type CanvasProps = {
   entities: EntityState,
+  wrappedCustomEntities: { [type: string]: ComponentType<*> },
   isConnecting: boolean,
   connectingEntity: EntityModel,
   handleRef: HTMLElement => void,
@@ -71,16 +68,16 @@ const Canvas = (props: CanvasProps) => (
 
       <ArrowMarker />
     </SvgLand>
-    {props.entities.map(entity => {
-      switch (entity.type) {
-        case 'Task':
-          return <EntitiesHOCList.Task key={entity.id} model={entity} />;
-        case 'Event':
-          return <EntitiesHOCList.Event key={entity.id} model={entity} />;
-        default:
-          return <EntitiesHOCList.Task key={entity.id} model={entity} />;
-      }
-    })}
+
+    {props.entities
+      .map(entity => ({
+        entity: entity,
+        CustomEntity: props.wrappedCustomEntities[entity.type],
+      }))
+      .map(Combo => (
+        <Combo.CustomEntity key={Combo.entity.id} model={Combo.entity} />
+      ))}
+
     <Panel />
   </CanvasStyle>
 );
@@ -91,6 +88,7 @@ const Canvas = (props: CanvasProps) => (
 
 type CanvasContainerProps = {
   entities: EntityState,
+  customEntities: CustomEntities,
   isConnecting: boolean,
   connectingEntity: EntityModel,
   setOffset: Coords => CanvasAction,
@@ -100,6 +98,15 @@ type CanvasContainerProps = {
 };
 class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   canvasDOM: ?HTMLElement;
+
+  wrappedCustomEntities = Object.assign(
+    {},
+    ...Object.keys(this.props.customEntities).map(type => ({
+      [type]: EntityHOC(
+        connect(null, { setName })(this.props.customEntities[type])
+      ),
+    }))
+  );
 
   componentDidMount() {
     if ('scrollRestoration' in window.history) {
@@ -160,6 +167,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     return (
       <Canvas
         entities={this.props.entities}
+        wrappedCustomEntities={this.wrappedCustomEntities}
         handleRef={this.handleRef}
         onMouseMove={this.onMouseMove}
         isConnecting={this.props.isConnecting}
