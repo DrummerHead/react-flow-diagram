@@ -1,6 +1,12 @@
 // @flow
 
+import Task from './task/component';
+import taskIcon from './task/icon';
+import Event from './event/component';
+import eventIcon from './event/icon';
+
 import type { ConfigState } from '../../src/config/reducer';
+import type { CustomEntities } from '../../src/diagram/component';
 
 const config: ConfigState = {
   entityTypes: {
@@ -15,4 +21,15 @@ const config: ConfigState = {
   },
 };
 
-export default config;
+const customEntities: CustomEntities = {
+  Task: {
+    component: Task,
+    icon: taskIcon,
+  },
+  Event: {
+    component: Event,
+    icon: eventIcon,
+  },
+};
+
+export { config, customEntities };

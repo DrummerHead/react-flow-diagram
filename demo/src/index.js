@@ -5,11 +5,7 @@ import { render } from 'react-dom';
 import styled, { injectGlobal } from 'styled-components';
 import { Diagram, store, setEntities, setConfig } from '../../src';
 import model from './model-example';
-import config from './config-example';
-import Task from './task/component';
-import TaskIcon from './task/icon';
-import Event from './event/component';
-import EventIcon from './event/icon';
+import { config, customEntities } from './config-example';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -31,17 +27,6 @@ const Main = styled.main`
   min-height: 150vh;
 `;
 
-const customEntities = {
-  Task: {
-    component: Task,
-    icon: TaskIcon,
-  },
-  Event: {
-    component: Event,
-    icon: EventIcon,
-  },
-};
-
 class Demo extends React.PureComponent<{}> {
   componentWillMount() {
     store.dispatch(setConfig(config));
@@ -56,14 +41,6 @@ class Demo extends React.PureComponent<{}> {
     );
   }
 }
-
-/*
- * this is how you'd get the modified model back
-store.subscribe(() => {
-  const model = store.getState();
-  console.log(model)
-});
-*/
 
 // $FlowFixMe
 render(<Demo />, document.querySelector('#demo'));
