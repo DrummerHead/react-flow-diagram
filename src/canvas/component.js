@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { setOffset, trackMovement } from './reducer';
 import { undo, redo } from '../history/reducer';
 import { setName } from '../entity/reducer';
+import { icons } from '../icon/component';
 import EntityHOC from '../entity/component';
 import Panel from '../panel/component';
 import Links from '../links/component';
@@ -103,7 +104,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     {},
     ...Object.keys(this.props.customEntities).map(type => ({
       [type]: EntityHOC(
-        connect(null, { setName })(this.props.customEntities[type])
+        connect(null, { setName })(this.props.customEntities[type].component)
       ),
     }))
   );
@@ -112,7 +113,14 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
+
     window.document.addEventListener('keydown', this.handleKey);
+
+    Object.keys(this.props.customEntities).forEach(entityType => {
+      icons.addIcon({
+        [entityType]: this.props.customEntities[entityType].icon,
+      });
+    });
   }
 
   componentWillUnmount() {

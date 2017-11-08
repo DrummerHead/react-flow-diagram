@@ -7,7 +7,8 @@ import { Provider } from 'react-redux';
 import reducer from './reducer';
 import Canvas from '../canvas/component';
 
-import type { ComponentType } from 'React';
+import type { ComponentType, Element } from 'React';
+import type { EntityType } from '../entity/reducer';
 import type { DiagComponentProps } from 'react-flow-diagram';
 
 export const store = createStore(
@@ -16,7 +17,13 @@ export const store = createStore(
 );
 
 export type CustomEntities = {
-  [type: string]: ComponentType<DiagComponentProps>,
+  [type: EntityType]: {
+    component: ComponentType<DiagComponentProps>,
+    icon: {
+      path: Element<*>,
+      size: number,
+    },
+  },
 };
 
 type DiagramProps = { customEntities: CustomEntities };

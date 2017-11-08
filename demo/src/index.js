@@ -7,7 +7,9 @@ import { Diagram, store, setEntities, setConfig } from '../../src';
 import model from './model-example';
 import config from './config-example';
 import Task from './task/component';
+import TaskIcon from './task/icon';
 import Event from './event/component';
+import EventIcon from './event/icon';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -30,8 +32,14 @@ const Main = styled.main`
 `;
 
 const customEntities = {
-  Task: Task,
-  Event: Event,
+  Task: {
+    component: Task,
+    icon: TaskIcon,
+  },
+  Event: {
+    component: Event,
+    icon: EventIcon,
+  },
 };
 
 class Demo extends React.PureComponent<{}> {

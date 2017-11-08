@@ -11,9 +11,9 @@ import type { Element } from 'react';
 
 const Svg = style.svg`
   width: 1.25em;
-`;
-const Path = style.path`
-  fill: #444;
+  & > path {
+    fill: #444;
+  }
 `;
 
 type IconList = {
@@ -22,30 +22,35 @@ type IconList = {
     size: number,
   },
 };
-const iconList: IconList = {
-  delete: {
-    path: (
-      <Path d="M3 16h10l1-11H2zm7-14V0H6v2H1v3l1-1h12l1 1V2h-5zM9 2H7V1h2v1z" />
-    ),
-    size: 16,
-  },
-  Task: {
-    path: (
-      <Path d="M14 0H2C1 0 0 1 0 2v12c0 1 1 2 2 2h12c1 0 2-1 2-2V2c0-1-1-2-2-2z" />
-    ),
-    size: 16,
-  },
-  Event: {
-    path: <Path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8z" />,
-    size: 16,
-  },
-  arrow: {
-    path: <Path d="M4.5 0l4 4L0 12.5 3.5 16 12 7.5l4 4V0H4.5z" />,
-    size: 16,
-  },
-};
 
-export type IconVariety = $Keys<typeof iconList>;
+const icons = (function() {
+  let iconList: IconList = {
+    delete: {
+      path: (
+        <path d="M3 16h10l1-11H2zm7-14V0H6v2H1v3l1-1h12l1 1V2h-5zM9 2H7V1h2v1z" />
+      ),
+      size: 16,
+    },
+    arrow: {
+      path: <path d="M4.5 0l4 4L0 12.5 3.5 16 12 7.5l4 4V0H4.5z" />,
+      size: 16,
+    },
+  };
+
+  return {
+    get(iconName: string) {
+      return iconList[iconName];
+    },
+    addIcon(icon: IconList): void {
+      iconList = {
+        ...iconList,
+        ...icon,
+      };
+    },
+  };
+})();
+
+export type IconVariety = string;
 
 type IconProps = {
   name: IconVariety,
@@ -54,11 +59,14 @@ type IconProps = {
 const Icon = ({ name, label }: IconProps) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox={`0 0 ${iconList[name].size} ${iconList[name].size}`}
+    viewBox={`0 0 ${icons.get(name).size.toString()} ${icons
+      .get(name)
+      .size.toString()}`}
   >
     {label && <title>{label}</title>}
-    {iconList[name].path}
+    {icons.get(name).path}
   </Svg>
 );
 
 export default Icon;
+export { icons };
