@@ -47,6 +47,7 @@ export type TaskProps = {
   toggleEdit: boolean => void,
   refreshName: (SyntheticEvent<HTMLTextAreaElement>) => void,
   handleKeyPress: (SyntheticKeyboardEvent<HTMLTextAreaElement>) => void,
+  handleRef: HTMLTextAreaElement => void,
 };
 const Task = (props: TaskProps) => (
   <TaskStyle
@@ -54,17 +55,19 @@ const Task = (props: TaskProps) => (
     height={props.meta.height}
     isEditing={props.isEditing}
   >
-    {props.isEditing ? (
-      <EditName
-        value={props.name}
-        onChange={props.refreshName}
-        onKeyDown={props.handleKeyPress}
-      />
-    ) : (
-      <Name onDoubleClick={() => props.toggleEdit(true)}>
-        {props.model.name}
-      </Name>
-    )}
+    <EditName
+      value={props.name}
+      onChange={props.refreshName}
+      onKeyDown={props.handleKeyPress}
+      innerRef={textarea => props.handleRef(textarea)}
+      style={{ display: props.isEditing ? 'block' : 'none' }}
+    />
+    <Name
+      onDoubleClick={() => props.toggleEdit(true)}
+      style={{ display: !props.isEditing ? 'block' : 'none' }}
+    >
+      {props.model.name}
+    </Name>
   </TaskStyle>
 );
 
@@ -81,12 +84,28 @@ class TaskComponent extends React.PureComponent<
   TaskComponentProps,
   TaskComponentState
 > {
+  textarea: ?HTMLTextAreaElement;
+
   state = {
     isEditing: false,
     name: this.props.model.name,
   };
 
+  componentWillUnmount() {
+    this.textarea = null;
+  }
+
+  handleRef = (textarea: HTMLTextAreaElement) => {
+    if (!this.textarea) {
+      this.textarea = textarea;
+    }
+  };
+
   toggleEdit = (isEditing: boolean) => {
+    const { textarea } = this;
+    if (isEditing && textarea) {
+      setTimeout(() => textarea.focus(), 16 * 4);
+    }
     this.setState({ isEditing });
   };
 
@@ -117,6 +136,7 @@ class TaskComponent extends React.PureComponent<
         toggleEdit={this.toggleEdit}
         refreshName={this.refreshName}
         handleKeyPress={this.handleKeyPress}
+        handleRef={this.handleRef}
       />
     );
   }
