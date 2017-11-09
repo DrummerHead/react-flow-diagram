@@ -3,11 +3,7 @@
 import React from 'react';
 import style from 'styled-components';
 
-import type {
-  EntityModel,
-  MetaEntityModel,
-  DiagComponentProps,
-} from 'react-flow-diagram';
+import type { DiagComponentProps } from 'react-flow-diagram';
 
 /*
  * Presentational
@@ -39,9 +35,7 @@ const EditName = style.textarea`
   border-radius: .5rem;
 `;
 
-export type TaskProps = {
-  model: EntityModel,
-  meta: MetaEntityModel,
+export type TaskProps = DiagComponentProps & {
   name: string,
   isEditing: boolean,
   toggleEdit: boolean => void,
