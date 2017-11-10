@@ -4,7 +4,7 @@ import type { ActionShape, Action } from '../diagram/reducer';
 import type { ConfigState } from '../config/reducer';
 import type { CanvasState } from '../canvas/reducer';
 
-export type Id = string;
+export type EntityId = string;
 
 // export type EntityType = 'Task' | 'Event';
 // I don't like that since the user can name any type of entity, now I lose on
@@ -13,18 +13,18 @@ export type Id = string;
 export type EntityType = string;
 
 export type EntityModel = {
-  id: Id,
+  id: EntityId,
   type: EntityType,
   x: number,
   y: number,
   name: string,
-  linksTo?: Array<Id>,
+  linksTo?: Array<EntityId>,
 };
 
 export type EntityState = Array<EntityModel>;
 
 export type MetaEntityModel = {
-  id: string,
+  id: EntityId,
   type: EntityType,
   width: number,
   height: number,
@@ -36,16 +36,16 @@ export type MetaEntityState = Array<MetaEntityModel>;
 
 export type AddLinkedEntityPayload = {
   entity: EntityModel & MetaEntityModel,
-  id: Id,
+  id: EntityId,
 };
 export type MovePayload = { x: number, y: number, id: string };
-export type SetNamePayload = { id: Id, name: string };
+export type SetNamePayload = { id: EntityId, name: string };
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
   | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
-  | ActionShape<'rd/entity/LINK_TO', Id>
+  | ActionShape<'rd/entity/LINK_TO', EntityId>
   | ActionShape<'rd/entity/ADD_LINKED', AddLinkedEntityPayload>
-  | ActionShape<'rd/entity/REMOVE', Id>
+  | ActionShape<'rd/entity/REMOVE', EntityId>
   | ActionShape<'rd/entity/MOVE', MovePayload>
   | ActionShape<'rd/entity/SET_NAME', SetNamePayload>;
 
@@ -60,7 +60,7 @@ export const EntityActionTypesModify = [
 
 export type MetaEntityAction = ActionShape<
   'rd/entity/SELECT',
-  { id: Id, isSelected: boolean }
+  { id: EntityId, isSelected: boolean }
 >;
 
 const entityReducer = (
@@ -256,7 +256,7 @@ export const addEntity = (
   payload: EntityModel & MetaEntityModel
 ): EntityAction => ({ type: 'rd/entity/ADD', payload });
 
-export const linkTo = (payload: Id): EntityAction => ({
+export const linkTo = (payload: EntityId): EntityAction => ({
   type: 'rd/entity/LINK_TO',
   payload,
 });
@@ -265,7 +265,7 @@ export const addLinkedEntity = (
   payload: AddLinkedEntityPayload
 ): EntityAction => ({ type: 'rd/entity/ADD_LINKED', payload });
 
-export const removeEntity = (payload: Id): EntityAction => ({
+export const removeEntity = (payload: EntityId): EntityAction => ({
   type: 'rd/entity/REMOVE',
   payload,
 });
@@ -281,7 +281,7 @@ export const setName = (payload: SetNamePayload): EntityAction => ({
 });
 
 export const selectEntity = (
-  id: Id,
+  id: EntityId,
   isSelected?: boolean = true
 ): MetaEntityAction => ({
   type: 'rd/entity/SELECT',

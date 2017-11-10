@@ -18,7 +18,7 @@
     "test:coverage": "nwb test-react --coverage",
     "test:watch": "nwb test-react --server",
     "preversion": "yarn build",
-    "lintjs": "prettier --single-quote --trailing-comma es5 --write \"{src,demo/src}/**/*.js\"",
+    "lintjs": "prettier --single-quote --trailing-comma es5 --write \"{src,demo/src,flow-typed-definition}/**/*.js\"",
     "air": "eslint \"{src,demo/src}/**/*.js\"",
     "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check",
     "flow": "flow",

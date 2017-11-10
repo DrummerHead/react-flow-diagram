@@ -17,7 +17,7 @@ import ContextMenu from '../contextMenu/component';
 // eslint-disable-next-line import/first
 import type { ComponentType, Node } from 'react';
 import type {
-  Id,
+  EntityId,
   EntityModel,
   EntityType,
   MetaEntityModel,
@@ -89,7 +89,7 @@ type EntityProps = {
   onMouseUp: () => void,
   children: Node,
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
-  removeEntity: Id => EntityAction,
+  removeEntity: EntityId => EntityAction,
   connecting: ConnectingPayload => CanvasAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
@@ -145,11 +145,11 @@ type EntityContainerProps = {
   canvas: CanvasState,
   entityTypes: ConfigEntityTypes,
   move: MovePayload => EntityAction,
-  linkTo: Id => EntityAction,
+  linkTo: EntityId => EntityAction,
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
-  removeEntity: Id => EntityAction,
+  removeEntity: EntityId => EntityAction,
   connecting: ConnectingPayload => CanvasAction,
-  selectEntity: (Id, isSelected?: boolean) => MetaEntityAction,
+  selectEntity: (EntityId, isSelected?: boolean) => MetaEntityAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
 const EntityContainerHOC = WrappedComponent =>

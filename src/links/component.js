@@ -4,7 +4,7 @@ import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
 
-import type { EntityModel, MetaEntityModel, Id } from '../entity/reducer';
+import type { EntityModel, MetaEntityModel, EntityId } from '../entity/reducer';
 import type { State } from '../diagram/reducer';
 
 type MergedModel = EntityModel & MetaEntityModel;
@@ -131,7 +131,7 @@ const ArrowBodyContainer = (props: ArrowBodyContainerProps) => (
   </g>
 );
 
-const getModelAndMeta = (id: Id, state: State): MergedModel => ({
+const getModelAndMeta = (id: EntityId, state: State): MergedModel => ({
   ...state.metaEntity.find(entity => entity.id === id),
   ...state.entity.find(entity => entity.id === id),
 });

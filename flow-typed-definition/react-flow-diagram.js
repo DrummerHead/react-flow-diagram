@@ -1,25 +1,27 @@
 // @flow
 
+import type { ComponentType, Element } from 'React';
+
 declare module 'react-flow-diagram' {
   // Entity
   //
-  declare type Id = string;
+  declare export type EntityId = string;
 
-  declare type EntityType = 'Task' | 'Event';
+  declare type EntityType = string;
 
   declare export type EntityModel = {
-    id: Id,
+    id: EntityId,
     type: EntityType,
     x: number,
     y: number,
     name: string,
-    linksTo?: Array<Id>,
+    linksTo?: Array<EntityId>,
   };
 
   declare export type EntityState = Array<EntityModel>;
 
   declare export type MetaEntityModel = {
-    id: string,
+    id: EntityId,
     type: EntityType,
     width: number,
     height: number,
@@ -31,41 +33,62 @@ declare module 'react-flow-diagram' {
 
   declare type AddLinkedEntityPayload = {
     entity: EntityModel & MetaEntityModel,
-    id: Id,
+    id: EntityId,
   };
   declare type MovePayload = { x: number, y: number, id: string };
-  declare export type SetNamePayload = { id: Id, name: string };
+  declare export type SetNamePayload = { id: EntityId, name: string };
   declare export type EntityAction =
     | ActionShape<'rd/entity/SET', EntityState>
     | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
+    | ActionShape<'rd/entity/LINK_TO', EntityId>
     | ActionShape<'rd/entity/ADD_LINKED', AddLinkedEntityPayload>
-    | ActionShape<'rd/entity/REMOVE', Id>
+    | ActionShape<'rd/entity/REMOVE', EntityId>
     | ActionShape<'rd/entity/MOVE', MovePayload>
     | ActionShape<'rd/entity/SET_NAME', SetNamePayload>;
 
   declare type MetaEntityAction = ActionShape<
     'rd/entity/SELECT',
-    { id: Id, isSelected: boolean }
+    { id: EntityId, isSelected: boolean }
   >;
 
   // Canvas
   //
   declare type CanvasState = {
-    offsetX: number,
-    offsetY: number,
+    offset: {
+      x: number,
+      y: number,
+    },
+    cursor: {
+      x: number,
+      y: number,
+    },
+    connecting: {
+      currently: boolean,
+      from: EntityId,
+    },
   };
 
-  declare type CanvasAction = ActionShape<'rd/canvas/SET_OFFSET', CanvasState>;
+  declare type Coords = { x: number, y: number };
+  declare type ConnectingPayload = {
+    currently: boolean,
+    from: EntityId,
+  };
+  declare type CanvasAction =
+    | ActionShape<'rd/canvas/SET_OFFSET', Coords>
+    | ActionShape<'rd/canvas/TRACK', Coords>
+    | ActionShape<'rd/canvas/CONNECT', ConnectingPayload>;
 
   // Config
   //
-  declare type ConfigState = {
-    entityTypes: {
-      [EntityType]: {
-        width: number,
-        height: number,
-      },
+  declare type ConfigEntityTypes = {
+    [EntityType]: {
+      width: number,
+      height: number,
     },
+  };
+
+  declare export type ConfigState = {
+    entityTypes: ConfigEntityTypes,
   };
 
   declare type ConfigAction = ActionShape<'rd/config/SET', ConfigState>;
@@ -88,15 +111,6 @@ declare module 'react-flow-diagram' {
 
   // Diagram
   //
-  declare type State = {
-    entity: EntityState,
-    metaEntity: MetaEntityState,
-    canvas: CanvasState,
-    config: ConfigState,
-    history: HistoryState,
-    lastAction: ActionType,
-  };
-
   declare type ActionShape<S, P> = { type: S, payload: P };
   declare type InitAction = ActionShape<'@@INIT', void>;
   declare type Action =
@@ -106,6 +120,25 @@ declare module 'react-flow-diagram' {
     | ConfigAction
     | HistoryAction;
   declare type ActionType = $PropertyType<Action, 'type'>;
+
+  declare type State = {
+    entity: EntityState,
+    metaEntity: MetaEntityState,
+    canvas: CanvasState,
+    config: ConfigState,
+    history: HistoryState,
+    lastAction: ActionType,
+  };
+
+  declare export type CustomEntities = {
+    [type: EntityType]: {
+      component: ComponentType<DiagComponentProps>,
+      icon: {
+        path: Element<*>,
+        size: number,
+      },
+    },
+  };
 
   // diagramOn
   //

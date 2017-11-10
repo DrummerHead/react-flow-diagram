@@ -1,7 +1,7 @@
 // @flow
 
 import type { ActionShape, Action } from '../diagram/reducer';
-import type { Id } from '../entity/reducer';
+import type { EntityId } from '../entity/reducer';
 
 export type CanvasState = {
   offset: {
@@ -14,14 +14,14 @@ export type CanvasState = {
   },
   connecting: {
     currently: boolean,
-    from: Id,
+    from: EntityId,
   },
 };
 
 export type Coords = { x: number, y: number };
 export type ConnectingPayload = {
   currently: boolean,
-  from: Id,
+  from: EntityId,
 };
 export type CanvasAction =
   | ActionShape<'rd/canvas/SET_OFFSET', Coords>
