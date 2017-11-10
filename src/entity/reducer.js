@@ -19,6 +19,7 @@ export type EntityModel = {
   y: number,
   name: string,
   linksTo?: Array<EntityId>,
+  custom?: Object,
 };
 
 export type EntityState = Array<EntityModel>;
@@ -40,6 +41,7 @@ export type AddLinkedEntityPayload = {
 };
 export type MovePayload = { x: number, y: number, id: string };
 export type SetNamePayload = { id: EntityId, name: string };
+export type SetCustomPayload = { id: EntityId, custom: Object };
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
   | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
@@ -47,11 +49,13 @@ export type EntityAction =
   | ActionShape<'rd/entity/ADD_LINKED', AddLinkedEntityPayload>
   | ActionShape<'rd/entity/REMOVE', EntityId>
   | ActionShape<'rd/entity/MOVE', MovePayload>
-  | ActionShape<'rd/entity/SET_NAME', SetNamePayload>;
+  | ActionShape<'rd/entity/SET_NAME', SetNamePayload>
+  | ActionShape<'rd/entity/SET_CUSTOM', SetCustomPayload>;
 
 export const EntityActionTypeOpen = 'rd/entity/SET';
 export const EntityActionTypesModify = [
   'rd/entity/ADD',
+  'rd/entity/LINK_TO',
   'rd/entity/ADD_LINKED',
   'rd/entity/REMOVE',
   'rd/entity/MOVE',
@@ -148,6 +152,7 @@ const entityReducer = (
             : entity
       );
     }
+
     case 'rd/entity/SET_NAME': {
       const { id, name } = action.payload;
       return state.map(
@@ -156,6 +161,19 @@ const entityReducer = (
             ? {
                 ...entity,
                 name,
+              }
+            : entity
+      );
+    }
+
+    case 'rd/entity/SET_CUSTOM': {
+      const { id, custom } = action.payload;
+      return state.map(
+        entity =>
+          entity.id === id
+            ? {
+                ...entity,
+                custom,
               }
             : entity
       );
@@ -277,6 +295,11 @@ export const move = (payload: MovePayload): EntityAction => ({
 
 export const setName = (payload: SetNamePayload): EntityAction => ({
   type: 'rd/entity/SET_NAME',
+  payload,
+});
+
+export const setCustom = (payload: SetCustomPayload): EntityAction => ({
+  type: 'rd/entity/SET_CUSTOM',
   payload,
 });
 

@@ -16,6 +16,7 @@ declare module 'react-flow-diagram' {
     y: number,
     name: string,
     linksTo?: Array<EntityId>,
+    custom?: Object,
   };
 
   declare export type EntityState = Array<EntityModel>;
@@ -37,6 +38,7 @@ declare module 'react-flow-diagram' {
   };
   declare type MovePayload = { x: number, y: number, id: string };
   declare export type SetNamePayload = { id: EntityId, name: string };
+  declare type SetCustomPayload = { id: EntityId, custom: Object };
   declare export type EntityAction =
     | ActionShape<'rd/entity/SET', EntityState>
     | ActionShape<'rd/entity/ADD', EntityModel & MetaEntityModel>
@@ -44,7 +46,8 @@ declare module 'react-flow-diagram' {
     | ActionShape<'rd/entity/ADD_LINKED', AddLinkedEntityPayload>
     | ActionShape<'rd/entity/REMOVE', EntityId>
     | ActionShape<'rd/entity/MOVE', MovePayload>
-    | ActionShape<'rd/entity/SET_NAME', SetNamePayload>;
+    | ActionShape<'rd/entity/SET_NAME', SetNamePayload>
+    | ActionShape<'rd/entity/SET_CUSTOM', SetCustomPayload>;
 
   declare type MetaEntityAction = ActionShape<
     'rd/entity/SELECT',
@@ -180,4 +183,6 @@ declare module 'react-flow-diagram' {
   declare export function setEntities(EntityState): EntityAction;
 
   declare export function setConfig(ConfigState): ConfigAction;
+
+  declare export function setCustom(SetCustomPayload): EntityAction;
 }
