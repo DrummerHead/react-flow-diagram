@@ -1,10 +1,12 @@
 // @flow
 
-import type { EntityModel, MetaEntityModel, Point } from '../entity/reducer';
+import type { EntityModel, Point } from '../entity/reducer';
 
-type MergedModel = EntityModel & MetaEntityModel;
+const calcLinkPoints = (from: EntityModel, to: ?EntityModel): Array<Point> => {
+  if (to === undefined || to === null) {
+    return [{ x: 0, y: 0 }, { x: 100, y: 100 }];
+  }
 
-const calcLinkPoints = (from: MergedModel, to: MergedModel): Array<Point> => {
   const fromMidX = from.x + from.width / 2;
   const fromMidY = from.y + from.height / 2;
   const toMidX = to.x + to.width / 2;

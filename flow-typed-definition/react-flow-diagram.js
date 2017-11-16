@@ -7,15 +7,31 @@ declare module 'react-flow-diagram' {
   //
   declare export type EntityId = string;
 
+  declare type Point = {
+    x: number,
+    y: number,
+  };
+
+  declare type Link = {
+    target: EntityId,
+    points?: Array<Point>,
+    label?: string,
+    color?: string,
+  };
+
+  declare type Links = Array<Link>;
+
   declare type EntityType = string;
 
   declare export type EntityModel = {
     id: EntityId,
     type: EntityType,
+    width: number,
+    height: number,
     x: number,
     y: number,
     name: string,
-    linksTo?: Array<EntityId>,
+    linksTo?: Links,
     custom?: Object,
   };
 
@@ -23,9 +39,6 @@ declare module 'react-flow-diagram' {
 
   declare export type MetaEntityModel = {
     id: EntityId,
-    type: EntityType,
-    width: number,
-    height: number,
     isAnchored: boolean,
     isSelected: boolean,
   };

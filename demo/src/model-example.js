@@ -11,6 +11,8 @@ const model: EntityState = [
   {
     id: 'ja1lnjvx',
     type: 'Task',
+    width: 120,
+    height: 75,
     x: 127,
     y: 107.5,
     name: 'Gorilla',
@@ -62,6 +64,8 @@ const model: EntityState = [
   {
     id: 'ja1lnkqu',
     type: 'Event',
+    width: 50,
+    height: 50,
     x: 423,
     y: 172,
     name: 'Toucan',
@@ -92,6 +96,8 @@ const model: EntityState = [
   {
     id: 'ja1lnq90',
     type: 'Task',
+    width: 120,
+    height: 75,
     x: 196,
     y: 287.5,
     name: 'Zebra',
@@ -99,6 +105,8 @@ const model: EntityState = [
   {
     id: 'ja1lnx2u',
     type: 'Task',
+    width: 120,
+    height: 75,
     x: 348,
     y: 47.5,
     name: 'Jiraffe',

@@ -45,8 +45,8 @@ export type TaskProps = DiagComponentProps & {
 };
 const Task = (props: TaskProps) => (
   <TaskStyle
-    width={props.meta.width}
-    height={props.meta.height}
+    width={props.model.width}
+    height={props.model.height}
     isEditing={props.isEditing}
   >
     <EditName

@@ -54,7 +54,7 @@ export type EventProps = DiagComponentProps & {
   handleRef: HTMLTextAreaElement => void,
 };
 const Event = (props: EventProps) => (
-  <EventStyle width={props.meta.width} height={props.meta.height}>
+  <EventStyle width={props.model.width} height={props.model.height}>
     <EditName
       value={props.name}
       onChange={props.refreshName}

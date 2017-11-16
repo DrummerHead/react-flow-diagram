@@ -158,8 +158,8 @@ const EntityContainerHOC = WrappedComponent =>
     EntityContainerState
   > {
     state = {
-      anchorX: this.props.meta.width / 2,
-      anchorY: this.props.meta.height / 2,
+      anchorX: this.props.model.width / 2,
+      anchorY: this.props.model.height / 2,
       isAnchored: this.props.meta.isAnchored,
       onMouseUpWouldBeClick: true,
     };

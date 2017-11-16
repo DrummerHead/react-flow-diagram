@@ -3,7 +3,6 @@
 import calcLinkPoints from '../links/calcLinkPoints';
 
 import type { ActionShape, Action } from '../diagram/reducer';
-import type { ConfigState } from '../config/reducer';
 import type { CanvasState } from '../canvas/reducer';
 
 export type EntityId = string;
@@ -26,6 +25,8 @@ export type EntityType = string;
 export type EntityModel = {
   id: EntityId,
   type: EntityType,
+  width: number,
+  height: number,
   x: number,
   y: number,
   name: string,
@@ -37,9 +38,6 @@ export type EntityState = Array<EntityModel>;
 
 export type MetaEntityModel = {
   id: EntityId,
-  type: EntityType,
-  width: number,
-  height: number,
   isAnchored: boolean,
   isSelected: boolean,
 };
@@ -52,11 +50,6 @@ export type AddLinkedEntityPayload = {
 };
 export type MovePayload = { x: number, y: number, id: string };
 export type SetNamePayload = { id: EntityId, name: string };
-export type SetLinkPointsPayload = {
-  from: EntityId,
-  to: EntityId,
-  points: Array<Point>,
-};
 export type SetCustomPayload = { id: EntityId, custom: Object };
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
@@ -66,7 +59,6 @@ export type EntityAction =
   | ActionShape<'rd/entity/REMOVE', EntityId>
   | ActionShape<'rd/entity/MOVE', MovePayload>
   | ActionShape<'rd/entity/SET_NAME', SetNamePayload>
-  | ActionShape<'rd/entity/LINK_POINTS', SetLinkPointsPayload>
   | ActionShape<'rd/entity/SET_CUSTOM', SetCustomPayload>;
 
 export const EntityActionTypeOpen = 'rd/entity/SET';
@@ -87,12 +79,25 @@ export type MetaEntityAction = ActionShape<
 const entityReducer = (
   state: EntityState = [],
   action: Action,
-  canvas: CanvasState,
-  metaState: MetaEntityState
+  canvas: CanvasState
 ): EntityState => {
   switch (action.type) {
     case 'rd/entity/SET':
       return action.payload;
+
+    case 'rd/config/SET': {
+      const configs = action.payload;
+      return state.map(entity => {
+        const relevantConfig = configs.entityTypes[entity.type];
+        return relevantConfig
+          ? {
+              ...entity,
+              width: relevantConfig.width,
+              height: relevantConfig.height,
+            }
+          : entity;
+      });
+    }
 
     case 'rd/entity/ADD':
       return [
@@ -100,6 +105,8 @@ const entityReducer = (
         {
           id: action.payload.id,
           type: action.payload.type,
+          width: action.payload.width,
+          height: action.payload.height,
           x: action.payload.x,
           y: action.payload.y,
           name: action.payload.name,
@@ -122,18 +129,8 @@ const entityReducer = (
                         {
                           target: payload,
                           points: calcLinkPoints(
-                            {
-                              ...entity,
-                              ...metaState.find(
-                                metaEntity => metaEntity.id === entity.id
-                              ),
-                            },
-                            {
-                              ...state.find(entity => entity.id === payload),
-                              ...metaState.find(
-                                metaEntity => metaEntity.id === payload
-                              ),
-                            }
+                            entity,
+                            state.find(ent => ent.id === payload)
                           ),
                         },
                       ]),
@@ -161,6 +158,8 @@ const entityReducer = (
         {
           id: entity.id,
           type: entity.type,
+          width: entity.width,
+          height: entity.height,
           x: entity.x,
           y: entity.y,
           name: entity.name,
@@ -192,16 +191,8 @@ const entityReducer = (
             linksTo: entity.linksTo.map(link => ({
               ...link,
               points: calcLinkPoints(
-                {
-                  ...entity,
-                  ...metaState.find(metaEntity => metaEntity.id === entity.id),
-                },
-                {
-                  ...state.find(entity => entity.id === link.target),
-                  ...metaState.find(
-                    metaEntity => metaEntity.id === link.target
-                  ),
-                }
+                entity,
+                state.find(ent => ent.id === link.target)
               ),
             })),
           };
@@ -223,16 +214,8 @@ const entityReducer = (
                   ? {
                       ...link,
                       points: calcLinkPoints(
-                        {
-                          ...entity,
-                          ...metaState.find(
-                            metaEntity => metaEntity.id === entity.id
-                          ),
-                        },
-                        {
-                          ...state.find(entity => entity.id === id),
-                          ...metaState.find(metaEntity => metaEntity.id === id),
-                        }
+                        entity,
+                        state.find(ent => ent.id === id)
                       ),
                     }
                   : link
@@ -297,53 +280,23 @@ const entityReducer = (
   }
 };
 
-const defaultConfig = {
-  width: 50,
-  height: 50,
-};
 export const metaEntityReducer = (
   state: MetaEntityState = [],
-  action: Action,
-  config: ConfigState
+  action: Action
 ): MetaEntityState => {
   switch (action.type) {
     case 'rd/entity/SET':
-      return action.payload.map(entity => {
-        const conf = config.entityTypes[entity.type]
-          ? config.entityTypes[entity.type]
-          : defaultConfig;
-        return {
-          id: entity.id,
-          type: entity.type,
-          width: conf.width,
-          height: conf.height,
-          isAnchored: false,
-          isSelected: false,
-        };
-      });
-
-    case 'rd/config/SET': {
-      const configs = action.payload;
-      return state.map(metaModel => {
-        const relevantConfig = configs.entityTypes[metaModel.type];
-        return relevantConfig
-          ? {
-              ...metaModel,
-              width: relevantConfig.width,
-              height: relevantConfig.height,
-            }
-          : metaModel;
-      });
-    }
+      return action.payload.map(entity => ({
+        id: entity.id,
+        isAnchored: false,
+        isSelected: false,
+      }));
 
     case 'rd/entity/ADD':
       return [
         ...state,
         {
           id: action.payload.id,
-          type: action.payload.type,
-          width: action.payload.width,
-          height: action.payload.height,
           isAnchored: action.payload.isAnchored,
           isSelected: action.payload.isSelected,
         },
@@ -353,9 +306,6 @@ export const metaEntityReducer = (
         ...state,
         {
           id: action.payload.entity.id,
-          type: action.payload.entity.type,
-          width: action.payload.entity.width,
-          height: action.payload.entity.height,
           isAnchored: action.payload.entity.isAnchored,
           isSelected: action.payload.entity.isSelected,
         },
@@ -409,14 +359,6 @@ export const move = (payload: MovePayload): EntityAction => ({
 
 export const setName = (payload: SetNamePayload): EntityAction => ({
   type: 'rd/entity/SET_NAME',
-  payload,
-});
-
-// TODO: Check if this following action (and types and stuff associated to it)
-// are necessesary, 'cause I think I don't need this action given the approach
-// I'm concocting for defining link points
-export const setLinkPoints = (payload: SetLinkPointsPayload): EntityAction => ({
-  type: 'rd/entity/LINK_POINTS',
   payload,
 });
 
