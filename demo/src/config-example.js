@@ -5,8 +5,7 @@ import taskIcon from './task/icon';
 import Event from './event/component';
 import eventIcon from './event/icon';
 
-import type { ConfigState } from 'react-flow-diagram';
-import type { CustomEntities } from 'react-flow-diagram';
+import type { ConfigState, CustomEntities } from 'react-flow-diagram';
 
 const config: ConfigState = {
   entityTypes: {

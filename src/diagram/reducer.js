@@ -62,7 +62,7 @@ const initialState = {
 };
 
 const appReducer = (state: State = initialState, action: Action): State => ({
-  entity: entityReducer(state.entity, action, state.canvas),
+  entity: entityReducer(state.entity, action, state.canvas, state.metaEntity),
   metaEntity: metaEntityReducer(state.metaEntity, action, state.config),
   canvas: canvasReducer(state.canvas, action),
   config: configReducer(state.config, action),

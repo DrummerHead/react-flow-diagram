@@ -40,43 +40,6 @@ import type { ConfigEntityTypes } from '../config/reducer';
  * Presentational
  * ==================================== */
 
-const contextMenuActions = (props: EntityProps): ContextMenuActions => {
-  const remove = {
-    action: () => props.removeEntity(props.model.id),
-    iconVariety: 'delete',
-    label: 'Remove',
-  };
-
-  const connect = {
-    action: () => props.connecting({ currently: true, from: props.model.id }),
-    iconVariety: 'arrow',
-    label: 'Connect',
-  };
-
-  const addEntities = props.entityTypeNames.map(entityTypeName => ({
-    action: ev =>
-      props.addLinkedEntity({
-        entity: props.defaultEntity({ entityType: entityTypeName, ev }),
-        id: props.model.id,
-      }),
-    iconVariety: entityTypeName,
-    label: `Add ${entityTypeName}`,
-  }));
-
-  return [remove, ...addEntities, connect];
-};
-
-const EntityStyle = style.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  text-align: center;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  user-select: none;
-`;
-
 type EntityProps = {
   model: EntityModel,
   entityTypeNames: Array<EntityType>,
@@ -93,6 +56,43 @@ type EntityProps = {
   connecting: ConnectingPayload => CanvasAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
+const contextMenuActions = (props: EntityProps): ContextMenuActions => {
+  const remove = {
+    action: () => props.removeEntity(props.model.id),
+    iconVariety: 'delete',
+    label: 'Remove',
+  };
+
+  const connectAction = {
+    action: () => props.connecting({ currently: true, from: props.model.id }),
+    iconVariety: 'arrow',
+    label: 'Connect',
+  };
+
+  const addEntities = props.entityTypeNames.map(entityTypeName => ({
+    action: ev =>
+      props.addLinkedEntity({
+        entity: props.defaultEntity({ entityType: entityTypeName, ev }),
+        id: props.model.id,
+      }),
+    iconVariety: entityTypeName,
+    label: `Add ${entityTypeName}`,
+  }));
+
+  return [remove, ...addEntities, connectAction];
+};
+
+const EntityStyle = style.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-align: center;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  user-select: none;
+`;
+
 const Entity = (props: EntityProps) => (
   <EntityStyle
     style={{
@@ -164,8 +164,6 @@ const EntityContainerHOC = WrappedComponent =>
       onMouseUpWouldBeClick: true,
     };
 
-    entityTypeNames = Object.keys(this.props.entityTypes);
-
     componentDidMount() {
       const wouldBeClick = () =>
         this.setState({ onMouseUpWouldBeClick: false });
@@ -175,6 +173,8 @@ const EntityContainerHOC = WrappedComponent =>
         wouldBeClick();
       }
     }
+
+    entityTypeNames = Object.keys(this.props.entityTypes);
 
     onMouseDown = (ev: SyntheticMouseEvent<HTMLElement>) => {
       if (this.props.canvas.connecting.currently) {

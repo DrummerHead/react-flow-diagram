@@ -72,7 +72,7 @@ const Canvas = (props: CanvasProps) => (
 
     {props.entities
       .map(entity => ({
-        entity: entity,
+        entity,
         CustomEntity: props.wrappedCustomEntities[entity.type],
       }))
       .map(Combo => (

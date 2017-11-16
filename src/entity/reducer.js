@@ -1,24 +1,35 @@
 // @flow
 
+import calcLinkPoints from '../links/calcLinkPoints';
+
 import type { ActionShape, Action } from '../diagram/reducer';
 import type { ConfigState } from '../config/reducer';
 import type { CanvasState } from '../canvas/reducer';
 
 export type EntityId = string;
 
-// export type EntityType = 'Task' | 'Event';
-// I don't like that since the user can name any type of entity, now I lose on
-// the EntityType specificity. Will this be a problem in the future? Who knows!
-// Programming is full of surprises. The dragons approach.
-export type EntityType = string;
+export type Point = {
+  x: number,
+  y: number,
+};
 
+type Link = {
+  target: EntityId,
+  points?: Array<Point>,
+  label?: string,
+  color?: string,
+};
+
+export type Links = Array<Link>;
+
+export type EntityType = string;
 export type EntityModel = {
   id: EntityId,
   type: EntityType,
   x: number,
   y: number,
   name: string,
-  linksTo?: Array<EntityId>,
+  linksTo?: Links,
   custom?: Object,
 };
 
@@ -41,6 +52,11 @@ export type AddLinkedEntityPayload = {
 };
 export type MovePayload = { x: number, y: number, id: string };
 export type SetNamePayload = { id: EntityId, name: string };
+export type SetLinkPointsPayload = {
+  from: EntityId,
+  to: EntityId,
+  points: Array<Point>,
+};
 export type SetCustomPayload = { id: EntityId, custom: Object };
 export type EntityAction =
   | ActionShape<'rd/entity/SET', EntityState>
@@ -50,6 +66,7 @@ export type EntityAction =
   | ActionShape<'rd/entity/REMOVE', EntityId>
   | ActionShape<'rd/entity/MOVE', MovePayload>
   | ActionShape<'rd/entity/SET_NAME', SetNamePayload>
+  | ActionShape<'rd/entity/LINK_POINTS', SetLinkPointsPayload>
   | ActionShape<'rd/entity/SET_CUSTOM', SetCustomPayload>;
 
 export const EntityActionTypeOpen = 'rd/entity/SET';
@@ -70,7 +87,8 @@ export type MetaEntityAction = ActionShape<
 const entityReducer = (
   state: EntityState = [],
   action: Action,
-  canvas: CanvasState
+  canvas: CanvasState,
+  metaState: MetaEntityState
 ): EntityState => {
   switch (action.type) {
     case 'rd/entity/SET':
@@ -95,7 +113,31 @@ const entityReducer = (
           entity.id === canvas.connecting.from
             ? {
                 ...entity,
-                linksTo: [...(entity.linksTo ? entity.linksTo : []), payload],
+                linksTo: [
+                  ...(entity.linksTo ? entity.linksTo : []),
+                  ...(entity.linksTo &&
+                  entity.linksTo.some(link => link.target === payload)
+                    ? []
+                    : [
+                        {
+                          target: payload,
+                          points: calcLinkPoints(
+                            {
+                              ...entity,
+                              ...metaState.find(
+                                metaEntity => metaEntity.id === entity.id
+                              ),
+                            },
+                            {
+                              ...state.find(entity => entity.id === payload),
+                              ...metaState.find(
+                                metaEntity => metaEntity.id === payload
+                              ),
+                            }
+                          ),
+                        },
+                      ]),
+                ],
               }
             : entity
       );
@@ -111,7 +153,7 @@ const entityReducer = (
                   ...existingEntity,
                   linksTo: [
                     ...(existingEntity.linksTo ? existingEntity.linksTo : []),
-                    entity.id,
+                    { target: entity.id },
                   ],
                 }
               : existingEntity
@@ -133,7 +175,7 @@ const entityReducer = (
             ? {
                 ...entity,
                 linksTo: entity.linksTo.filter(
-                  entityId => entityId !== action.payload
+                  link => link.target !== action.payload
                 ),
               }
             : entity
@@ -141,16 +183,65 @@ const entityReducer = (
 
     case 'rd/entity/MOVE': {
       const { id, x, y } = action.payload;
-      return state.map(
-        entity =>
-          entity.id === id
-            ? {
-                ...entity,
-                x,
-                y,
-              }
-            : entity
-      );
+      return state.map(entity => {
+        if (entity.linksTo && entity.id === id) {
+          return {
+            ...entity,
+            x,
+            y,
+            linksTo: entity.linksTo.map(link => ({
+              ...link,
+              points: calcLinkPoints(
+                {
+                  ...entity,
+                  ...metaState.find(metaEntity => metaEntity.id === entity.id),
+                },
+                {
+                  ...state.find(entity => entity.id === link.target),
+                  ...metaState.find(
+                    metaEntity => metaEntity.id === link.target
+                  ),
+                }
+              ),
+            })),
+          };
+        } else if (entity.id === id) {
+          return {
+            ...entity,
+            x,
+            y,
+          };
+        } else if (
+          entity.linksTo &&
+          entity.linksTo.some(link => link.target === id)
+        ) {
+          return {
+            ...entity,
+            linksTo: entity.linksTo.map(
+              link =>
+                link.target === id
+                  ? {
+                      ...link,
+                      points: calcLinkPoints(
+                        {
+                          ...entity,
+                          ...metaState.find(
+                            metaEntity => metaEntity.id === entity.id
+                          ),
+                        },
+                        {
+                          ...state.find(entity => entity.id === id),
+                          ...metaState.find(metaEntity => metaEntity.id === id),
+                        }
+                      ),
+                    }
+                  : link
+            ),
+          };
+        } else {
+          return entity;
+        }
+      });
     }
 
     case 'rd/entity/SET_NAME': {
@@ -161,6 +252,29 @@ const entityReducer = (
             ? {
                 ...entity,
                 name,
+              }
+            : entity
+      );
+    }
+
+    case 'rd/entity/LINK_POINTS': {
+      const { from, to, points } = action.payload;
+      return state.map(
+        entity =>
+          entity.id === from
+            ? {
+                ...entity,
+                linksTo: entity.linksTo
+                  ? entity.linksTo.map(
+                      link =>
+                        link.target === to
+                          ? {
+                              ...link,
+                              points,
+                            }
+                          : link
+                    )
+                  : [{ target: to, points }],
               }
             : entity
       );
@@ -295,6 +409,14 @@ export const move = (payload: MovePayload): EntityAction => ({
 
 export const setName = (payload: SetNamePayload): EntityAction => ({
   type: 'rd/entity/SET_NAME',
+  payload,
+});
+
+// TODO: Check if this following action (and types and stuff associated to it)
+// are necessesary, 'cause I think I don't need this action given the approach
+// I'm concocting for defining link points
+export const setLinkPoints = (payload: SetLinkPointsPayload): EntityAction => ({
+  type: 'rd/entity/LINK_POINTS',
   payload,
 });
 
