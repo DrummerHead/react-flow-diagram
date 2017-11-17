@@ -1,9 +1,24 @@
 // @flow
 
-import type { EntityModel, Point } from '../entity/reducer';
+import type { Point } from '../entity/reducer';
 
-const calcLinkPoints = (from: EntityModel, to: ?EntityModel): Array<Point> => {
-  if (to === undefined || to === null) {
+type Rect = {
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+};
+
+// TODO: the bend when the elements are close to each other (vertically or
+// horizontally) takes the center of each element as the distance to be divided
+// by two. It should take the distance between the edges of each element to be
+// divided by two.
+//
+// Imagine you have a wide element connecting to a slim element. The bend would
+// be too close to the wide element in relationship to the slim element.
+//
+const calcLinkPoints = (from: ?Rect, to: ?Rect): Array<Point> => {
+  if (from == null || to == null) {
     return [{ x: 0, y: 0 }, { x: 100, y: 100 }];
   }
 
