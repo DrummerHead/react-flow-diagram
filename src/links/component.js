@@ -3,7 +3,7 @@
 import React from 'react';
 import style from 'styled-components';
 
-import type { EntityModel, Point } from '../entity/reducer';
+import type { Links, Point } from '../entity/reducer';
 
 /*
  * Presentational
@@ -42,17 +42,16 @@ const pointsToString = (points: Array<Point>): string =>
   points.reduce((acc, curr) => `${acc} ${curr.x},${curr.y}`, '');
 
 type ArrowBodyContainerProps = {
-  model: EntityModel,
+  links: Links,
 };
 const ArrowBodyContainer = (props: ArrowBodyContainerProps) => (
   <g>
-    {props.model.linksTo &&
-      props.model.linksTo.map(
-        link =>
-          link.points && (
-            <ArrowBody key={link.target} points={pointsToString(link.points)} />
-          )
-      )}
+    {props.links.map(
+      link =>
+        link.points && (
+          <ArrowBody key={link.target} points={pointsToString(link.points)} />
+        )
+    )}
   </g>
 );
 
