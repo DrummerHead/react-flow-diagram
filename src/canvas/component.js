@@ -12,10 +12,11 @@ import Panel from '../panel/component';
 import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
 import Debug from '../debug/component';
+import calcLinkPoints from '../links/calcLinkPoints';
 
 import type { ComponentType } from 'React';
 import type { Coords, CanvasAction } from '../canvas/reducer';
-import type { EntityModel, EntityState } from '../entity/reducer';
+import type { EntityState, Point, Links as LinksType } from '../entity/reducer';
 import type { CustomEntities } from '../diagram/component';
 import type { State } from '../diagram/reducer';
 import type { HistoryAction } from '../history/reducer';
@@ -50,7 +51,7 @@ type CanvasProps = {
   entities: EntityState,
   wrappedCustomEntities: { [type: string]: ComponentType<*> },
   isConnecting: boolean,
-  connectingEntity: EntityModel,
+  connectingLink: LinksType,
   handleRef: HTMLElement => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
 };
@@ -63,10 +64,10 @@ const Canvas = (props: CanvasProps) => (
     <SvgLand width="100%" height="100%">
       {props.entities
         .filter(entity => 'linksTo' in entity)
-        .map(entity => <Links key={entity.id} model={entity} />)}
-
-      {props.isConnecting && <Links model={props.connectingEntity} />}
-
+        // $FlowFixMe
+        .map(entity => <Links key={entity.id} links={entity.linksTo} />)}
+      // https://github.com/facebook/flow/issues/1414
+      {props.isConnecting && <Links links={props.connectingLink} />}
       <ArrowMarker />
     </SvgLand>
 
@@ -91,7 +92,7 @@ type CanvasContainerProps = {
   entities: EntityState,
   customEntities: CustomEntities,
   isConnecting: boolean,
-  connectingEntity: EntityModel,
+  connectingLink: LinksType,
   setOffset: Coords => CanvasAction,
   trackMovement: Coords => CanvasAction,
   undo: () => HistoryAction,
@@ -99,15 +100,6 @@ type CanvasContainerProps = {
 };
 class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   canvasDOM: ?HTMLElement;
-
-  wrappedCustomEntities = Object.assign(
-    {},
-    ...Object.keys(this.props.customEntities).map(type => ({
-      [type]: EntityHOC(
-        connect(null, { setName })(this.props.customEntities[type].component)
-      ),
-    }))
-  );
 
   componentDidMount() {
     if ('scrollRestoration' in window.history) {
@@ -126,6 +118,15 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   componentWillUnmount() {
     window.document.removeEventListener('keydown', this.handleKey);
   }
+
+  wrappedCustomEntities = Object.assign(
+    {},
+    ...Object.keys(this.props.customEntities).map(type => ({
+      [type]: EntityHOC(
+        connect(null, { setName })(this.props.customEntities[type].component)
+      ),
+    }))
+  );
 
   setOffset() {
     if (this.canvasDOM) {
@@ -164,6 +165,8 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     });
   };
 
+  // TODO: Gotta do the setOffset when there's a window resize or an element
+  // dinamically added on top... perhaps call it each time an entity is created
   handleRef = (div: HTMLElement) => {
     if (this.canvasDOM === undefined) {
       this.canvasDOM = div;
@@ -179,18 +182,38 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
         handleRef={this.handleRef}
         onMouseMove={this.onMouseMove}
         isConnecting={this.props.isConnecting}
-        connectingEntity={this.props.connectingEntity}
+        connectingLink={this.props.connectingLink}
       />
     );
   }
 }
 
+const makeConnectingLinks = (state: State): LinksType => {
+  if (state.canvas.connecting.currently) {
+    const points: Array<Point> = calcLinkPoints(
+      state.entity.find(entity => entity.id === state.canvas.connecting.from),
+      {
+        x: state.canvas.cursor.x,
+        y: state.canvas.cursor.y,
+        width: 0,
+        height: 0,
+      }
+    );
+    return [
+      {
+        target: 'will_connect',
+        points,
+      },
+    ];
+  } else {
+    return [{ target: 'noop' }];
+  }
+};
+
 const mapStateToProps = (state: State) => ({
   entities: state.entity,
-  connectingEntity: state.entity.find(
-    entity => entity.id === state.canvas.connecting.from
-  ),
   isConnecting: state.canvas.connecting.currently,
+  connectingLink: makeConnectingLinks(state),
 });
 
 export default connect(mapStateToProps, {
