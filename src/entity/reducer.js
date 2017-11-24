@@ -12,8 +12,9 @@ export type Point = {
   y: number,
 };
 
-type Link = {
+export type Link = {
   target: EntityId,
+  edited: boolean,
   points?: Array<Point>,
   label?: string,
   color?: string,
@@ -128,6 +129,7 @@ const entityReducer = (
                     : [
                         {
                           target: payload,
+                          edited: false,
                           points: calcLinkPoints(
                             entity,
                             state.find(ent => ent.id === payload)
@@ -150,7 +152,7 @@ const entityReducer = (
                   ...existingEntity,
                   linksTo: [
                     ...(existingEntity.linksTo ? existingEntity.linksTo : []),
-                    { target: entity.id },
+                    { target: entity.id, edited: false },
                   ],
                 }
               : existingEntity

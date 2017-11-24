@@ -202,11 +202,12 @@ const makeConnectingLinks = (state: State): LinksType => {
     return [
       {
         target: 'will_connect',
+        edited: false,
         points,
       },
     ];
   } else {
-    return [{ target: 'noop' }];
+    return [{ target: 'noop', edited: false }];
   }
 };
 

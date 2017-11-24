@@ -19,6 +19,7 @@ const model: EntityState = [
     linksTo: [
       {
         target: 'ja1lnkqu',
+        edited: false,
         points: [
           {
             x: 187,
@@ -40,6 +41,7 @@ const model: EntityState = [
       },
       {
         target: 'ja1lnq90',
+        edited: true,
         points: [
           {
             x: 187,
@@ -72,6 +74,7 @@ const model: EntityState = [
     linksTo: [
       {
         target: 'ja1lnx2u',
+        edited: false,
         points: [
           {
             x: 448,
