@@ -14,6 +14,7 @@ declare module 'react-flow-diagram' {
 
   declare type Link = {
     target: EntityId,
+    edited: boolean,
     points?: Array<Point>,
     label?: string,
     color?: string,
