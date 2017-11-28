@@ -70,6 +70,7 @@ export const EntityActionTypesModify = [
   'rd/entity/REMOVE',
   'rd/entity/MOVE',
   'rd/entity/SET_NAME',
+  'rd/entity/SET_CUSTOM',
 ];
 
 export type MetaEntityAction = ActionShape<
