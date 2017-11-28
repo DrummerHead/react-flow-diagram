@@ -97,7 +97,7 @@ const Entity = (props: EntityProps) => (
   <EntityStyle
     style={{
       transform: `translate(${props.model.x}px, ${props.model.y}px)`,
-      zIndex: props.isAnchored ? '100' : '10',
+      zIndex: props.isAnchored || props.isSelected ? '100' : '10',
       cursor: props.toBeConnected ? 'pointer' : 'move',
     }}
   >
