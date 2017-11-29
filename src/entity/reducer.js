@@ -306,7 +306,7 @@ export const metaEntityReducer = (
       ];
     case 'rd/entity/ADD_LINKED':
       return [
-        ...state,
+        ...state.map(metaEntity => ({ ...metaEntity, isSelected: false })),
         {
           id: action.payload.entity.id,
           isAnchored: action.payload.entity.isAnchored,
@@ -326,6 +326,9 @@ export const metaEntityReducer = (
 
     case 'rd/entity/REMOVE':
       return state.filter(entity => entity.id !== action.payload);
+
+    case 'rd/canvas/CONNECT':
+      return state.map(metaEntity => ({ ...metaEntity, isSelected: false }));
 
     default:
       return state;
