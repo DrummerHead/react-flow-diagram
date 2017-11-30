@@ -5,7 +5,7 @@ import style from 'styled-components';
 import { connect } from 'react-redux';
 import { setOffset, trackMovement } from './reducer';
 import { undo, redo } from '../history/reducer';
-import { setName } from '../entity/reducer';
+import { setName, unselectAll } from '../entity/reducer';
 import { icons } from '../icon/component';
 import EntityHOC from '../entity/component';
 import Panel from '../panel/component';
@@ -16,7 +16,12 @@ import calcLinkPoints from '../links/calcLinkPoints';
 
 import type { ComponentType } from 'React';
 import type { Coords, CanvasAction } from '../canvas/reducer';
-import type { EntityState, Point, Links as LinksType } from '../entity/reducer';
+import type {
+  EntityState,
+  Point,
+  Links as LinksType,
+  MetaEntityAction,
+} from '../entity/reducer';
 import type { CustomEntities } from '../diagram/component';
 import type { State } from '../diagram/reducer';
 import type { HistoryAction } from '../history/reducer';
@@ -54,11 +59,13 @@ type CanvasProps = {
   connectingLink: LinksType,
   handleRef: HTMLElement => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
+  unselectAll: () => MetaEntityAction,
 };
 const Canvas = (props: CanvasProps) => (
   <CanvasStyle
     innerRef={div => props.handleRef(div)}
     onMouseMove={props.onMouseMove}
+    onMouseDown={props.unselectAll}
   >
     <Debug />
     <SvgLand width="100%" height="100%">
@@ -95,6 +102,7 @@ type CanvasContainerProps = {
   connectingLink: LinksType,
   setOffset: Coords => CanvasAction,
   trackMovement: Coords => CanvasAction,
+  unselectAll: () => MetaEntityAction,
   undo: () => HistoryAction,
   redo: () => HistoryAction,
 };
@@ -183,6 +191,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
         onMouseMove={this.onMouseMove}
         isConnecting={this.props.isConnecting}
         connectingLink={this.props.connectingLink}
+        unselectAll={this.props.unselectAll}
       />
     );
   }
@@ -222,4 +231,5 @@ export default connect(mapStateToProps, {
   trackMovement,
   undo,
   redo,
+  unselectAll,
 })(CanvasContainer);

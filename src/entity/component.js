@@ -177,6 +177,7 @@ const EntityContainerHOC = WrappedComponent =>
     entityTypeNames = Object.keys(this.props.entityTypes);
 
     onMouseDown = (ev: SyntheticMouseEvent<HTMLElement>) => {
+      ev.stopPropagation();
       if (this.props.canvas.connecting.currently) {
         // In this case we want to select an entity to be connected to a
         // previously selected entity to connect from

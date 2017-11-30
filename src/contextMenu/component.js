@@ -27,13 +27,23 @@ export type ContextMenuActions = Array<{
   label: string,
 }>;
 
+const stopActionPropagation = (action: Function) => (
+  ev: SyntheticMouseEvent<HTMLElement>
+): void => {
+  ev.stopPropagation();
+  action(ev);
+};
+
 type ContextMenuProps = {
   actions: ContextMenuActions,
 };
 const ContextMenu = (props: ContextMenuProps) => (
   <ContextMenuStyle>
     {props.actions.map(action => (
-      <Action key={action.label} onClick={action.action}>
+      <Action
+        key={action.label}
+        onMouseDown={stopActionPropagation(action.action)}
+      >
         <Icon name={action.iconVariety} label={action.label} />
       </Action>
     ))}

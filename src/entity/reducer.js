@@ -73,11 +73,9 @@ export const EntityActionTypesModify = [
   'rd/entity/SET_CUSTOM',
 ];
 
-export type MetaEntityAction = ActionShape<
-  'rd/entity/SELECT',
-  { id: EntityId, isSelected: boolean }
->;
-
+export type MetaEntityAction =
+  | ActionShape<'rd/metaentity/SELECT', { id: EntityId, isSelected: boolean }>
+  | ActionShape<'rd/metaentity/UNSELECTALL', null>;
 const entityReducer = (
   state: EntityState = [],
   action: Action,
@@ -283,6 +281,8 @@ const entityReducer = (
   }
 };
 
+const unselectMetaEntity = metaEntity => ({ ...metaEntity, isSelected: false });
+
 export const metaEntityReducer = (
   state: MetaEntityState = [],
   action: Action
@@ -306,7 +306,7 @@ export const metaEntityReducer = (
       ];
     case 'rd/entity/ADD_LINKED':
       return [
-        ...state.map(metaEntity => ({ ...metaEntity, isSelected: false })),
+        ...state.map(unselectMetaEntity),
         {
           id: action.payload.entity.id,
           isAnchored: action.payload.entity.isAnchored,
@@ -314,7 +314,7 @@ export const metaEntityReducer = (
         },
       ];
 
-    case 'rd/entity/SELECT': {
+    case 'rd/metaentity/SELECT': {
       const { id, isSelected } = action.payload;
       return state.map(
         metaEntity =>
@@ -327,8 +327,9 @@ export const metaEntityReducer = (
     case 'rd/entity/REMOVE':
       return state.filter(entity => entity.id !== action.payload);
 
-    case 'rd/canvas/CONNECT':
-      return state.map(metaEntity => ({ ...metaEntity, isSelected: false }));
+    case 'rd/entity/CONNECT':
+    case 'rd/metaentity/UNSELECTALL':
+      return state.map(unselectMetaEntity);
 
     default:
       return state;
@@ -377,8 +378,13 @@ export const selectEntity = (
   id: EntityId,
   isSelected?: boolean = true
 ): MetaEntityAction => ({
-  type: 'rd/entity/SELECT',
+  type: 'rd/metaentity/SELECT',
   payload: { id, isSelected },
+});
+
+export const unselectAll = (): MetaEntityAction => ({
+  type: 'rd/metaentity/UNSELECTALL',
+  payload: null,
 });
 
 export default entityReducer;
