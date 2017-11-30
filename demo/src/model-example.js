@@ -20,44 +20,42 @@ const model: EntityState = [
       {
         target: 'ja1lnkqu',
         edited: false,
+        label: 'Is friends with',
         points: [
           {
             x: 187,
             y: 145,
           },
           {
-            x: 317,
+            x: 516,
             y: 145,
           },
           {
-            x: 317,
-            y: 197,
-          },
-          {
-            x: 422,
-            y: 197,
+            x: 516,
+            y: 199,
           },
         ],
       },
       {
         target: 'ja1lnq90',
         edited: true,
+        label: 'Eats',
         points: [
           {
             x: 187,
-            y: 145,
+            y: 182.5,
           },
           {
             x: 187,
             y: 234.5,
           },
           {
-            x: 256,
+            x: 246,
             y: 234.5,
           },
           {
-            x: 256,
-            y: 286.5,
+            x: 246,
+            y: 316.5,
           },
         ],
       },
@@ -68,8 +66,8 @@ const model: EntityState = [
     type: 'Event',
     width: 50,
     height: 50,
-    x: 423,
-    y: 172,
+    x: 490,
+    y: 199,
     name: 'Toucan',
     linksTo: [
       {
@@ -77,20 +75,20 @@ const model: EntityState = [
         edited: false,
         points: [
           {
-            x: 448,
-            y: 197,
+            x: 515,
+            y: 224,
           },
           {
-            x: 448,
-            y: 141,
+            x: 433,
+            y: 224,
           },
           {
-            x: 408,
-            y: 141,
+            x: 433,
+            y: 253,
           },
           {
-            x: 408,
-            y: 122.5,
+            x: 411,
+            y: 253,
           },
         ],
       },
@@ -101,8 +99,8 @@ const model: EntityState = [
     type: 'Task',
     width: 120,
     height: 75,
-    x: 196,
-    y: 287.5,
+    x: 187,
+    y: 316.5,
     name: 'Zebra',
   },
   {
@@ -110,8 +108,8 @@ const model: EntityState = [
     type: 'Task',
     width: 120,
     height: 75,
-    x: 348,
-    y: 47.5,
+    x: 291,
+    y: 218.5,
     name: 'Jiraffe',
   },
 ];
