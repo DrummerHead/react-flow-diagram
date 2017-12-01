@@ -11,10 +11,10 @@ const model: EntityState = [
   {
     id: 'ja1lnjvx',
     type: 'Task',
-    width: 120,
+    width: 125,
     height: 75,
-    x: 127,
-    y: 107.5,
+    x: 50,
+    y: 75,
     name: 'Gorilla',
     linksTo: [
       {
@@ -23,16 +23,16 @@ const model: EntityState = [
         label: 'Is friends with',
         points: [
           {
-            x: 187,
-            y: 145,
+            x: 112.5,
+            y: 112.5,
           },
           {
-            x: 516,
-            y: 145,
+            x: 475,
+            y: 112.5,
           },
           {
-            x: 516,
-            y: 199,
+            x: 475,
+            y: 150,
           },
         ],
       },
@@ -42,20 +42,20 @@ const model: EntityState = [
         label: 'Eats',
         points: [
           {
-            x: 187,
-            y: 182.5,
+            x: 112.5,
+            y: 150,
           },
           {
-            x: 187,
+            x: 112.5,
             y: 234.5,
           },
           {
-            x: 246,
+            x: 212.5,
             y: 234.5,
           },
           {
-            x: 246,
-            y: 316.5,
+            x: 212.5,
+            y: 325,
           },
         ],
       },
@@ -66,8 +66,8 @@ const model: EntityState = [
     type: 'Event',
     width: 50,
     height: 50,
-    x: 490,
-    y: 199,
+    x: 450,
+    y: 150,
     name: 'Toucan',
     linksTo: [
       {
@@ -75,20 +75,20 @@ const model: EntityState = [
         edited: false,
         points: [
           {
-            x: 515,
-            y: 224,
+            x: 475,
+            y: 175,
           },
           {
-            x: 433,
-            y: 224,
+            x: 393.75,
+            y: 175,
           },
           {
-            x: 433,
-            y: 253,
+            x: 393.75,
+            y: 212.5,
           },
           {
-            x: 411,
-            y: 253,
+            x: 375,
+            y: 212.5,
           },
         ],
       },
@@ -97,19 +97,19 @@ const model: EntityState = [
   {
     id: 'ja1lnq90',
     type: 'Task',
-    width: 120,
+    width: 125,
     height: 75,
-    x: 187,
-    y: 316.5,
+    x: 150,
+    y: 325,
     name: 'Zebra',
   },
   {
     id: 'ja1lnx2u',
     type: 'Task',
-    width: 120,
+    width: 125,
     height: 75,
-    x: 291,
-    y: 218.5,
+    x: 250,
+    y: 175,
     name: 'Jiraffe',
   },
 ];

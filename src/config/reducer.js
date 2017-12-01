@@ -12,6 +12,7 @@ export type ConfigEntityTypes = {
 
 export type ConfigState = {
   entityTypes: ConfigEntityTypes,
+  gridSize?: number,
 };
 
 export type ConfigAction = ActionShape<'rd/config/SET', ConfigState>;

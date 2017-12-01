@@ -44,6 +44,13 @@ const CanvasStyle = style.div`
     margin: 0;
     padding: 0;
   }
+  ${props => {
+    const restPercentage = 100 - 100 / props.gridSize;
+    return props.gridSize
+      ? `background-image: linear-gradient(0deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%), linear-gradient(90deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%);
+  background-size: ${props.gridSize}px ${props.gridSize}px;`
+      : '';
+  }}
 `;
 
 const SvgLand = style.svg`
@@ -56,6 +63,7 @@ type CanvasProps = {
   entities: EntityState,
   wrappedCustomEntities: { [type: string]: ComponentType<*> },
   isConnecting: boolean,
+  gridSize: ?number,
   connectingLink: LinksType,
   handleRef: HTMLElement => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
@@ -66,6 +74,7 @@ const Canvas = (props: CanvasProps) => (
     innerRef={div => props.handleRef(div)}
     onMouseMove={props.onMouseMove}
     onMouseDown={props.unselectAll}
+    gridSize={props.gridSize}
   >
     <Debug />
     <SvgLand width="100%" height="100%">
@@ -100,6 +109,7 @@ type CanvasContainerProps = {
   customEntities: CustomEntities,
   isConnecting: boolean,
   connectingLink: LinksType,
+  gridSize: ?number,
   setOffset: Coords => CanvasAction,
   trackMovement: Coords => CanvasAction,
   unselectAll: () => MetaEntityAction,
@@ -192,6 +202,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
         isConnecting={this.props.isConnecting}
         connectingLink={this.props.connectingLink}
         unselectAll={this.props.unselectAll}
+        gridSize={this.props.gridSize}
       />
     );
   }
@@ -224,6 +235,7 @@ const mapStateToProps = (state: State) => ({
   entities: state.entity,
   isConnecting: state.canvas.connecting.currently,
   connectingLink: makeConnectingLinks(state),
+  gridSize: state.canvas.gridSize,
 });
 
 export default connect(mapStateToProps, {

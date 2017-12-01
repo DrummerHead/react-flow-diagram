@@ -1,6 +1,7 @@
 // @flow
 
 import calcLinkPoints from '../links/calcLinkPoints';
+import positionAdjustedToGrid from '../canvas/positionAdjustedToGrid';
 
 import type { ActionShape, Action } from '../diagram/reducer';
 import type { CanvasState } from '../canvas/reducer';
@@ -76,6 +77,7 @@ export const EntityActionTypesModify = [
 export type MetaEntityAction =
   | ActionShape<'rd/metaentity/SELECT', { id: EntityId, isSelected: boolean }>
   | ActionShape<'rd/metaentity/UNSELECTALL', null>;
+
 const entityReducer = (
   state: EntityState = [],
   action: Action,
@@ -183,12 +185,14 @@ const entityReducer = (
 
     case 'rd/entity/MOVE': {
       const { id, x, y } = action.payload;
+      const gridX = positionAdjustedToGrid(x, canvas.gridSize);
+      const gridY = positionAdjustedToGrid(y, canvas.gridSize);
       return state.map(entity => {
         if (entity.linksTo && entity.id === id) {
           return {
             ...entity,
-            x,
-            y,
+            x: gridX,
+            y: gridY,
             linksTo: entity.linksTo.map(link => ({
               ...link,
               points: calcLinkPoints(
@@ -200,8 +204,8 @@ const entityReducer = (
         } else if (entity.id === id) {
           return {
             ...entity,
-            x,
-            y,
+            x: gridX,
+            y: gridY,
           };
         } else if (
           entity.linksTo &&

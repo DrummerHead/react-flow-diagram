@@ -16,6 +16,7 @@ export type CanvasState = {
     currently: boolean,
     from: EntityId,
   },
+  gridSize?: number,
 };
 
 export type Coords = { x: number, y: number };
@@ -34,6 +35,12 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
       return {
         ...state,
         offset: action.payload,
+      };
+
+    case 'rd/config/SET':
+      return {
+        ...state,
+        gridSize: action.payload.gridSize,
       };
 
     case 'rd/canvas/TRACK':

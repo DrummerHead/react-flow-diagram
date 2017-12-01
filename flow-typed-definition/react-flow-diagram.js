@@ -106,6 +106,7 @@ declare module 'react-flow-diagram' {
 
   declare export type ConfigState = {
     entityTypes: ConfigEntityTypes,
+    gridSize?: number,
   };
 
   declare type ConfigAction = ActionShape<'rd/config/SET', ConfigState>;
