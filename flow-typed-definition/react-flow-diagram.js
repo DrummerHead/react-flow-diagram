@@ -63,10 +63,9 @@ declare module 'react-flow-diagram' {
     | ActionShape<'rd/entity/SET_NAME', SetNamePayload>
     | ActionShape<'rd/entity/SET_CUSTOM', SetCustomPayload>;
 
-  declare type MetaEntityAction = ActionShape<
-    'rd/entity/SELECT',
-    { id: EntityId, isSelected: boolean }
-  >;
+  declare type MetaEntityAction =
+    | ActionShape<'rd/metaentity/SELECT', { id: EntityId, isSelected: boolean }>
+    | ActionShape<'rd/metaentity/UNSELECTALL', null>;
 
   // Canvas
   //
@@ -83,6 +82,7 @@ declare module 'react-flow-diagram' {
       currently: boolean,
       from: EntityId,
     },
+    gridSize?: number,
   };
 
   declare type Coords = { x: number, y: number };
@@ -148,6 +148,7 @@ declare module 'react-flow-diagram' {
     lastAction: ActionType,
   };
 
+  /* From the Component */
   declare export type CustomEntities = {
     [type: EntityType]: {
       component: ComponentType<DiagComponentProps>,
