@@ -39,7 +39,7 @@ const icons = (function() {
 
   return {
     get(iconName: string) {
-      return iconList[iconName];
+      return iconName in iconList ? iconList[iconName] : iconList['arrow'];
     },
     addIcon(icon: IconList): void {
       iconList = {
