@@ -48,13 +48,14 @@ And in it we create:
 
 * [model-example.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/model-example.js)
 * [config-example.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/config-example.js)
+* [index.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/index.js)
 * event
   * [component.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/event/component.js)
   * [icon.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/event/icon.js)
 * task
   * [component.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/component.js)
   * [icon.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/icon.js)
-* [index.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/index.js)
+
 
 ### [model-example.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/model-example.js)
 
@@ -117,6 +118,128 @@ type Point = {
 Check [model-example.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/model-example.js) to see who this all pans out.
 
 
+### [config-example.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/config-example.js)
+
+In this file we have two configuration objects, `config` which deals with diagram configurations and `customEntities` which holds references to our custom components that represent each type of entity.
+
+`config` can be defined as:
+
+```
+export type ConfigState = {
+  entityTypes: ConfigEntityTypes, // Size of entities
+  gridSize?: number,              // optional grid size
+};
+```
+`ConfigEntityTypes` is an [object being used as a Map](https://flow.org/en/docs/types/objects/#toc-objects-as-maps) whose keys reference the types of entities.
+
+```
+export type ConfigEntityTypes = {
+  [EntityType]: {
+    width: number,
+    height: number,
+  },
+};
+```
+
+It's recommended to find an entitiy size that is a multiple of the grid size; however you're free to choose any positive `number`.
+
+`customEntities` can be defined as:
+
+```
+type CustomEntities = {
+  [EntityType]: {
+    component: ComponentType<DiagComponentProps>,
+    icon: {
+      path: Element<*>,
+      size: number,
+    },
+  },
+};
+```
+
+The `component` attribute holds a reference to a [React Component](https://reactjs.org/docs/react-component.html) that will be provided `DiagComponentProps` props. The creation of your custom components is covered in {{TODO: Link to create custom entitiy components section}}
+
+```
+export type DiagComponentProps = {
+  model: EntityModel,
+  meta: MetaEntityModel,
+  setName: SetNamePayload => EntityAction,
+};
+```
+
+You can use this props to get information about the component, and `setName` method to change the name of the component.
+
+We referenced `EntityModel` before, and `MetaEntityModel` can be defined as:
+
+```
+type MetaEntityModel = {
+  id: EntityId,
+  isAnchored: boolean,
+  isSelected: boolean,
+};
+```
+
+Which is information that only matters while interacting with the components on the UI. You wouldn't need to save this information. A [HOC](https://reactjs.org/docs/higher-order-components.html) [Entity component](https://github.com/DrummerHead/react-flow-diagram/blob/master/src/entity/component.js) will deal about positioning, selection, context menus and more for you, so you just need to focus on the specific features of your custom Entity.
+
+
+### [index.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/index.js)
+
+On index we define our custom Component that initializes seting throguh `componentWillMount` and passes `customEntities` to the `Diagram` Component
+
+```
+import React from 'react';
+import {
+  Diagram,
+  store as diagramStore,
+  setEntities,
+  setConfig,
+  diagramOn,
+} from 'react-flow-diagram';
+import model from './model-example';
+import { config, customEntities } from './config-example';
+
+class CustomDiagram extends React.PureComponent {
+  componentWillMount() {
+    diagramStore.dispatch(setConfig(config));
+    diagramStore.dispatch(setEntities(model));
+
+    diagramOn('anyChange', entityState =>
+      // You can get the model back
+      // after modifying the UI representation
+      console.info(entityState)
+    );
+  }
+  render() {
+    return <Diagram customEntities={customEntities} />;
+  }
+}
+
+export default CustomDiagram;
+```
+
+We dispatch a `setConfig` and `setEntities` action to the `diagramStore`, and on `anyChange` we can get a hold of our modified `entityState`
+
+### event and task folders
+
+We'll cover this in the next section:
+
+## Creating our own Entities
+
+This component does not come with any custom entities, and you must create your own. However on (react-flow-diagram-example)[https://github.com/DrummerHead/react-flow-diagram-example/] we have two examples of custom entities, namely (task)[https://github.com/DrummerHead/react-flow-diagram-example/tree/master/src/CustomDiagram/task] and (event)[https://github.com/DrummerHead/react-flow-diagram-example/tree/master/src/CustomDiagram/event].
+
+Let's take a look at the task entitiy as an example.
+
+In the [task folder](https://github.com/DrummerHead/react-flow-diagram-example/tree/master/src/CustomDiagram/task) we see two files:
+
+* [component.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/component.js)
+* [icon.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/icon.js)
+
+Let's start with...
+
+### [component.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/component.js)
+
+
+### [icon.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/icon.js)
 
 ## Configuration
 
