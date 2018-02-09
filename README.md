@@ -125,7 +125,7 @@ In this file we have two configuration objects, `config` which deals with diagra
 `config` can be defined as:
 
 ```JavaScript
-export type ConfigState = {
+type ConfigState = {
   entityTypes: ConfigEntityTypes, // Size of entities
   gridSize?: number,              // optional grid size
 };
@@ -133,7 +133,7 @@ export type ConfigState = {
 `ConfigEntityTypes` is an [object being used as a Map](https://flow.org/en/docs/types/objects/#toc-objects-as-maps) whose keys reference the types of entities.
 
 ```JavaScript
-export type ConfigEntityTypes = {
+type ConfigEntityTypes = {
   [EntityType]: {
     width: number,
     height: number,
@@ -160,7 +160,7 @@ type CustomEntities = {
 The `component` attribute holds a reference to a [React Component](https://reactjs.org/docs/react-component.html) that will be provided `DiagComponentProps` props. The creation of your custom components is covered in {{TODO: Link to create custom entitiy components section}}
 
 ```JavaScript
-export type DiagComponentProps = {
+type DiagComponentProps = {
   model: EntityModel,
   meta: MetaEntityModel,
   setName: SetNamePayload => EntityAction,
