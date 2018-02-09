@@ -238,8 +238,67 @@ Let's start with...
 
 ### [component.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/component.js)
 
+Our custom component will be visually rendered on the UI in such a way that it uniquely identifies a specific concept. We can take for example [BPMN's](https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation#Elements) elements or [UX flow diagrams](http://jjg.net/ia/visvocab/#page). Perhaps in the future we'll include Packs with custom entities for these types of use cases, but for now you'll have to create your own.
+
+Our entity can also deal with user interaction such as changing the name and whatever interaction you may come up with, with the possibility of using already present information in the `EntityModel` or adding your custom data to `custom` object field.
+
+There are no specific requirements for the component. What we do need to know is that the component will be provided `DiagComponentProps` props, which encompasses:
+
+```
+type DiagComponentProps = {
+  model: EntityModel,
+  meta: MetaEntityModel,
+  setName: SetNamePayload => EntityAction,
+};
+```
+
+More details about `EntityModel` in the [model-example.js](#model-example.js) section and `MetaEntityModel` in the [config-example.js](#config-example.js) section.
+
+`setName` is a connected action that takes the propery `SetNamePayload` and returns `EntityAction`. The return of the function can be ignored since the important aspect is the side effect that sets the name of the entity.
+
+```
+type SetNamePayload = { id: EntityId, name: string };
+```
+
+A usage example in [component.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/component.js) is:
+
+```
+handleKeyPress = (ev) => {
+  switch (ev.key) {
+    case 'Enter':
+      this.toggleEdit(false);
+      this.props.setName({ id: this.props.model.id, name: this.state.name });
+      break;
+    case 'Escape':
+      this.toggleEdit(false);
+      this.setState({ name: this.props.model.name });
+      break;
+    // no default
+  }
+};
+```
 
 ### [icon.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/icon.js)
+
+We also need to provide an icon which will be used in the Panel for adding new elements and in the contextual menu for each entity to quickly add new entities.
+
+```
+import React from 'react';
+
+const icon = {
+  path: (
+    <path d="M14 0H2C1 0 0 1 0 2v12c0 1 1 2 2 2h12c1 0 2-1 2-2V2c0-1-1-2-2-2z" />
+  ),
+  size: 16,
+};
+
+export default icon;
+```
+
+The icon consists of a `path` SVG React Element and a size that is the same as the size of `viewBox` SVG attribute. [Check the icon component](https://github.com/DrummerHead/react-flow-diagram/blob/master/src/icon/component.js#L59-L69) to make this more clear.
+
+The size attribute is provided so you don't need to transform the SVG element to fix exactly the needs of the panel or context menu. If we didn't have the size attribute, the SVG element may overflow or underflow its container.
+
 
 ## Configuration
 
