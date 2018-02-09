@@ -6,6 +6,7 @@ Batteries included React Component for renderizing, creating and editing diagram
 
 {{Animation gif that shows some of the features}}
 
+
 ## Features
 
 - The data is the source of truth
@@ -25,6 +26,7 @@ Batteries included React Component for renderizing, creating and editing diagram
 - Select several entities
 - Copy and paste entities
 - Alignment tools
+
 
 ## Installation
 
@@ -252,7 +254,7 @@ type DiagComponentProps = {
 };
 ```
 
-More details about `EntityModel` in the [model-example.js](#model-example.js) section and `MetaEntityModel` in the [config-example.js](#config-example.js) section.
+More details about `EntityModel` in the [model-example.js](#model-examplejs) section and `MetaEntityModel` in the [config-example.js](#config-examplejs) section.
 
 `setName` is a connected action that takes the propery `SetNamePayload` and returns `EntityAction`. The return of the function can be ignored since the important aspect is the side effect that sets the name of the entity.
 
@@ -300,18 +302,32 @@ The icon consists of a `path` SVG React Element and a size that is the same as t
 The size attribute is provided so you don't need to transform the SVG element to fix exactly the needs of the panel or context menu. If we didn't have the size attribute, the SVG element may overflow or underflow its container.
 
 
-## Configuration
-
 ## Examples
+
+You can use [react-flow-diagram-example](https://github.com/DrummerHead/react-flow-diagram-example) as a template of a working implementation and modify it for your own needs.
+
+With time I'll add more examples, namely:
+
+- Integration with Redux
+- Using the provided flow types
+
 
 ## Some History
 
-Why did I end up creating this project
+In a [Trailblazer](http://trailblazer.to/) related project I had the task of creating an editing environment surrounding [bpmn-js](https://github.com/bpmn-io/bpmn-js) which was the first diagramming library we used. bpmn-js proved to be a feature rich library, but extending to add the features we wanted proved to be practically impossible, coupled with dwindling documentation. It's still a great option if you're not thinking of adding your own types of entites or swerving from the BPMN model at all.
 
-## Alternatives
+After assessing many diagramming libraries available, my second go after bpmn-js was [react-diagrams](https://github.com/projectstorm/react-diagrams); which worked pretty well, had modern JS standards and was more extensible. However the source of truth (model) was scattered through many object's internal state and getting to the underlying data proved difficult in many scenarios. In my opinion, the code base was not idiomatic with React principles and it led to me implementing what I felt were many hacks to sync model state with UI representation.
+
+I never set off to reinvent the wheel, I was quite happy with the idea of using a time-tested open source library. But the options available left me making the decission to build another alternative. And perhaps it'll be useful to you too!
 
 ## Contributing
 
+TODO
+
 ## Companies using React Flow Diagram
 
+TODO
+
 ## Sponsored by
+
+TODO
