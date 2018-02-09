@@ -28,7 +28,7 @@ Batteries included React Component for renderizing, creating and editing diagram
 
 ## Installation
 
-It's easier to see the an example already working to explain what we need to add. Pull (react-flow-diagram-example)[https://github.com/DrummerHead/react-flow-diagram-example] and follow along; consider it a finished state of following these instructions. You can also use this repo as a starting point for your own implementation.
+It's easier to see the an example already working to explain what we need to add. Pull [react-flow-diagram-example](https://github.com/DrummerHead/react-flow-diagram-example) and follow along; consider it a finished state of following these instructions. You can also use this repo as a starting point for your own implementation.
 
 Let's assume a fresh [create-react-app](https://github.com/facebook/create-react-app) (which the example is created from) strucure, then:
 
@@ -36,7 +36,7 @@ Let's assume a fresh [create-react-app](https://github.com/facebook/create-react
 yarn add react-flow-diagram
 ```
 
-And we'll also add [styled-components](https://github.com/styled-components/styled-components) for our custom entities, although this is not a requirement. You can just add classNames to elements and use regular css or any css transpilation language.
+And we'll also add [styled-components](https://github.com/styled-components/styled-components) for our custom entities, although this is not a requirement. You can just add `classNames` to elements and use regular css or any css transpilation language.
 
 ```
 yarn add styled-components
@@ -65,13 +65,13 @@ You don't need to conciously know the structure of the model, since you can alwa
 
 The structure held in the `model` const can be defined in [flow types](https://flow.org/en/docs/types/) as (you don't really need to know flowtype to grasp this):
 
-```
+```JavaScript
 type EntityState = Array<EntityModel>;
 ```
 
 model is an array with `EntityModel`s representing each entity
 
-```
+```JavaScript
 type EntityType = string;
 type EntityModel = {
   id: EntityId,      // unique identifier of the Entity
@@ -88,13 +88,13 @@ type EntityModel = {
 
 The `id` of an `EntityModel` is an `EntityId`; which is just a string
 
-```
+```JavaScript
 type EntityId = string;
 ```
 
 The `linksTo` attribute is [optional](https://flow.org/en/docs/types/objects/#toc-optional-object-type-properties) (an entity may not link to anyone) and holds a `Links` type, which is an array of `Link`
 
-```
+```JavaScript
 type Links = Array<Link>;
 
 type Link = {
@@ -108,7 +108,7 @@ type Link = {
 
 The `points` attribute is also optional (as well as any attribute ending with `?`) and holds an array of `Point`
 
-```
+```JavaScript
 type Point = {
   x: number,  // x position
   y: number,  // y position
@@ -124,7 +124,7 @@ In this file we have two configuration objects, `config` which deals with diagra
 
 `config` can be defined as:
 
-```
+```JavaScript
 export type ConfigState = {
   entityTypes: ConfigEntityTypes, // Size of entities
   gridSize?: number,              // optional grid size
@@ -132,7 +132,7 @@ export type ConfigState = {
 ```
 `ConfigEntityTypes` is an [object being used as a Map](https://flow.org/en/docs/types/objects/#toc-objects-as-maps) whose keys reference the types of entities.
 
-```
+```JavaScript
 export type ConfigEntityTypes = {
   [EntityType]: {
     width: number,
@@ -145,7 +145,7 @@ It's recommended to find an entitiy size that is a multiple of the grid size; ho
 
 `customEntities` can be defined as:
 
-```
+```JavaScript
 type CustomEntities = {
   [EntityType]: {
     component: ComponentType<DiagComponentProps>,
@@ -159,7 +159,7 @@ type CustomEntities = {
 
 The `component` attribute holds a reference to a [React Component](https://reactjs.org/docs/react-component.html) that will be provided `DiagComponentProps` props. The creation of your custom components is covered in {{TODO: Link to create custom entitiy components section}}
 
-```
+```JavaScript
 export type DiagComponentProps = {
   model: EntityModel,
   meta: MetaEntityModel,
@@ -171,7 +171,7 @@ You can use this props to get information about the component, and `setName` met
 
 We referenced `EntityModel` before, and `MetaEntityModel` can be defined as:
 
-```
+```JavaScript
 type MetaEntityModel = {
   id: EntityId,
   isAnchored: boolean,
@@ -186,7 +186,7 @@ Which is information that only matters while interacting with the components on 
 
 On index we define our custom Component that initializes seting throguh `componentWillMount` and passes `customEntities` to the `Diagram` Component
 
-```
+```JavaScript
 import React from 'react';
 import {
   Diagram,
@@ -225,7 +225,7 @@ We'll cover this in the next section:
 
 ## Creating our own Entities
 
-This component does not come with any custom entities, and you must create your own. However on (react-flow-diagram-example)[https://github.com/DrummerHead/react-flow-diagram-example/] we have two examples of custom entities, namely (task)[https://github.com/DrummerHead/react-flow-diagram-example/tree/master/src/CustomDiagram/task] and (event)[https://github.com/DrummerHead/react-flow-diagram-example/tree/master/src/CustomDiagram/event].
+This component does not come with any custom entities, and you must create your own. However on [react-flow-diagram-example](https://github.com/DrummerHead/react-flow-diagram-example/) we have two examples of custom entities, namely [task](https://github.com/DrummerHead/react-flow-diagram-example/tree/master/src/CustomDiagram/task) and [event](https://github.com/DrummerHead/react-flow-diagram-example/tree/master/src/CustomDiagram/event).
 
 Let's take a look at the task entitiy as an example.
 
@@ -244,7 +244,7 @@ Our entity can also deal with user interaction such as changing the name and wha
 
 There are no specific requirements for the component. What we do need to know is that the component will be provided `DiagComponentProps` props, which encompasses:
 
-```
+```JavaScript
 type DiagComponentProps = {
   model: EntityModel,
   meta: MetaEntityModel,
@@ -256,13 +256,13 @@ More details about `EntityModel` in the [model-example.js](#model-example.js) se
 
 `setName` is a connected action that takes the propery `SetNamePayload` and returns `EntityAction`. The return of the function can be ignored since the important aspect is the side effect that sets the name of the entity.
 
-```
+```JavaScript
 type SetNamePayload = { id: EntityId, name: string };
 ```
 
 A usage example in [component.js](https://github.com/DrummerHead/react-flow-diagram-example/blob/master/src/CustomDiagram/task/component.js) is:
 
-```
+```JavaScript
 handleKeyPress = (ev) => {
   switch (ev.key) {
     case 'Enter':
@@ -282,7 +282,7 @@ handleKeyPress = (ev) => {
 
 We also need to provide an icon which will be used in the Panel for adding new elements and in the contextual menu for each entity to quickly add new entities.
 
-```
+```JavaScript
 import React from 'react';
 
 const icon = {
