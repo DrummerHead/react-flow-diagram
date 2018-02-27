@@ -16,6 +16,7 @@ export type CanvasState = {
     currently: boolean,
     from: EntityId,
   },
+  zoom: number,
   gridSize?: number,
 };
 
@@ -27,6 +28,7 @@ export type ConnectingPayload = {
 export type CanvasAction =
   | ActionShape<'rd/canvas/SET_OFFSET', Coords>
   | ActionShape<'rd/canvas/TRACK', Coords>
+  | ActionShape<'rd/canvas/ZOOM', number>
   | ActionShape<'rd/canvas/CONNECT', ConnectingPayload>;
 
 const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
@@ -57,6 +59,12 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
         },
       };
 
+    case 'rd/canvas/ZOOM':
+      return {
+        ...state,
+        zoom: action.payload,
+      };
+
     case 'rd/canvas/CONNECT':
       return {
         ...state,
@@ -84,6 +92,11 @@ export const setOffset = (payload: Coords): CanvasAction => ({
 
 export const trackMovement = (payload: Coords): CanvasAction => ({
   type: 'rd/canvas/TRACK',
+  payload,
+});
+
+export const zoom = (payload: number): CanvasAction => ({
+  type: 'rd/canvas/ZOOM',
   payload,
 });
 
