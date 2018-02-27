@@ -77,11 +77,12 @@ type PanelContainerProps = {
   entityTypes: ConfigEntityTypes,
   addEntity: (EntityModel & MetaEntityModel) => EntityAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
-  gridSize: number,
+  gridSize: ?number,
 };
 class PanelContainer extends React.PureComponent<PanelContainerProps> {
   entityTypeNames = Object.keys(this.props.entityTypes);
   minToolSize = 40;
+  niceToolSize = 50;
 
   addEntityHelper = (
     entityType: EntityType = 'Task',
@@ -90,14 +91,17 @@ class PanelContainer extends React.PureComponent<PanelContainerProps> {
     this.props.addEntity(this.props.defaultEntity({ entityType, ev }));
   };
 
-  toolWidth = () => {
-    const howManyFit = parseInt(this.minToolSize / this.props.gridSize, 10);
-    const theRest = (this.minToolSize * howManyFit) % this.props.gridSize;
-    const fittingSize =
-      theRest === 0
-        ? howManyFit * this.props.gridSize
-        : (howManyFit + 1) * this.props.gridSize;
-    return fittingSize === 0 ? this.props.gridSize : fittingSize;
+  toolWidth = (): number => {
+    if (typeof this.props.gridSize === 'number') {
+      const gridSize = this.props.gridSize;
+      const howManyFit = parseInt(this.minToolSize / this.props.gridSize, 10);
+      const theRest = (this.minToolSize * howManyFit) % gridSize;
+      const fittingSize =
+        theRest === 0 ? howManyFit * gridSize : (howManyFit + 1) * gridSize;
+      return fittingSize === 0 ? gridSize : fittingSize;
+    } else {
+      return this.niceToolSize;
+    }
   };
 
   render() {
