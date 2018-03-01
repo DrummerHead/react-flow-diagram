@@ -37,11 +37,15 @@ const initialState = {
   entity: [],
   metaEntity: [],
   canvas: {
-    offset: {
+    cursor: {
       x: 0,
       y: 0,
     },
-    cursor: {
+    pageOffset: {
+      x: 0,
+      y: 0,
+    },
+    position: {
       x: 0,
       y: 0,
     },
@@ -49,6 +53,7 @@ const initialState = {
       currently: false,
       from: '',
     },
+    zoom: 1,
   },
   config: {
     entityTypes: {},

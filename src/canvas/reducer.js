@@ -3,15 +3,11 @@
 import type { ActionShape, Action } from '../diagram/reducer';
 import type { EntityId } from '../entity/reducer';
 
+export type Coords = { x: number, y: number };
 export type CanvasState = {
-  offset: {
-    x: number,
-    y: number,
-  },
-  cursor: {
-    x: number,
-    y: number,
-  },
+  cursor: Coords,
+  pageOffset: Coords,
+  position: Coords,
   connecting: {
     currently: boolean,
     from: EntityId,
@@ -20,7 +16,6 @@ export type CanvasState = {
   gridSize?: number,
 };
 
-export type Coords = { x: number, y: number };
 export type ConnectingPayload = {
   currently: boolean,
   from: EntityId,
@@ -28,6 +23,7 @@ export type ConnectingPayload = {
 export type CanvasAction =
   | ActionShape<'rd/canvas/SET_OFFSET', Coords>
   | ActionShape<'rd/canvas/TRACK', Coords>
+  | ActionShape<'rd/canvas/TRANSLATE', Coords>
   | ActionShape<'rd/canvas/ZOOM', number>
   | ActionShape<'rd/canvas/CONNECT', ConnectingPayload>;
 
@@ -36,7 +32,7 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
     case 'rd/canvas/SET_OFFSET':
       return {
         ...state,
-        offset: action.payload,
+        pageOffset: action.payload,
       };
 
     case 'rd/config/SET':
@@ -54,9 +50,15 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
       return {
         ...state,
         cursor: {
-          x: action.payload.x - state.offset.x,
-          y: action.payload.y - state.offset.y,
+          x: action.payload.x - state.pageOffset.x,
+          y: action.payload.y - state.pageOffset.y,
         },
+      };
+
+    case 'rd/canvas/TRANSLATE':
+      return {
+        ...state,
+        position: action.payload,
       };
 
     case 'rd/canvas/ZOOM':
@@ -92,6 +94,11 @@ export const setOffset = (payload: Coords): CanvasAction => ({
 
 export const trackMovement = (payload: Coords): CanvasAction => ({
   type: 'rd/canvas/TRACK',
+  payload,
+});
+
+export const translate = (payload: Coords): CanvasAction => ({
+  type: 'rd/canvas/TRANSLATE',
   payload,
 });
 

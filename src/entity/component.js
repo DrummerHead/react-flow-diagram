@@ -186,8 +186,10 @@ const EntityContainerHOC = WrappedComponent =>
         // Most common behavior is that when you click on an entity, your
         // intention is to start dragging the entity
         this.setState({
-          anchorX: ev.pageX - this.props.canvas.offset.x - this.props.model.x,
-          anchorY: ev.pageY - this.props.canvas.offset.y - this.props.model.y,
+          anchorX:
+            ev.pageX - this.props.canvas.pageOffset.x - this.props.model.x,
+          anchorY:
+            ev.pageY - this.props.canvas.pageOffset.y - this.props.model.y,
           isAnchored: true,
         });
       }
@@ -203,26 +205,28 @@ const EntityContainerHOC = WrappedComponent =>
         // this.state.anchorX + this.props.model.x
         //
         // This is where the mouse was (in relation to diagram coordinates)
-        // ev.pageX - this.props.canvas.offsetX
+        // ev.pageX - this.props.canvas.pageOffset.x
         //
         // This is the difference:
-        // (ev.pageX - this.props.canvas.offsetX) - (this.state.anchorX + this.props.model.x)
+        // (ev.pageX - this.props.canvas.pageOffset.x) - (this.state.anchorX + this.props.model.x)
         //
         // The above number signifies by how much has the mouse left the original
         // anchor point. If we add this difference to where we would have
         // calculated our original location, we're left with:
-        // (ev.pageX - this.props.canvas.offsetX - this.state.anchorX) +
-        // ((ev.pageX - this.props.canvas.offsetX) - (this.state.anchorX + this.props.model.x))
+        // (ev.pageX - this.props.canvas.pageOffset.x - this.state.anchorX) +
+        // ((ev.pageX - this.props.canvas.pageOffset.x) - (this.state.anchorX + this.props.model.x))
         //
         // Which simplified leaves us with:
-        // 2 * (ev.pageX - this.props.canvas.offsetX - this.state.anchorX) - this.props.model.x
+        // 2 * (ev.pageX - this.props.canvas.pageOffset.x - this.state.anchorX) - this.props.model.x
         //
         this.props.move({
           x:
-            2 * (ev.pageX - this.props.canvas.offset.x - this.state.anchorX) -
+            2 *
+              (ev.pageX - this.props.canvas.pageOffset.x - this.state.anchorX) -
             this.props.model.x,
           y:
-            2 * (ev.pageY - this.props.canvas.offset.y - this.state.anchorY) -
+            2 *
+              (ev.pageY - this.props.canvas.pageOffset.y - this.state.anchorY) -
             this.props.model.y,
           id: this.props.model.id,
         });
@@ -232,8 +236,8 @@ const EntityContainerHOC = WrappedComponent =>
     onMouseMove = (ev: SyntheticMouseEvent<HTMLElement>) => {
       if (this.state.isAnchored) {
         this.props.move({
-          x: ev.pageX - this.props.canvas.offset.x - this.state.anchorX,
-          y: ev.pageY - this.props.canvas.offset.y - this.state.anchorY,
+          x: ev.pageX - this.props.canvas.pageOffset.x - this.state.anchorX,
+          y: ev.pageY - this.props.canvas.pageOffset.y - this.state.anchorY,
           id: this.props.model.id,
         });
       }

@@ -29,11 +29,11 @@ const defaultEntity = (state: State) => ({
   type: entityType,
   x:
     ev.pageX -
-    state.canvas.offset.x -
+    state.canvas.pageOffset.x -
     state.config.entityTypes[entityType].width / 2,
   y:
     ev.pageY -
-    state.canvas.offset.y -
+    state.canvas.pageOffset.y -
     state.config.entityTypes[entityType].height / 2,
   width: state.config.entityTypes[entityType].width,
   height: state.config.entityTypes[entityType].height,
