@@ -4,14 +4,11 @@ import calcLinkPoints from '../links/calcLinkPoints';
 import positionAdjustedToGrid from '../canvas/positionAdjustedToGrid';
 
 import type { ActionShape, Action } from '../diagram/reducer';
-import type { CanvasState } from '../canvas/reducer';
+import type { CanvasState, Coords } from '../canvas/reducer';
 
 export type EntityId = string;
 
-export type Point = {
-  x: number,
-  y: number,
-};
+export type Point = Coords;
 
 export type Link = {
   target: EntityId,
@@ -38,10 +35,13 @@ export type EntityModel = {
 
 export type EntityState = Array<EntityModel>;
 
+// TODO: Determine if isAnchored attr on entity is still needed here. Will
+// probably change that for an attribute on canvas
 export type MetaEntityModel = {
   id: EntityId,
   isAnchored: boolean,
   isSelected: boolean,
+  anchor: Coords,
 };
 
 export type MetaEntityState = Array<MetaEntityModel>;
@@ -81,6 +81,7 @@ export type MetaEntityAction =
 const entityReducer = (
   state: EntityState = [],
   action: Action,
+  metaEntity: MetaEntityState,
   canvas: CanvasState
 ): EntityState => {
   switch (action.type) {
@@ -183,6 +184,67 @@ const entityReducer = (
             : entity
       );
 
+    case 'rd/canvas/TRACK': {
+      if (canvas.anchoredEntity.isAnchored) {
+        const { id } = canvas.anchoredEntity;
+        const mEntity = metaEntity.find(e => e.id === id) || {
+          anchor: { x: 0, y: 0 },
+        };
+        const x = action.payload.x - canvas.pageOffset.x - mEntity.anchor.x;
+        const y = action.payload.y - canvas.pageOffset.y - mEntity.anchor.y;
+        const gridX = positionAdjustedToGrid(x, canvas.gridSize);
+        const gridY = positionAdjustedToGrid(y, canvas.gridSize);
+        return state.map(entity => {
+          if (entity.linksTo && entity.id === id) {
+            return {
+              ...entity,
+              x: gridX,
+              y: gridY,
+              linksTo: entity.linksTo.map(link => ({
+                ...link,
+                points: calcLinkPoints(
+                  entity,
+                  state.find(ent => ent.id === link.target)
+                ),
+              })),
+            };
+          } else if (entity.id === id) {
+            return {
+              ...entity,
+              x: gridX,
+              y: gridY,
+            };
+          } else if (
+            entity.linksTo &&
+            entity.linksTo.some(link => link.target === id)
+          ) {
+            return {
+              ...entity,
+              linksTo: entity.linksTo.map(
+                link =>
+                  link.target === id
+                    ? {
+                        ...link,
+                        points: calcLinkPoints(
+                          entity,
+                          state.find(ent => ent.id === id)
+                        ),
+                      }
+                    : link
+              ),
+            };
+          } else {
+            return entity;
+          }
+        });
+      } else {
+        return state;
+      }
+    }
+
+    // All this logic can be potentially removed, research if I'll still use
+    // the MOVE action... or perhaps put all this into its own function and
+    // reuse :shrug:
     case 'rd/entity/MOVE': {
       const { id, x, y } = action.payload;
       const gridX = positionAdjustedToGrid(x, canvas.gridSize);
@@ -289,7 +351,9 @@ const unselectMetaEntity = metaEntity => ({ ...metaEntity, isSelected: false });
 
 export const metaEntityReducer = (
   state: MetaEntityState = [],
-  action: Action
+  action: Action,
+  entity: EntityState,
+  canvas: CanvasState
 ): MetaEntityState => {
   switch (action.type) {
     case 'rd/entity/SET':
@@ -297,6 +361,10 @@ export const metaEntityReducer = (
         id: entity.id,
         isAnchored: false,
         isSelected: false,
+        anchor: {
+          x: entity.width / 2,
+          y: entity.height / 2,
+        },
       }));
 
     case 'rd/entity/ADD':
@@ -306,6 +374,10 @@ export const metaEntityReducer = (
           id: action.payload.id,
           isAnchored: action.payload.isAnchored,
           isSelected: action.payload.isSelected,
+          anchor: {
+            x: action.payload.width / 2,
+            y: action.payload.height / 2,
+          },
         },
       ];
     case 'rd/entity/ADD_LINKED':
@@ -315,6 +387,10 @@ export const metaEntityReducer = (
           id: action.payload.entity.id,
           isAnchored: action.payload.entity.isAnchored,
           isSelected: action.payload.entity.isSelected,
+          anchor: {
+            x: action.payload.entity.width / 2,
+            y: action.payload.entity.height / 2,
+          },
         },
       ];
 
@@ -326,6 +402,28 @@ export const metaEntityReducer = (
             ? { ...metaEntity, isSelected }
             : { ...metaEntity, isSelected: false }
       );
+    }
+
+    case 'rd/canvas/ANCHOR': {
+      const { isAnchored, id } = action.payload;
+      return isAnchored
+        ? state.map(
+            metaEntity =>
+              metaEntity.id == id
+                ? {
+                    ...metaEntity,
+                    anchor: {
+                      x:
+                        canvas.cursor.x -
+                        (entity.find(e => e.id === id) || { x: 0 }).x,
+                      y:
+                        canvas.cursor.y -
+                        (entity.find(e => e.id === id) || { y: 0 }).y,
+                    },
+                  }
+                : metaEntity
+          )
+        : state;
     }
 
     case 'rd/entity/REMOVE':

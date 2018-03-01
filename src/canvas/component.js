@@ -60,7 +60,8 @@ const CanvasStyle = style.div.attrs({
     return props.gridSize
       ? {
           ...scaleStyles,
-          backgroundImage: `linear-gradient(0deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%), linear-gradient(90deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%)`,
+          backgroundImage: `linear-gradient(0deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%),
+linear-gradient(90deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%)`,
           backgroundSize: `${props.gridSize}px ${props.gridSize}px`,
         }
       : scaleStyles;
@@ -90,10 +91,9 @@ type CanvasProps = {
   unselectAll: () => MetaEntityAction,
 };
 const Canvas = (props: CanvasProps) => (
-  <CanvasViewport>
+  <CanvasViewport onMouseMove={props.onMouseMove}>
     <CanvasStyle
       innerRef={div => props.handleRef(div)}
-      onMouseMove={props.onMouseMove}
       onMouseDown={props.unselectAll}
       gridSize={props.gridSize}
       position={props.position}

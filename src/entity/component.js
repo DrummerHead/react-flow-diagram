@@ -10,7 +10,7 @@ import {
   removeEntity,
   selectEntity,
 } from './reducer';
-import { connecting } from '../canvas/reducer';
+import { connecting, anchorEntity } from '../canvas/reducer';
 import defaultEntity from './defaultEntity';
 import ContextMenu from '../contextMenu/component';
 
@@ -30,6 +30,7 @@ import type {
   CanvasState,
   CanvasAction,
   ConnectingPayload,
+  AnchorPayload,
 } from '../canvas/reducer';
 import type { State } from '../diagram/reducer';
 import type { DefaultEntityProps } from './defaultEntity';
@@ -104,7 +105,6 @@ const Entity = (props: EntityProps) => (
     <div
       onMouseDown={props.onMouseDown}
       onMouseLeave={props.onMouseLeave}
-      onMouseMove={props.onMouseMove}
       onMouseUp={props.onMouseUp}
       role="presentation"
     >
@@ -119,8 +119,6 @@ const Entity = (props: EntityProps) => (
  * ==================================== */
 
 type EntityContainerState = {
-  anchorX: number,
-  anchorY: number,
   isAnchored: boolean,
   onMouseUpWouldBeClick: boolean,
 };
@@ -149,6 +147,7 @@ type EntityContainerProps = {
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
   removeEntity: EntityId => EntityAction,
   connecting: ConnectingPayload => CanvasAction,
+  anchorEntity: AnchorPayload => CanvasAction,
   selectEntity: (EntityId, isSelected?: boolean) => MetaEntityAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
@@ -158,8 +157,6 @@ const EntityContainerHOC = WrappedComponent =>
     EntityContainerState
   > {
     state = {
-      anchorX: this.props.model.width / 2,
-      anchorY: this.props.model.height / 2,
       isAnchored: this.props.meta.isAnchored,
       onMouseUpWouldBeClick: true,
     };
@@ -167,7 +164,7 @@ const EntityContainerHOC = WrappedComponent =>
     componentDidMount() {
       const wouldBeClick = () =>
         this.setState({ onMouseUpWouldBeClick: false });
-      if (this.state.isAnchored) {
+      if (this.props.canvas.anchoredEntity.isAnchored) {
         setTimeout(wouldBeClick, 16 * 12);
       } else {
         wouldBeClick();
@@ -185,17 +182,36 @@ const EntityContainerHOC = WrappedComponent =>
       } else {
         // Most common behavior is that when you click on an entity, your
         // intention is to start dragging the entity
-        this.setState({
-          anchorX:
-            ev.pageX - this.props.canvas.pageOffset.x - this.props.model.x,
-          anchorY:
-            ev.pageY - this.props.canvas.pageOffset.y - this.props.model.y,
-          isAnchored: true,
-        });
+        //
+        // The new thing is that now the anchor info is on metaenttiy, cursor
+        // position is on canvas, and what I actually need to do is set that
+        // this entity is starting to be selected for movement, passing the id
+        // of the entitiy. This will "ripple" down to canvas and metaentity.
+        // meow.
+        // so I have to create a new action for this...
+        this.props.anchorEntity({ id: this.props.model.id, isAnchored: true });
+        //        this.setState({
+        //          anchorX: this.props.canvas.cursor.x - this.props.model.x,
+        //          anchorY: this.props.canvas.cursor.y - this.props.model.y,
+        //          isAnchored: true,
+        //        });
       }
     };
 
     onMouseLeave = (ev: SyntheticMouseEvent<HTMLElement>) => {
+      // Ok... this will potentially be deleted.  If I'll be using canvas mouse
+      // position as source of truth... that's the same truth that wasn't being
+      // able to update as fast as the actual movement. So it will actually not
+      // help me at all. And I can't really say "Ok so for this I'll use the
+      // actual event" because in zooming states, it will not match "canvas
+      // scale reality"...
+      //
+      // On the plus side, now that I have a track in the canvas itself, an
+      // element can never "get away" from my hold because the event is not on
+      // top of the... mmmh it can still get away... hhhhmmmm... ok but I can
+      // know if it's "anchored" or not... so if it gets away and it is
+      // anchored, keep moving I guess... we'll see. I'll keep integrating
+      // cursor from canvas and then come back here
       if (this.state.isAnchored) {
         // If the entity is still being dragged while leaving (mouse movement
         // faster than state refresh on DOM) then (discussing only X
@@ -205,28 +221,27 @@ const EntityContainerHOC = WrappedComponent =>
         // this.state.anchorX + this.props.model.x
         //
         // This is where the mouse was (in relation to diagram coordinates)
-        // ev.pageX - this.props.canvas.pageOffset.x
+        // this.props.canvas.cursor.x
         //
         // This is the difference:
-        // (ev.pageX - this.props.canvas.pageOffset.x) - (this.state.anchorX + this.props.model.x)
+        // (this.props.canvas.cursor.x) - (this.state.anchorX + this.props.model.x)
+        // (this.props.canvas.cursor.x) - (this.state.anchorX + this.props.model.x)
         //
         // The above number signifies by how much has the mouse left the original
         // anchor point. If we add this difference to where we would have
         // calculated our original location, we're left with:
-        // (ev.pageX - this.props.canvas.pageOffset.x - this.state.anchorX) +
-        // ((ev.pageX - this.props.canvas.pageOffset.x) - (this.state.anchorX + this.props.model.x))
+        // (this.props.canvas.cursor.x - this.state.anchorX) +
+        // ((this.props.canvas.cursor.x) - (this.state.anchorX + this.props.model.x))
         //
         // Which simplified leaves us with:
-        // 2 * (ev.pageX - this.props.canvas.pageOffset.x - this.state.anchorX) - this.props.model.x
+        // 2 * (this.props.canvas.cursor.x - this.state.anchorX) - this.props.model.x
         //
         this.props.move({
           x:
-            2 *
-              (ev.pageX - this.props.canvas.pageOffset.x - this.state.anchorX) -
+            2 * (this.props.canvas.cursor.x - this.props.meta.anchor.x) -
             this.props.model.x,
           y:
-            2 *
-              (ev.pageY - this.props.canvas.pageOffset.y - this.state.anchorY) -
+            2 * (this.props.canvas.cursor.y - this.props.meta.anchor.y) -
             this.props.model.y,
           id: this.props.model.id,
         });
@@ -234,10 +249,14 @@ const EntityContainerHOC = WrappedComponent =>
     };
 
     onMouseMove = (ev: SyntheticMouseEvent<HTMLElement>) => {
+      // Ok... here the problem is that sometimes the DOM doesn't update as
+      // fast as the mouse move. In those cases... you just are not moving the
+      // mouse on top of the element... so it stops moviing.  I have to handle
+      // the move on the canvas and not on the element itself to avoid this...
       if (this.state.isAnchored) {
         this.props.move({
-          x: ev.pageX - this.props.canvas.pageOffset.x - this.state.anchorX,
-          y: ev.pageY - this.props.canvas.pageOffset.y - this.state.anchorY,
+          x: this.props.canvas.cursor.x - this.props.meta.anchor.x,
+          y: this.props.canvas.cursor.y - this.props.meta.anchor.y,
           id: this.props.model.id,
         });
       }
@@ -248,9 +267,7 @@ const EntityContainerHOC = WrappedComponent =>
         // Behaves as if it was spawned with a mouse drag
         // meaning that when you release the mouse button,
         // the element will de-anchor
-        this.setState({
-          isAnchored: false,
-        });
+        this.props.anchorEntity({ id: '', isAnchored: false });
         this.props.selectEntity(this.props.model.id);
       }
       // else it behaves as if it was spawned with a mouse click
@@ -297,4 +314,5 @@ export default (WrappedComponent: ComponentType<*>) =>
     removeEntity,
     selectEntity,
     connecting,
+    anchorEntity,
   })(EntityContainerHOC(WrappedComponent));

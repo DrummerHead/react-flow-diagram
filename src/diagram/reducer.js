@@ -53,6 +53,10 @@ const initialState = {
       currently: false,
       from: '',
     },
+    anchoredEntity: {
+      isAnchored: false,
+      id: '',
+    },
     zoom: 1,
   },
   config: {
@@ -67,9 +71,14 @@ const initialState = {
 };
 
 const appReducer = (state: State = initialState, action: Action): State => ({
-  entity: entityReducer(state.entity, action, state.canvas),
-  metaEntity: metaEntityReducer(state.metaEntity, action),
   canvas: canvasReducer(state.canvas, action),
+  entity: entityReducer(state.entity, action, state.metaEntity, state.canvas),
+  metaEntity: metaEntityReducer(
+    state.metaEntity,
+    action,
+    state.entity,
+    state.canvas
+  ),
   config: configReducer(state.config, action),
   history: state.history,
   lastAction: action.type,

@@ -27,19 +27,17 @@ const defaultEntity = (state: State) => ({
   // Perhaps something less naive for id generation
   id: window.Date.now().toString(36),
   type: entityType,
-  x:
-    ev.pageX -
-    state.canvas.pageOffset.x -
-    state.config.entityTypes[entityType].width / 2,
-  y:
-    ev.pageY -
-    state.canvas.pageOffset.y -
-    state.config.entityTypes[entityType].height / 2,
+  x: state.canvas.cursor.x - state.config.entityTypes[entityType].width / 2,
+  y: state.canvas.cursor.y - state.config.entityTypes[entityType].height / 2,
   width: state.config.entityTypes[entityType].width,
   height: state.config.entityTypes[entityType].height,
   name: 'test',
   isAnchored: true,
   isSelected: false,
+  anchor: {
+    x: state.config.entityTypes[entityType].width / 2,
+    y: state.config.entityTypes[entityType].height / 2,
+  },
 });
 
 export default defaultEntity;

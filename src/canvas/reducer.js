@@ -12,6 +12,10 @@ export type CanvasState = {
     currently: boolean,
     from: EntityId,
   },
+  anchoredEntity: {
+    isAnchored: boolean,
+    id: EntityId,
+  },
   zoom: number,
   gridSize?: number,
 };
@@ -20,12 +24,17 @@ export type ConnectingPayload = {
   currently: boolean,
   from: EntityId,
 };
+export type AnchorPayload = {
+  isAnchored: boolean,
+  id: EntityId,
+};
 export type CanvasAction =
   | ActionShape<'rd/canvas/SET_OFFSET', Coords>
   | ActionShape<'rd/canvas/TRACK', Coords>
   | ActionShape<'rd/canvas/TRANSLATE', Coords>
   | ActionShape<'rd/canvas/ZOOM', number>
-  | ActionShape<'rd/canvas/CONNECT', ConnectingPayload>;
+  | ActionShape<'rd/canvas/CONNECT', ConnectingPayload>
+  | ActionShape<'rd/canvas/ANCHOR', AnchorPayload>;
 
 const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
   switch (action.type) {
@@ -45,7 +54,11 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
       /* TODO: these coordinates are also useful for entity in general. I
        * shouldn't be tracking mouse position in several places independently
        * and perhaps I should converge to always using the cursor position as
-       * calculated in the canvas reducer */
+       * calculated in the canvas reducer
+       *
+       * I'm on it :D love you dude <3
+       *
+       */
 
       return {
         ...state,
@@ -71,6 +84,21 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
       return {
         ...state,
         connecting: action.payload,
+      };
+
+    case 'rd/canvas/ANCHOR':
+      return {
+        ...state,
+        anchoredEntity: action.payload,
+      };
+
+    case 'rd/entity/ADD':
+      return {
+        ...state,
+        anchoredEntity: {
+          ...state.anchoredEntity,
+          id: action.payload.id,
+        },
       };
 
     case 'rd/entity/LINK_TO':
@@ -110,6 +138,14 @@ export const zoom = (payload: number): CanvasAction => ({
 export const connecting = (payload: ConnectingPayload): CanvasAction => ({
   type: 'rd/canvas/CONNECT',
   payload,
+});
+
+export const anchorEntity = ({
+  isAnchored = true,
+  id = '',
+}: AnchorPayload): CanvasAction => ({
+  type: 'rd/canvas/ANCHOR',
+  payload: { isAnchored, id },
 });
 
 export default canvasReducer;
