@@ -30,10 +30,14 @@ import type { HistoryAction } from '../history/reducer';
  * Presentational
  * ==================================== */
 
-const CanvasStyle = style.div`
-  position: relative;
-  background-color: #eee;
+const CanvasViewport = style.div`
+  display: flex;
+  flex-flow: column nowrap;
+  min-height: 10em;
   flex: 1 0;
+  position: relative;
+  overflow: hidden;
+  background-color: yellow;
 
   & * {
     box-sizing: border-box;
@@ -44,13 +48,27 @@ const CanvasStyle = style.div`
     margin: 0;
     padding: 0;
   }
-  ${props => {
+`;
+
+const CanvasStyle = style.div.attrs({
+  style: props => {
     const restPercentage = 100 - 100 / props.gridSize;
+    const scaleStyles = {
+      transform: `scale(${props.zoom}) translate(${props.position.x}px, ${props
+        .position.y}px)`,
+    };
     return props.gridSize
-      ? `background-image: linear-gradient(0deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%), linear-gradient(90deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%);
-  background-size: ${props.gridSize}px ${props.gridSize}px;`
-      : '';
-  }}
+      ? {
+          ...scaleStyles,
+          backgroundImage: `linear-gradient(0deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%), linear-gradient(90deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%)`,
+          backgroundSize: `${props.gridSize}px ${props.gridSize}px`,
+        }
+      : scaleStyles;
+  },
+})`
+  position: relative;
+  flex: 1 0;
+  background-color: #eee;
 `;
 
 const SvgLand = style.svg`
@@ -66,38 +84,43 @@ type CanvasProps = {
   gridSize: ?number,
   connectingLink: LinksType,
   handleRef: HTMLElement => void,
+  zoom: number,
+  position: Coords,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
   unselectAll: () => MetaEntityAction,
 };
 const Canvas = (props: CanvasProps) => (
-  <CanvasStyle
-    innerRef={div => props.handleRef(div)}
-    onMouseMove={props.onMouseMove}
-    onMouseDown={props.unselectAll}
-    gridSize={props.gridSize}
-  >
-    <Debug />
-    <SvgLand width="100%" height="100%">
+  <CanvasViewport>
+    <CanvasStyle
+      innerRef={div => props.handleRef(div)}
+      onMouseMove={props.onMouseMove}
+      onMouseDown={props.unselectAll}
+      gridSize={props.gridSize}
+      position={props.position}
+      zoom={props.zoom}
+    >
+      <SvgLand width="100%" height="100%">
+        {props.entities
+          .filter(entity => 'linksTo' in entity)
+          // $FlowFixMe
+          .map(entity => <Links key={entity.id} links={entity.linksTo} />)}
+        // https://github.com/facebook/flow/issues/1414
+        {props.isConnecting && <Links links={props.connectingLink} />}
+        <ArrowMarker />
+      </SvgLand>
+
       {props.entities
-        .filter(entity => 'linksTo' in entity)
-        // $FlowFixMe
-        .map(entity => <Links key={entity.id} links={entity.linksTo} />)}
-      // https://github.com/facebook/flow/issues/1414
-      {props.isConnecting && <Links links={props.connectingLink} />}
-      <ArrowMarker />
-    </SvgLand>
-
-    {props.entities
-      .map(entity => ({
-        entity,
-        CustomEntity: props.wrappedCustomEntities[entity.type],
-      }))
-      .map(Combo => (
-        <Combo.CustomEntity key={Combo.entity.id} model={Combo.entity} />
-      ))}
-
+        .map(entity => ({
+          entity,
+          CustomEntity: props.wrappedCustomEntities[entity.type],
+        }))
+        .map(Combo => (
+          <Combo.CustomEntity key={Combo.entity.id} model={Combo.entity} />
+        ))}
+    </CanvasStyle>
     <Panel />
-  </CanvasStyle>
+    <Debug />
+  </CanvasViewport>
 );
 
 /*
@@ -110,6 +133,8 @@ type CanvasContainerProps = {
   isConnecting: boolean,
   connectingLink: LinksType,
   gridSize: ?number,
+  zoom: number,
+  position: Coords,
   setOffset: Coords => CanvasAction,
   trackMovement: Coords => CanvasAction,
   unselectAll: () => MetaEntityAction,
@@ -201,6 +226,8 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
         onMouseMove={this.onMouseMove}
         isConnecting={this.props.isConnecting}
         connectingLink={this.props.connectingLink}
+        zoom={this.props.zoom}
+        position={this.props.position}
         unselectAll={this.props.unselectAll}
         gridSize={this.props.gridSize}
       />
@@ -236,6 +263,8 @@ const mapStateToProps = (state: State) => ({
   isConnecting: state.canvas.connecting.currently,
   connectingLink: makeConnectingLinks(state),
   gridSize: state.canvas.gridSize,
+  position: state.canvas.position,
+  zoom: state.canvas.zoom,
 });
 
 export default connect(mapStateToProps, {
