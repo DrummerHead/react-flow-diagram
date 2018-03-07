@@ -404,7 +404,7 @@ export const metaEntityReducer = (
       );
     }
 
-    case 'rd/canvas/ANCHOR': {
+    case 'rd/canvas/ANCHOR_ENTITY': {
       const { isAnchored, id } = action.payload;
       return state.map(
         metaEntity =>
@@ -430,6 +430,7 @@ export const metaEntityReducer = (
 
     case 'rd/entity/CONNECT':
     case 'rd/metaentity/UNSELECTALL':
+    case 'rd/canvas/ANCHOR_CANVAS':
       return state.map(unselectMetaEntity);
 
     default:

@@ -33,22 +33,14 @@ export type State = {
   lastAction: ActionType,
 };
 
+const defaultCoords = { x: 0, y: 0 };
 const initialState = {
   entity: [],
   metaEntity: [],
   canvas: {
-    cursor: {
-      x: 0,
-      y: 0,
-    },
-    pageOffset: {
-      x: 0,
-      y: 0,
-    },
-    position: {
-      x: 0,
-      y: 0,
-    },
+    cursor: defaultCoords,
+    pageOffset: defaultCoords,
+    position: defaultCoords,
     connecting: {
       currently: false,
       from: '',
@@ -56,6 +48,10 @@ const initialState = {
     anchoredEntity: {
       isAnchored: false,
       id: '',
+    },
+    canvasAnchor: {
+      isMoving: false,
+      coords: defaultCoords,
     },
     zoom: 1,
   },

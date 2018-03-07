@@ -30,7 +30,7 @@ import type {
   CanvasState,
   CanvasAction,
   ConnectingPayload,
-  AnchorPayload,
+  AnchorEntityPayload,
 } from '../canvas/reducer';
 import type { State } from '../diagram/reducer';
 import type { DefaultEntityProps } from './defaultEntity';
@@ -49,7 +49,7 @@ type EntityProps = {
   toBeConnected: boolean,
   onMouseDown: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseLeave: (SyntheticMouseEvent<HTMLElement>) => void,
-  onMouseUp: () => void,
+  onMouseUp: (SyntheticMouseEvent<HTMLElement>) => void,
   children: Node,
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
   removeEntity: EntityId => EntityAction,
@@ -145,7 +145,7 @@ type EntityContainerProps = {
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
   removeEntity: EntityId => EntityAction,
   connecting: ConnectingPayload => CanvasAction,
-  anchorEntity: AnchorPayload => CanvasAction,
+  anchorEntity: AnchorEntityPayload => CanvasAction,
   selectEntity: (EntityId, isSelected?: boolean) => MetaEntityAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
 };
@@ -191,19 +191,9 @@ const EntityContainerHOC = WrappedComponent =>
     };
 
     onMouseLeave = (ev: SyntheticMouseEvent<HTMLElement>) => {
-      // Ok... this will potentially be deleted.  If I'll be using canvas mouse
-      // position as source of truth... that's the same truth that wasn't being
-      // able to update as fast as the actual movement. So it will actually not
-      // help me at all. And I can't really say "Ok so for this I'll use the
-      // actual event" because in zooming states, it will not match "canvas
-      // scale reality"...
-      //
-      // On the plus side, now that I have a track in the canvas itself, an
-      // element can never "get away" from my hold because the event is not on
-      // top of the... mmmh it can still get away... hhhhmmmm... ok but I can
-      // know if it's "anchored" or not... so if it gets away and it is
-      // anchored, keep moving I guess... we'll see. I'll keep integrating
-      // cursor from canvas and then come back here
+      // If this magic below proves to be a hinderance, remove it.
+      // Now that I'm tracking mouse movement on canvas, Entity mouseMove
+      // jailbreak is not such a problem.
       if (this.props.meta.isAnchored) {
         // If the entity is still being dragged while leaving (mouse movement
         // faster than state refresh on DOM) then (discussing only X
@@ -240,7 +230,8 @@ const EntityContainerHOC = WrappedComponent =>
       }
     };
 
-    onMouseUp = (/* ev: SyntheticMouseEvent<HTMLElement> */) => {
+    onMouseUp = (ev: SyntheticMouseEvent<HTMLElement>) => {
+      ev.stopPropagation();
       if (!this.state.onMouseUpWouldBeClick) {
         // Behaves as if it was spawned with a mouse drag
         // meaning that when you release the mouse button,

@@ -3,9 +3,9 @@
 import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
-import { setOffset, trackMovement } from './reducer';
+import { setOffset, trackMovement, anchorCanvas } from './reducer';
 import { undo, redo } from '../history/reducer';
-import { setName, unselectAll } from '../entity/reducer';
+import { setName } from '../entity/reducer';
 import { icons } from '../icon/component';
 import EntityHOC from '../entity/component';
 import Panel from '../panel/component';
@@ -15,7 +15,7 @@ import Debug from '../debug/component';
 import calcLinkPoints from '../links/calcLinkPoints';
 
 import type { ComponentType } from 'React';
-import type { Coords, CanvasAction } from '../canvas/reducer';
+import type { Coords, CanvasAction } from './reducer';
 import type {
   EntityState,
   Point,
@@ -87,14 +87,16 @@ type CanvasProps = {
   handleRef: HTMLElement => void,
   zoom: number,
   position: Coords,
+  onMouseDown: () => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
-  unselectAll: () => MetaEntityAction,
+  onMouseUp: () => void,
 };
 const Canvas = (props: CanvasProps) => (
   <CanvasViewport onMouseMove={props.onMouseMove}>
     <CanvasStyle
       innerRef={div => props.handleRef(div)}
-      onMouseDown={props.unselectAll}
+      onMouseDown={props.onMouseDown}
+      onMouseUp={props.onMouseUp}
       gridSize={props.gridSize}
       position={props.position}
       zoom={props.zoom}
@@ -137,7 +139,7 @@ type CanvasContainerProps = {
   position: Coords,
   setOffset: Coords => CanvasAction,
   trackMovement: Coords => CanvasAction,
-  unselectAll: () => MetaEntityAction,
+  anchorCanvas: boolean => CanvasAction,
   undo: () => HistoryAction,
   redo: () => HistoryAction,
 };
@@ -201,11 +203,19 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     }
   };
 
+  onMouseDown = () => {
+    this.props.anchorCanvas(true);
+  };
+
   onMouseMove = (ev: SyntheticMouseEvent<HTMLElement>) => {
     this.props.trackMovement({
       x: ev.pageX,
       y: ev.pageY,
     });
+  };
+
+  onMouseUp = () => {
+    this.props.anchorCanvas(false);
   };
 
   // TODO: Gotta do the setOffset when there's a window resize or an element
@@ -223,12 +233,13 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
         entities={this.props.entities}
         wrappedCustomEntities={this.wrappedCustomEntities}
         handleRef={this.handleRef}
+        onMouseDown={this.onMouseDown}
         onMouseMove={this.onMouseMove}
+        onMouseUp={this.onMouseUp}
         isConnecting={this.props.isConnecting}
         connectingLink={this.props.connectingLink}
         zoom={this.props.zoom}
         position={this.props.position}
-        unselectAll={this.props.unselectAll}
         gridSize={this.props.gridSize}
       />
     );
@@ -272,5 +283,5 @@ export default connect(mapStateToProps, {
   trackMovement,
   undo,
   redo,
-  unselectAll,
+  anchorCanvas,
 })(CanvasContainer);

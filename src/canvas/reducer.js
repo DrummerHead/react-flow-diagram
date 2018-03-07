@@ -16,6 +16,10 @@ export type CanvasState = {
     isAnchored: boolean,
     id: EntityId,
   },
+  canvasAnchor: {
+    isMoving: boolean,
+    coords: Coords,
+  },
   zoom: number,
   gridSize?: number,
 };
@@ -24,7 +28,7 @@ export type ConnectingPayload = {
   currently: boolean,
   from: EntityId,
 };
-export type AnchorPayload = {
+export type AnchorEntityPayload = {
   isAnchored: boolean,
   id: EntityId,
 };
@@ -34,7 +38,8 @@ export type CanvasAction =
   | ActionShape<'rd/canvas/TRANSLATE', Coords>
   | ActionShape<'rd/canvas/ZOOM', number>
   | ActionShape<'rd/canvas/CONNECT', ConnectingPayload>
-  | ActionShape<'rd/canvas/ANCHOR', AnchorPayload>;
+  | ActionShape<'rd/canvas/ANCHOR_ENTITY', AnchorEntityPayload>
+  | ActionShape<'rd/canvas/ANCHOR_CANVAS', boolean>;
 
 const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
   switch (action.type) {
@@ -51,22 +56,27 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
       };
 
     case 'rd/canvas/TRACK':
-      /* TODO: these coordinates are also useful for entity in general. I
-       * shouldn't be tracking mouse position in several places independently
-       * and perhaps I should converge to always using the cursor position as
-       * calculated in the canvas reducer
-       *
-       * I'm on it :D love you dude <3
-       *
-       */
-
-      return {
-        ...state,
-        cursor: {
-          x: action.payload.x - state.pageOffset.x - state.position.x,
-          y: action.payload.y - state.pageOffset.y - state.position.y,
-        },
-      };
+      return state.canvasAnchor.isMoving
+        ? {
+            ...state,
+            position: {
+              x:
+                action.payload.x -
+                state.pageOffset.x -
+                state.canvasAnchor.coords.x,
+              y:
+                action.payload.y -
+                state.pageOffset.y -
+                state.canvasAnchor.coords.y,
+            },
+          }
+        : {
+            ...state,
+            cursor: {
+              x: action.payload.x - state.pageOffset.x - state.position.x,
+              y: action.payload.y - state.pageOffset.y - state.position.y,
+            },
+          };
 
     case 'rd/canvas/TRANSLATE':
       return {
@@ -86,7 +96,16 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
         connecting: action.payload,
       };
 
-    case 'rd/canvas/ANCHOR':
+    case 'rd/canvas/ANCHOR_CANVAS':
+      return {
+        ...state,
+        canvasAnchor: {
+          isMoving: action.payload,
+          coords: state.cursor,
+        },
+      };
+
+    case 'rd/canvas/ANCHOR_ENTITY':
       return {
         ...state,
         anchoredEntity: action.payload,
@@ -152,9 +171,14 @@ export const connecting = (payload: ConnectingPayload): CanvasAction => ({
 export const anchorEntity = ({
   isAnchored = true,
   id = '',
-}: AnchorPayload): CanvasAction => ({
-  type: 'rd/canvas/ANCHOR',
+}: AnchorEntityPayload): CanvasAction => ({
+  type: 'rd/canvas/ANCHOR_ENTITY',
   payload: { isAnchored, id },
+});
+
+export const anchorCanvas = (payload: boolean): CanvasAction => ({
+  type: 'rd/canvas/ANCHOR_CANVAS',
+  payload,
 });
 
 export default canvasReducer;
