@@ -63,8 +63,8 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
       return {
         ...state,
         cursor: {
-          x: action.payload.x - state.pageOffset.x,
-          y: action.payload.y - state.pageOffset.y,
+          x: action.payload.x - state.pageOffset.x - state.position.x,
+          y: action.payload.y - state.pageOffset.y - state.position.y,
         },
       };
 

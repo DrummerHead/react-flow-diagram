@@ -190,8 +190,8 @@ const entityReducer = (
         const mEntity = metaEntity.find(e => e.id === id) || {
           anchor: { x: 0, y: 0 },
         };
-        const x = action.payload.x - canvas.pageOffset.x - mEntity.anchor.x;
-        const y = action.payload.y - canvas.pageOffset.y - mEntity.anchor.y;
+        const x = canvas.cursor.x - mEntity.anchor.x;
+        const y = canvas.cursor.y - mEntity.anchor.y;
         const gridX = positionAdjustedToGrid(x, canvas.gridSize);
         const gridY = positionAdjustedToGrid(y, canvas.gridSize);
         return state.map(entity => {
