@@ -101,6 +101,15 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
         },
       };
 
+    case 'rd/entity/ADD_LINKED':
+      return {
+        ...state,
+        anchoredEntity: {
+          isAnchored: true,
+          id: action.payload.entity.id,
+        },
+      };
+
     case 'rd/entity/LINK_TO':
       return {
         ...state,
