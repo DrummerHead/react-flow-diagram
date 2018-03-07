@@ -96,7 +96,7 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
       return {
         ...state,
         anchoredEntity: {
-          ...state.anchoredEntity,
+          isAnchored: true,
           id: action.payload.id,
         },
       };

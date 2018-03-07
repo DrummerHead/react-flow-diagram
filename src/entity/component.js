@@ -49,7 +49,6 @@ type EntityProps = {
   toBeConnected: boolean,
   onMouseDown: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseLeave: (SyntheticMouseEvent<HTMLElement>) => void,
-  onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseUp: () => void,
   children: Node,
   addLinkedEntity: AddLinkedEntityPayload => EntityAction,
@@ -119,7 +118,6 @@ const Entity = (props: EntityProps) => (
  * ==================================== */
 
 type EntityContainerState = {
-  isAnchored: boolean,
   onMouseUpWouldBeClick: boolean,
 };
 // TODO: These signatures are probably wrong. The original action does return
@@ -157,14 +155,13 @@ const EntityContainerHOC = WrappedComponent =>
     EntityContainerState
   > {
     state = {
-      isAnchored: this.props.meta.isAnchored,
       onMouseUpWouldBeClick: true,
     };
 
     componentDidMount() {
       const wouldBeClick = () =>
         this.setState({ onMouseUpWouldBeClick: false });
-      if (this.props.canvas.anchoredEntity.isAnchored) {
+      if (this.props.meta.isAnchored) {
         setTimeout(wouldBeClick, 16 * 12);
       } else {
         wouldBeClick();
@@ -190,11 +187,6 @@ const EntityContainerHOC = WrappedComponent =>
         // meow.
         // so I have to create a new action for this...
         this.props.anchorEntity({ id: this.props.model.id, isAnchored: true });
-        //        this.setState({
-        //          anchorX: this.props.canvas.cursor.x - this.props.model.x,
-        //          anchorY: this.props.canvas.cursor.y - this.props.model.y,
-        //          isAnchored: true,
-        //        });
       }
     };
 
@@ -212,7 +204,7 @@ const EntityContainerHOC = WrappedComponent =>
       // know if it's "anchored" or not... so if it gets away and it is
       // anchored, keep moving I guess... we'll see. I'll keep integrating
       // cursor from canvas and then come back here
-      if (this.state.isAnchored) {
+      if (this.props.meta.isAnchored) {
         // If the entity is still being dragged while leaving (mouse movement
         // faster than state refresh on DOM) then (discussing only X
         // coordinate, calculations the same with Y):
@@ -248,20 +240,6 @@ const EntityContainerHOC = WrappedComponent =>
       }
     };
 
-    onMouseMove = (ev: SyntheticMouseEvent<HTMLElement>) => {
-      // Ok... here the problem is that sometimes the DOM doesn't update as
-      // fast as the mouse move. In those cases... you just are not moving the
-      // mouse on top of the element... so it stops moviing.  I have to handle
-      // the move on the canvas and not on the element itself to avoid this...
-      if (this.state.isAnchored) {
-        this.props.move({
-          x: this.props.canvas.cursor.x - this.props.meta.anchor.x,
-          y: this.props.canvas.cursor.y - this.props.meta.anchor.y,
-          id: this.props.model.id,
-        });
-      }
-    };
-
     onMouseUp = (/* ev: SyntheticMouseEvent<HTMLElement> */) => {
       if (!this.state.onMouseUpWouldBeClick) {
         // Behaves as if it was spawned with a mouse drag
@@ -279,7 +257,7 @@ const EntityContainerHOC = WrappedComponent =>
         <Entity
           model={this.props.model}
           entityTypeNames={this.entityTypeNames}
-          isAnchored={this.state.isAnchored}
+          isAnchored={this.props.meta.isAnchored}
           isSelected={this.props.meta.isSelected}
           toBeConnected={this.props.canvas.connecting.currently}
           addLinkedEntity={this.props.addLinkedEntity}
@@ -288,7 +266,6 @@ const EntityContainerHOC = WrappedComponent =>
           defaultEntity={this.props.defaultEntity}
           onMouseDown={this.onMouseDown}
           onMouseLeave={this.onMouseLeave}
-          onMouseMove={this.onMouseMove}
           onMouseUp={this.onMouseUp}
         >
           <WrappedComponent model={this.props.model} meta={this.props.meta} />

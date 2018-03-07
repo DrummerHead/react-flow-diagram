@@ -406,24 +406,23 @@ export const metaEntityReducer = (
 
     case 'rd/canvas/ANCHOR': {
       const { isAnchored, id } = action.payload;
-      return isAnchored
-        ? state.map(
-            metaEntity =>
-              metaEntity.id == id
-                ? {
-                    ...metaEntity,
-                    anchor: {
-                      x:
-                        canvas.cursor.x -
-                        (entity.find(e => e.id === id) || { x: 0 }).x,
-                      y:
-                        canvas.cursor.y -
-                        (entity.find(e => e.id === id) || { y: 0 }).y,
-                    },
-                  }
-                : metaEntity
-          )
-        : state;
+      return state.map(
+        metaEntity =>
+          metaEntity.id == id
+            ? {
+                ...metaEntity,
+                isAnchored: true,
+                anchor: {
+                  x:
+                    canvas.cursor.x -
+                    (entity.find(e => e.id === id) || { x: 0 }).x,
+                  y:
+                    canvas.cursor.y -
+                    (entity.find(e => e.id === id) || { y: 0 }).y,
+                },
+              }
+            : { ...metaEntity, isAnchored: false }
+      );
     }
 
     case 'rd/entity/REMOVE':
