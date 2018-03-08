@@ -7,10 +7,7 @@ declare module 'react-flow-diagram' {
   //
   declare export type EntityId = string;
 
-  declare type Point = {
-    x: number,
-    y: number,
-  };
+  declare type Point = Coords;
 
   declare type Link = {
     target: EntityId,
@@ -38,10 +35,11 @@ declare module 'react-flow-diagram' {
 
   declare export type EntityState = Array<EntityModel>;
 
-  declare export type MetaEntityModel = {
+  declare type MetaEntityModel = {
     id: EntityId,
     isAnchored: boolean,
     isSelected: boolean,
+    anchor: Coords,
   };
 
   declare type MetaEntityState = Array<MetaEntityModel>;
@@ -69,31 +67,59 @@ declare module 'react-flow-diagram' {
 
   // Canvas
   //
+  declare type Coords = { x: number, y: number };
   declare type CanvasState = {
-    offset: {
+    cursor: Coords,
+    canvasViewport: {
       x: number,
       y: number,
+      width: number,
+      height: number,
     },
-    cursor: {
+    canvasArtboard: {
       x: number,
       y: number,
+      width: number,
+      height: number,
     },
     connecting: {
       currently: boolean,
       from: EntityId,
     },
+    anchoredEntity: {
+      isAnchored: boolean,
+      id: EntityId,
+    },
+    canvasAnchor: {
+      isMoving: boolean,
+      coords: Coords,
+    },
+    zoom: number,
     gridSize?: number,
   };
 
-  declare type Coords = { x: number, y: number };
+  declare type ConfigViewportPayload = {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  };
   declare type ConnectingPayload = {
     currently: boolean,
     from: EntityId,
   };
+  declare type AnchorEntityPayload = {
+    isAnchored: boolean,
+    id: EntityId,
+  };
   declare type CanvasAction =
-    | ActionShape<'rd/canvas/SET_OFFSET', Coords>
+    | ActionShape<'rd/canvas/CONFIG_VIEWPORT', ConfigViewportPayload>
     | ActionShape<'rd/canvas/TRACK', Coords>
-    | ActionShape<'rd/canvas/CONNECT', ConnectingPayload>;
+    | ActionShape<'rd/canvas/TRANSLATE', Coords>
+    | ActionShape<'rd/canvas/ZOOM', number>
+    | ActionShape<'rd/canvas/CONNECT', ConnectingPayload>
+    | ActionShape<'rd/canvas/ANCHOR_ENTITY', AnchorEntityPayload>
+    | ActionShape<'rd/canvas/ANCHOR_CANVAS', boolean>;
 
   // Config
   //

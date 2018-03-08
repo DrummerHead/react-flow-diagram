@@ -35,8 +35,6 @@ export type EntityModel = {
 
 export type EntityState = Array<EntityModel>;
 
-// TODO: Determine if isAnchored attr on entity is still needed here. Will
-// probably change that for an attribute on canvas
 export type MetaEntityModel = {
   id: EntityId,
   isAnchored: boolean,
