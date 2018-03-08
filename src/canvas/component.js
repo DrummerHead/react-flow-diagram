@@ -37,7 +37,7 @@ const CanvasViewport = style.div`
   flex: 1 0;
   position: relative;
   overflow: hidden;
-  background-color: yellow;
+  background-color: #282828;
 
   & * {
     box-sizing: border-box;
@@ -122,7 +122,6 @@ const Canvas = (props: CanvasProps) => (
         ))}
     </CanvasArtboard>
     <Panel />
-    <Debug />
   </CanvasViewport>
 );
 
