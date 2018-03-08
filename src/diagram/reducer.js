@@ -39,8 +39,18 @@ const initialState = {
   metaEntity: [],
   canvas: {
     cursor: defaultCoords,
-    pageOffset: defaultCoords,
-    position: defaultCoords,
+    canvasViewport: {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    },
+    canvasArtboard: {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    },
     connecting: {
       currently: false,
       from: '',

@@ -3,7 +3,7 @@
 import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
-import { setOffset, trackMovement, anchorCanvas } from './reducer';
+import { configViewport, trackMovement, anchorCanvas } from './reducer';
 import { undo, redo } from '../history/reducer';
 import { setName } from '../entity/reducer';
 import { icons } from '../icon/component';
@@ -15,7 +15,7 @@ import Debug from '../debug/component';
 import calcLinkPoints from '../links/calcLinkPoints';
 
 import type { ComponentType } from 'React';
-import type { Coords, CanvasAction } from './reducer';
+import type { Coords, CanvasAction, ConfigViewportPayload } from './reducer';
 import type {
   EntityState,
   Point,
@@ -50,21 +50,21 @@ const CanvasViewport = style.div`
   }
 `;
 
-const CanvasStyle = style.div.attrs({
+const CanvasArtboard = style.div.attrs({
   style: props => {
     const restPercentage = 100 - 100 / props.gridSize;
-    const scaleStyles = {
-      transform: `scale(${props.zoom}) translate(${props.position.x}px, ${props
-        .position.y}px)`,
+    const defaultStyles = {
+      transform: `scale(${props.zoom}) translate(${props.artboard.x}px, ${props
+        .artboard.y}px)`,
+      width: `${props.artboard.width}px`,
+      height: `${props.artboard.height}px`,
     };
-    return props.gridSize
-      ? {
-          ...scaleStyles,
-          backgroundImage: `linear-gradient(0deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%),
+    const gridStyle = {
+      backgroundImage: `linear-gradient(0deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%),
 linear-gradient(90deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0, 0, .2) 100%)`,
-          backgroundSize: `${props.gridSize}px ${props.gridSize}px`,
-        }
-      : scaleStyles;
+      backgroundSize: `${props.gridSize}px ${props.gridSize}px`,
+    };
+    return props.gridSize ? { ...defaultStyles, ...gridStyle } : defaultStyles;
   },
 })`
   position: relative;
@@ -86,19 +86,21 @@ type CanvasProps = {
   connectingLink: LinksType,
   handleRef: HTMLElement => void,
   zoom: number,
-  position: Coords,
+  artboard: { x: number, y: number, width: number, height: number },
   onMouseDown: () => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
   onMouseUp: () => void,
 };
 const Canvas = (props: CanvasProps) => (
-  <CanvasViewport onMouseMove={props.onMouseMove}>
-    <CanvasStyle
-      innerRef={div => props.handleRef(div)}
+  <CanvasViewport
+    onMouseMove={props.onMouseMove}
+    innerRef={div => props.handleRef(div)}
+  >
+    <CanvasArtboard
       onMouseDown={props.onMouseDown}
       onMouseUp={props.onMouseUp}
       gridSize={props.gridSize}
-      position={props.position}
+      artboard={props.artboard}
       zoom={props.zoom}
     >
       <SvgLand width="100%" height="100%">
@@ -119,7 +121,7 @@ const Canvas = (props: CanvasProps) => (
         .map(Combo => (
           <Combo.CustomEntity key={Combo.entity.id} model={Combo.entity} />
         ))}
-    </CanvasStyle>
+    </CanvasArtboard>
     <Panel />
     <Debug />
   </CanvasViewport>
@@ -136,8 +138,8 @@ type CanvasContainerProps = {
   connectingLink: LinksType,
   gridSize: ?number,
   zoom: number,
-  position: Coords,
-  setOffset: Coords => CanvasAction,
+  artboard: { x: number, y: number, width: number, height: number },
+  configViewport: ConfigViewportPayload => CanvasAction,
   trackMovement: Coords => CanvasAction,
   anchorCanvas: boolean => CanvasAction,
   undo: () => HistoryAction,
@@ -179,8 +181,10 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
       if (window.scrollY !== 0) {
         window.scrollTo(0, 0);
       }
-      const { left, top } = cd.getBoundingClientRect();
-      this.props.setOffset({
+      const { left, top, width, height } = cd.getBoundingClientRect();
+      this.props.configViewport({
+        width: parseInt(width, 10),
+        height: parseInt(height, 10),
         x: parseInt(left, 10),
         y: parseInt(top, 10),
       });
@@ -239,7 +243,7 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
         isConnecting={this.props.isConnecting}
         connectingLink={this.props.connectingLink}
         zoom={this.props.zoom}
-        position={this.props.position}
+        artboard={this.props.artboard}
         gridSize={this.props.gridSize}
       />
     );
@@ -274,12 +278,12 @@ const mapStateToProps = (state: State) => ({
   isConnecting: state.canvas.connecting.currently,
   connectingLink: makeConnectingLinks(state),
   gridSize: state.canvas.gridSize,
-  position: state.canvas.position,
+  artboard: state.canvas.canvasArtboard,
   zoom: state.canvas.zoom,
 });
 
 export default connect(mapStateToProps, {
-  setOffset,
+  configViewport,
   trackMovement,
   undo,
   redo,

@@ -6,8 +6,18 @@ import type { EntityId } from '../entity/reducer';
 export type Coords = { x: number, y: number };
 export type CanvasState = {
   cursor: Coords,
-  pageOffset: Coords,
-  position: Coords,
+  canvasViewport: {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  },
+  canvasArtboard: {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  },
   connecting: {
     currently: boolean,
     from: EntityId,
@@ -24,6 +34,12 @@ export type CanvasState = {
   gridSize?: number,
 };
 
+export type ConfigViewportPayload = {
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+};
 export type ConnectingPayload = {
   currently: boolean,
   from: EntityId,
@@ -33,7 +49,7 @@ export type AnchorEntityPayload = {
   id: EntityId,
 };
 export type CanvasAction =
-  | ActionShape<'rd/canvas/SET_OFFSET', Coords>
+  | ActionShape<'rd/canvas/CONFIG_VIEWPORT', ConfigViewportPayload>
   | ActionShape<'rd/canvas/TRACK', Coords>
   | ActionShape<'rd/canvas/TRANSLATE', Coords>
   | ActionShape<'rd/canvas/ZOOM', number>
@@ -43,10 +59,15 @@ export type CanvasAction =
 
 const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
   switch (action.type) {
-    case 'rd/canvas/SET_OFFSET':
+    case 'rd/canvas/CONFIG_VIEWPORT':
       return {
         ...state,
-        pageOffset: action.payload,
+        canvasViewport: action.payload,
+        canvasArtboard: {
+          ...state.canvasArtboard,
+          width: action.payload.width,
+          height: action.payload.height,
+        },
       };
 
     case 'rd/config/SET':
@@ -59,29 +80,40 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
       return state.canvasAnchor.isMoving
         ? {
             ...state,
-            position: {
+            canvasArtboard: {
+              ...state.canvasArtboard,
               x:
                 action.payload.x -
-                state.pageOffset.x -
+                state.canvasViewport.x -
                 state.canvasAnchor.coords.x,
               y:
                 action.payload.y -
-                state.pageOffset.y -
+                state.canvasViewport.y -
                 state.canvasAnchor.coords.y,
             },
           }
         : {
             ...state,
             cursor: {
-              x: action.payload.x - state.pageOffset.x - state.position.x,
-              y: action.payload.y - state.pageOffset.y - state.position.y,
+              x:
+                action.payload.x -
+                state.canvasViewport.x -
+                state.canvasArtboard.x,
+              y:
+                action.payload.y -
+                state.canvasViewport.y -
+                state.canvasArtboard.y,
             },
           };
 
     case 'rd/canvas/TRANSLATE':
       return {
         ...state,
-        position: action.payload,
+        canvasArtboard: {
+          ...state.canvasArtboard,
+          x: action.payload.x,
+          y: action.payload.y,
+        },
       };
 
     case 'rd/canvas/ZOOM':
@@ -143,8 +175,10 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
   }
 };
 
-export const setOffset = (payload: Coords): CanvasAction => ({
-  type: 'rd/canvas/SET_OFFSET',
+export const configViewport = (
+  payload: ConfigViewportPayload
+): CanvasAction => ({
+  type: 'rd/canvas/CONFIG_VIEWPORT',
   payload,
 });
 
