@@ -68,7 +68,6 @@ linear-gradient(90deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0
   },
 })`
   position: relative;
-  flex: 1 0;
   background-color: #eee;
 `;
 

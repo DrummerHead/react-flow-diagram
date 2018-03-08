@@ -81,7 +81,16 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
         ? {
             ...state,
             canvasArtboard: {
-              ...state.canvasArtboard,
+              width:
+                state.canvasViewport.width -
+                (action.payload.x -
+                  state.canvasViewport.x -
+                  state.canvasAnchor.coords.x),
+              height:
+                state.canvasViewport.height -
+                (action.payload.y -
+                  state.canvasViewport.y -
+                  state.canvasAnchor.coords.y),
               x:
                 action.payload.x -
                 state.canvasViewport.x -
