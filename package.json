@@ -1,6 +1,6 @@
 {
   "name": "react-flow-diagram",
-  "version": "2.11.0",
+  "version": "2.11.1",
   "description": "react-flow-diagram React component",
   "main": "lib/index.js",
   "module": "es/index.js",
