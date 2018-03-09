@@ -40,6 +40,9 @@ class Debug extends React.Component<DebugProps, DebugState> {
   };
   zoomPhases: Array<number> = [0.5, 2, 0.75, 1];
   positionPhases: Array<[number, number]> = [
+    [100, 100],
+    [100, 400],
+    [400, 100],
     [-100, 100],
     [-100, -100],
     [100, -100],
@@ -77,6 +80,8 @@ class Debug extends React.Component<DebugProps, DebugState> {
   }
 }
 
+// Default export is <Debug /> component, to live inside of <CanvasViewport>.
+// It adds buttons to move history, zoom and pan.
 export default connect(null, { undo, redo, zoom, translate })(Debug);
 
 // https://github.com/flowtype/flow-typed/issues/1269#issuecomment-332100335
@@ -84,6 +89,8 @@ const mapStateToProps: MapStateToProps<any, any, any> = (state: State) => ({
   canvas: state.canvas,
 });
 
+// <Fairy /> component lives inside <CanvasArtboard>
+// and follows the cursor around
 export const Fairy = connect(mapStateToProps)(style.div.attrs({
   style: props => ({
     transform: `translate(${props.canvas.cursor.x}px, ${props.canvas.cursor

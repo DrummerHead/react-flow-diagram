@@ -82,36 +82,40 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
             ...state,
             canvasArtboard: {
               width:
-                state.canvasViewport.width -
-                (action.payload.x -
-                  state.canvasViewport.x -
-                  state.canvasAnchor.coords.x),
+                (state.canvasViewport.width -
+                  (action.payload.x -
+                    state.canvasViewport.x -
+                    state.canvasAnchor.coords.x * state.zoom)) *
+                (1 / state.zoom),
               height:
-                state.canvasViewport.height -
-                (action.payload.y -
-                  state.canvasViewport.y -
-                  state.canvasAnchor.coords.y),
+                (state.canvasViewport.height -
+                  (action.payload.y -
+                    state.canvasViewport.y -
+                    state.canvasAnchor.coords.y * state.zoom)) *
+                (1 / state.zoom),
               x:
                 action.payload.x -
                 state.canvasViewport.x -
-                state.canvasAnchor.coords.x,
+                state.canvasAnchor.coords.x * state.zoom,
               y:
                 action.payload.y -
                 state.canvasViewport.y -
-                state.canvasAnchor.coords.y,
+                state.canvasAnchor.coords.y * state.zoom,
             },
           }
         : {
             ...state,
             cursor: {
               x:
-                action.payload.x -
-                state.canvasViewport.x -
-                state.canvasArtboard.x,
+                (action.payload.x -
+                  state.canvasViewport.x -
+                  state.canvasArtboard.x) *
+                (1 / state.zoom),
               y:
-                action.payload.y -
-                state.canvasViewport.y -
-                state.canvasArtboard.y,
+                (action.payload.y -
+                  state.canvasViewport.y -
+                  state.canvasArtboard.y) *
+                (1 / state.zoom),
             },
           };
 
@@ -129,6 +133,15 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
       return {
         ...state,
         zoom: action.payload,
+        canvasArtboard: {
+          ...state.canvasArtboard,
+          width:
+            (state.canvasViewport.width - state.canvasArtboard.x) *
+            (1 / action.payload),
+          height:
+            (state.canvasViewport.height - state.canvasArtboard.y) *
+            (1 / action.payload),
+        },
       };
 
     case 'rd/canvas/CONNECT':

@@ -11,7 +11,7 @@ import EntityHOC from '../entity/component';
 import Panel from '../panel/component';
 import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
-import Debug from '../debug/component';
+import Debug, { Fairy } from '../debug/component';
 import calcLinkPoints from '../links/calcLinkPoints';
 
 import type { ComponentType } from 'React';
@@ -52,8 +52,8 @@ const CanvasArtboard = style.div.attrs({
   style: props => {
     const restPercentage = 100 - 100 / props.gridSize;
     const defaultStyles = {
-      transform: `scale(${props.zoom}) translate(${props.artboard.x}px, ${props
-        .artboard.y}px)`,
+      transform: `translate(${props.artboard.x}px, ${props.artboard
+        .y}px) scale(${props.zoom})`,
       width: `${props.artboard.width}px`,
       height: `${props.artboard.height}px`,
     };
@@ -66,6 +66,7 @@ linear-gradient(90deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0
   },
 })`
   position: relative;
+  transform-origin: 0 0;
   background-color: #eee;
   overflow: hidden;
 `;
@@ -121,6 +122,7 @@ const Canvas = (props: CanvasProps) => (
         ))}
     </CanvasArtboard>
     <Panel />
+    <Debug />
   </CanvasViewport>
 );
 
