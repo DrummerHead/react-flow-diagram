@@ -31,10 +31,8 @@ import type { HistoryAction } from '../history/reducer';
  * ==================================== */
 
 const CanvasViewport = style.div`
-  display: flex;
-  flex-flow: column nowrap;
   min-height: 10em;
-  flex: 1 0;
+  flex: 1 0 auto;
   position: relative;
   overflow: hidden;
   background-color: #282828;
@@ -69,6 +67,7 @@ linear-gradient(90deg, transparent 0%, transparent ${restPercentage}%, rgba(0, 0
 })`
   position: relative;
   background-color: #eee;
+  overflow: hidden;
 `;
 
 const SvgLand = style.svg`
