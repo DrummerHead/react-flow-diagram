@@ -6,8 +6,11 @@ import { connect } from 'react-redux';
 import { undo, redo } from '../history/reducer';
 import { zoom, translate } from '../canvas/reducer';
 
+import type { State } from '../diagram/reducer';
+import type { CanvasState } from '../canvas/reducer';
 import type { HistoryAction } from '../history/reducer';
 import type { CanvasAction, Coords } from '../canvas/reducer';
+import type { MapStateToProps } from 'react-redux';
 
 const Panel = style.div`
   position: absolute;
@@ -75,3 +78,22 @@ class Debug extends React.Component<DebugProps, DebugState> {
 }
 
 export default connect(null, { undo, redo, zoom, translate })(Debug);
+
+// https://github.com/flowtype/flow-typed/issues/1269#issuecomment-332100335
+const mapStateToProps: MapStateToProps<any, any, any> = (state: State) => ({
+  canvas: state.canvas,
+});
+
+export const Fairy = connect(mapStateToProps)(style.div.attrs({
+  style: props => ({
+    transform: `translate(${props.canvas.cursor.x}px, ${props.canvas.cursor
+      .y}px)`,
+  }),
+})`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11px;
+  height: 18px;
+  background-color: rgba(255, 0, 0, 0.5);
+`);
