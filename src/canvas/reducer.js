@@ -1,5 +1,7 @@
 // @flow
 
+import elemLayout from './elemLayout';
+
 import type { ActionShape, Action } from '../diagram/reducer';
 import type { EntityId } from '../entity/reducer';
 
@@ -34,12 +36,6 @@ export type CanvasState = {
   gridSize?: number,
 };
 
-export type ConfigViewportPayload = {
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-};
 export type ConnectingPayload = {
   currently: boolean,
   from: EntityId,
@@ -49,7 +45,7 @@ export type AnchorEntityPayload = {
   id: EntityId,
 };
 export type CanvasAction =
-  | ActionShape<'rd/canvas/CONFIG_VIEWPORT', ConfigViewportPayload>
+  | ActionShape<'rd/canvas/CONFIG_VIEWPORT', void>
   | ActionShape<'rd/canvas/TRACK', Coords>
   | ActionShape<'rd/canvas/TRANSLATE', Coords>
   | ActionShape<'rd/canvas/ZOOM', number>
@@ -57,18 +53,26 @@ export type CanvasAction =
   | ActionShape<'rd/canvas/ANCHOR_ENTITY', AnchorEntityPayload>
   | ActionShape<'rd/canvas/ANCHOR_CANVAS', boolean>;
 
+const addEntityHelper = id => ({
+  anchoredEntity: { isAnchored: true, id },
+});
+const configViewportHelper = state => {
+  const layoutData = elemLayout.get();
+  return {
+    ...state,
+    canvasViewport: layoutData,
+    canvasArtboard: {
+      ...state.canvasArtboard,
+      width: layoutData.width,
+      height: layoutData.height,
+    },
+  };
+};
+
 const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
   switch (action.type) {
     case 'rd/canvas/CONFIG_VIEWPORT':
-      return {
-        ...state,
-        canvasViewport: action.payload,
-        canvasArtboard: {
-          ...state.canvasArtboard,
-          width: action.payload.width,
-          height: action.payload.height,
-        },
-      };
+      return configViewportHelper(state);
 
     case 'rd/config/SET':
       return {
@@ -167,20 +171,14 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
 
     case 'rd/entity/ADD':
       return {
-        ...state,
-        anchoredEntity: {
-          isAnchored: true,
-          id: action.payload.id,
-        },
+        ...configViewportHelper(state),
+        ...addEntityHelper(action.payload.id),
       };
 
     case 'rd/entity/ADD_LINKED':
       return {
-        ...state,
-        anchoredEntity: {
-          isAnchored: true,
-          id: action.payload.entity.id,
-        },
+        ...configViewportHelper(state),
+        ...addEntityHelper(action.payload.entity.id),
       };
 
     case 'rd/entity/LINK_TO':
@@ -197,9 +195,7 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
   }
 };
 
-export const configViewport = (
-  payload: ConfigViewportPayload
-): CanvasAction => ({
+export const configViewport = (payload: void): CanvasAction => ({
   type: 'rd/canvas/CONFIG_VIEWPORT',
   payload,
 });

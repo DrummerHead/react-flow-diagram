@@ -13,9 +13,10 @@ import Links from '../links/component';
 import ArrowMarker from '../arrowMarker/component';
 import Debug, { Fairy } from '../debug/component';
 import calcLinkPoints from '../links/calcLinkPoints';
+import elemLayout from './elemLayout';
 
 import type { ComponentType } from 'React';
-import type { Coords, CanvasAction, ConfigViewportPayload } from './reducer';
+import type { Coords, CanvasAction } from './reducer';
 import type {
   EntityState,
   Point,
@@ -138,7 +139,7 @@ type CanvasContainerProps = {
   gridSize: ?number,
   zoom: number,
   artboard: { x: number, y: number, width: number, height: number },
-  configViewport: ConfigViewportPayload => CanvasAction,
+  configViewport: () => CanvasAction,
   trackMovement: Coords => CanvasAction,
   anchorCanvas: boolean => CanvasAction,
   undo: () => HistoryAction,
@@ -163,6 +164,8 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
 
   componentWillUnmount() {
     window.document.removeEventListener('keydown', this.handleKey);
+    this.canvasDOM = undefined;
+    elemLayout.gc();
   }
 
   wrappedCustomEntities = Object.assign(
@@ -177,16 +180,11 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
   setOffset() {
     if (this.canvasDOM) {
       const cd = this.canvasDOM;
+      elemLayout.set(cd);
       if (window.scrollY !== 0) {
         window.scrollTo(0, 0);
       }
-      const { left, top, width, height } = cd.getBoundingClientRect();
-      this.props.configViewport({
-        width: parseInt(width, 10),
-        height: parseInt(height, 10),
-        x: parseInt(left, 10),
-        y: parseInt(top, 10),
-      });
+      this.props.configViewport();
     }
   }
 
@@ -221,8 +219,6 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     this.props.anchorCanvas(false);
   };
 
-  // TODO: Gotta do the setOffset when there's a window resize or an element
-  // dinamically added on top... perhaps call it each time an entity is created
   handleRef = (div: HTMLElement) => {
     if (this.canvasDOM === undefined) {
       this.canvasDOM = div;
