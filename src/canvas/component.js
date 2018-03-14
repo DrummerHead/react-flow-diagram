@@ -17,12 +17,7 @@ import elemLayout from './elemLayout';
 
 import type { ComponentType } from 'React';
 import type { Coords, CanvasAction } from './reducer';
-import type {
-  EntityState,
-  Point,
-  Links as LinksType,
-  MetaEntityAction,
-} from '../entity/reducer';
+import type { EntityState, Point, Links as LinksType } from '../entity/reducer';
 import type { CustomEntities } from '../diagram/component';
 import type { State } from '../diagram/reducer';
 import type { HistoryAction } from '../history/reducer';
@@ -110,7 +105,7 @@ const Canvas = (props: CanvasProps) => (
           .filter(entity => 'linksTo' in entity)
           // $FlowFixMe
           .map(entity => <Links key={entity.id} links={entity.linksTo} />)}
-        // https://github.com/facebook/flow/issues/1414
+        {/* https://github.com/facebook/flow/issues/1414 */}
         {props.isConnecting && <Links links={props.connectingLink} />}
         <ArrowMarker />
       </SvgLand>
