@@ -355,13 +355,13 @@ export const metaEntityReducer = (
 ): MetaEntityState => {
   switch (action.type) {
     case 'rd/entity/SET':
-      return action.payload.map(entity => ({
-        id: entity.id,
+      return action.payload.map(ent => ({
+        id: ent.id,
         isAnchored: false,
         isSelected: false,
         anchor: {
-          x: entity.width / 2,
-          y: entity.height / 2,
+          x: ent.width / 2,
+          y: ent.height / 2,
         },
       }));
 
@@ -403,10 +403,10 @@ export const metaEntityReducer = (
     }
 
     case 'rd/canvas/ANCHOR_ENTITY': {
-      const { isAnchored, id } = action.payload;
+      const { id } = action.payload;
       return state.map(
         metaEntity =>
-          metaEntity.id == id
+          metaEntity.id === id
             ? {
                 ...metaEntity,
                 isAnchored: true,
@@ -424,7 +424,7 @@ export const metaEntityReducer = (
     }
 
     case 'rd/entity/REMOVE':
-      return state.filter(entity => entity.id !== action.payload);
+      return state.filter(ent => ent.id !== action.payload);
 
     case 'rd/entity/CONNECT':
     case 'rd/metaentity/UNSELECTALL':
