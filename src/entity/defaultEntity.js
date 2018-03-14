@@ -18,11 +18,9 @@ import type {
 
 export type DefaultEntityProps = {
   entityType: EntityType,
-  ev: SyntheticMouseEvent<HTMLElement>,
 };
 const defaultEntity = (state: State) => ({
   entityType,
-  ev,
 }: DefaultEntityProps): EntityModel & MetaEntityModel => ({
   // Perhaps something less naive for id generation
   id: window.Date.now().toString(36),

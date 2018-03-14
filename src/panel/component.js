@@ -104,7 +104,7 @@ class PanelContainer extends React.PureComponent<PanelContainerProps> {
     entityType: EntityType = 'Task',
     ev: SyntheticMouseEvent<HTMLElement>
   ) => {
-    this.props.addEntity(this.props.defaultEntity({ entityType, ev }));
+    this.props.addEntity(this.props.defaultEntity({ entityType }));
   };
 
   toolWidth = (): number => {

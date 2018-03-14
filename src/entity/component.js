@@ -70,9 +70,9 @@ const contextMenuActions = (props: EntityProps): ContextMenuActions => {
   };
 
   const addEntities = props.entityTypeNames.map(entityTypeName => ({
-    action: ev =>
+    action: () =>
       props.addLinkedEntity({
-        entity: props.defaultEntity({ entityType: entityTypeName, ev }),
+        entity: props.defaultEntity({ entityType: entityTypeName }),
         id: props.model.id,
       }),
     iconVariety: entityTypeName,

@@ -7,7 +7,6 @@ import { undo, redo } from '../history/reducer';
 import { zoom, translate } from '../canvas/reducer';
 
 import type { State } from '../diagram/reducer';
-import type { CanvasState } from '../canvas/reducer';
 import type { HistoryAction } from '../history/reducer';
 import type { CanvasAction, Coords } from '../canvas/reducer';
 import type { MapStateToProps } from 'react-redux';
