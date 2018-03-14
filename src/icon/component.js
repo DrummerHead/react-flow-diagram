@@ -51,7 +51,7 @@ const icons = (function() {
 
   return {
     get(iconName: string) {
-      return iconName in iconList ? iconList[iconName] : iconList['arrow'];
+      return iconName in iconList ? iconList[iconName] : iconList.arrow;
     },
     addIcon(icon: IconList): void {
       iconList = {

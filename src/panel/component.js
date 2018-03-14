@@ -51,7 +51,7 @@ const PanelTool = style.li`
 `;
 
 type PanelProps = {
-  addEntityHelper: (EntityType, SyntheticMouseEvent<HTMLElement>) => void,
+  addEntityHelper: EntityType => void,
   entityTypeNames: Array<EntityType>,
   toolWidth(): number,
   zoomIn: () => void,
@@ -64,7 +64,7 @@ const Panel = (props: PanelProps) => (
         <PanelTool
           width={props.toolWidth()}
           key={entityTypeName}
-          onMouseDown={ev => props.addEntityHelper(entityTypeName, ev)}
+          onMouseDown={() => props.addEntityHelper(entityTypeName)}
         >
           <Icon name={entityTypeName} label={`Add ${entityTypeName}`} />
         </PanelTool>
@@ -100,10 +100,7 @@ class PanelContainer extends React.PureComponent<PanelContainerProps> {
   minToolSize = 40;
   niceToolSize = 50;
 
-  addEntityHelper = (
-    entityType: EntityType = 'Task',
-    ev: SyntheticMouseEvent<HTMLElement>
-  ) => {
+  addEntityHelper = (entityType: EntityType = 'Task') => {
     this.props.addEntity(this.props.defaultEntity({ entityType }));
   };
 
