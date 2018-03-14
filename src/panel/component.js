@@ -54,6 +54,8 @@ type PanelProps = {
   addEntityHelper: (EntityType, SyntheticMouseEvent<HTMLElement>) => void,
   entityTypeNames: Array<EntityType>,
   toolWidth(): number,
+  zoomIn: () => void,
+  zoomOut: () => void,
 };
 const Panel = (props: PanelProps) => (
   <PanelStyle>
@@ -67,6 +69,16 @@ const Panel = (props: PanelProps) => (
           <Icon name={entityTypeName} label={`Add ${entityTypeName}`} />
         </PanelTool>
       ))}
+      <PanelTool
+        separator
+        width={props.toolWidth()}
+        onMouseDown={() => props.zoomIn()}
+      >
+        <Icon name="zoomIn" label="Zoom in" />
+      </PanelTool>
+      <PanelTool width={props.toolWidth()} onMouseDown={() => props.zoomOut()}>
+        <Icon name="zoomOut" label="Zoom out" />
+      </PanelTool>
     </PanelTools>
   </PanelStyle>
 );
@@ -79,6 +91,8 @@ type PanelContainerProps = {
   entityTypes: ConfigEntityTypes,
   addEntity: (EntityModel & MetaEntityModel) => EntityAction,
   defaultEntity: DefaultEntityProps => EntityModel & MetaEntityModel,
+  zoomIn: () => void,
+  zoomOut: () => void,
   gridSize: ?number,
 };
 class PanelContainer extends React.PureComponent<PanelContainerProps> {
@@ -112,6 +126,8 @@ class PanelContainer extends React.PureComponent<PanelContainerProps> {
         addEntityHelper={this.addEntityHelper}
         entityTypeNames={this.entityTypeNames}
         toolWidth={this.toolWidth}
+        zoomIn={this.props.zoomIn}
+        zoomOut={this.props.zoomOut}
       />
     );
   }

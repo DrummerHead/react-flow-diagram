@@ -3,7 +3,7 @@
 import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
-import { configViewport, trackMovement, anchorCanvas } from './reducer';
+import { configViewport, trackMovement, anchorCanvas, zoom } from './reducer';
 import { undo, redo } from '../history/reducer';
 import { setName } from '../entity/reducer';
 import { icons } from '../icon/component';
@@ -54,7 +54,7 @@ const CanvasArtboard = style.div.attrs({
     const restPercentage = 100 - 100 / props.gridSize;
     const defaultStyles = {
       transform: `translate(${props.artboard.x}px, ${props.artboard
-        .y}px) scale(${props.zoom})`,
+        .y}px) scale(${props.zoomLevel})`,
       width: `${props.artboard.width}px`,
       height: `${props.artboard.height}px`,
     };
@@ -85,7 +85,9 @@ type CanvasProps = {
   gridSize: ?number,
   connectingLink: LinksType,
   handleRef: HTMLElement => void,
-  zoom: number,
+  zoomLevel: number,
+  zoomIn: () => void,
+  zoomOut: () => void,
   artboard: { x: number, y: number, width: number, height: number },
   onMouseDown: () => void,
   onMouseMove: (SyntheticMouseEvent<HTMLElement>) => void,
@@ -101,7 +103,7 @@ const Canvas = (props: CanvasProps) => (
       onMouseUp={props.onMouseUp}
       gridSize={props.gridSize}
       artboard={props.artboard}
-      zoom={props.zoom}
+      zoomLevel={props.zoomLevel}
     >
       <SvgLand width="100%" height="100%">
         {props.entities
@@ -122,7 +124,7 @@ const Canvas = (props: CanvasProps) => (
           <Combo.CustomEntity key={Combo.entity.id} model={Combo.entity} />
         ))}
     </CanvasArtboard>
-    <Panel />
+    <Panel zoomIn={props.zoomIn} zoomOut={props.zoomOut} />
     <Debug />
   </CanvasViewport>
 );
@@ -137,16 +139,28 @@ type CanvasContainerProps = {
   isConnecting: boolean,
   connectingLink: LinksType,
   gridSize: ?number,
-  zoom: number,
   artboard: { x: number, y: number, width: number, height: number },
+  zoomLevel: number,
   configViewport: () => CanvasAction,
   trackMovement: Coords => CanvasAction,
   anchorCanvas: boolean => CanvasAction,
+  zoom: number => CanvasAction,
   undo: () => HistoryAction,
   redo: () => HistoryAction,
 };
-class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
+type CanvasContainerState = {
+  zoomStep: number,
+};
+class CanvasContainer extends React.PureComponent<
+  CanvasContainerProps,
+  CanvasContainerState
+> {
   canvasDOM: ?HTMLElement;
+  zoomSteps: Array<number> = [0.25, 0.5, 0.75, 1, 1.5, 2, 4];
+
+  state = {
+    zoomStep: 3,
+  };
 
   componentDidMount() {
     if ('scrollRestoration' in window.history) {
@@ -219,6 +233,36 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
     this.props.anchorCanvas(false);
   };
 
+  traverseZoomLevels(i: number) {
+    const min = 0;
+    const max = this.zoomSteps.length - 1;
+    const potential = this.state.zoomStep + i;
+
+    const determineZoomLevel = (prevIndex: number): number => {
+      if (potential > max) {
+        return max;
+      } else if (potential < min) {
+        return min;
+      } else {
+        return prevIndex + i;
+      }
+    };
+    this.setState(
+      prevState => ({
+        zoomStep: determineZoomLevel(prevState.zoomStep),
+      }),
+      () => this.props.zoom(this.zoomSteps[this.state.zoomStep])
+    );
+  }
+
+  zoomIn = () => {
+    this.traverseZoomLevels(1);
+  };
+
+  zoomOut = () => {
+    this.traverseZoomLevels(-1);
+  };
+
   handleRef = (div: HTMLElement) => {
     if (this.canvasDOM === undefined) {
       this.canvasDOM = div;
@@ -237,7 +281,9 @@ class CanvasContainer extends React.PureComponent<CanvasContainerProps> {
         onMouseUp={this.onMouseUp}
         isConnecting={this.props.isConnecting}
         connectingLink={this.props.connectingLink}
-        zoom={this.props.zoom}
+        zoomLevel={this.props.zoomLevel}
+        zoomIn={this.zoomIn}
+        zoomOut={this.zoomOut}
         artboard={this.props.artboard}
         gridSize={this.props.gridSize}
       />
@@ -274,13 +320,14 @@ const mapStateToProps = (state: State) => ({
   connectingLink: makeConnectingLinks(state),
   gridSize: state.canvas.gridSize,
   artboard: state.canvas.canvasArtboard,
-  zoom: state.canvas.zoom,
+  zoomLevel: state.canvas.zoom,
 });
 
 export default connect(mapStateToProps, {
   configViewport,
   trackMovement,
+  anchorCanvas,
+  zoom,
   undo,
   redo,
-  anchorCanvas,
 })(CanvasContainer);
