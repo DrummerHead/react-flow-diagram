@@ -6,6 +6,7 @@ import type { ActionShape, Action } from '../diagram/reducer';
 import type { EntityId } from '../entity/reducer';
 
 export type Coords = { x: number, y: number };
+type Dimensions = { width: number, height: number };
 export type CanvasState = {
   cursor: Coords,
   canvasViewport: {
@@ -47,7 +48,6 @@ export type AnchorEntityPayload = {
 export type CanvasAction =
   | ActionShape<'rd/canvas/CONFIG_VIEWPORT', void>
   | ActionShape<'rd/canvas/TRACK', Coords>
-  | ActionShape<'rd/canvas/TRANSLATE', Coords>
   | ActionShape<'rd/canvas/ZOOM', number>
   | ActionShape<'rd/canvas/CONNECT', ConnectingPayload>
   | ActionShape<'rd/canvas/ANCHOR_ENTITY', AnchorEntityPayload>
@@ -56,6 +56,20 @@ export type CanvasAction =
 const addEntityHelper = id => ({
   anchoredEntity: { isAnchored: true, id },
 });
+
+const canvasArtboardDimensions = (
+  canvasViewportDimensions: Dimensions,
+  canvasArtboardPosition: Coords,
+  zoomLevel: number
+): Dimensions => ({
+  width:
+    (canvasViewportDimensions.width - canvasArtboardPosition.x) *
+    (1 / zoomLevel),
+  height:
+    (canvasViewportDimensions.height - canvasArtboardPosition.y) *
+    (1 / zoomLevel),
+});
+
 const configViewportHelper = state => {
   const layoutData = elemLayout.get();
   return {
@@ -63,8 +77,7 @@ const configViewportHelper = state => {
     canvasViewport: layoutData,
     canvasArtboard: {
       ...state.canvasArtboard,
-      width: layoutData.width,
-      height: layoutData.height,
+      ...canvasArtboardDimensions(layoutData, state.canvasArtboard, state.zoom),
     },
   };
 };
@@ -85,18 +98,20 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
         ? {
             ...state,
             canvasArtboard: {
-              width:
-                (state.canvasViewport.width -
-                  (action.payload.x -
+              ...canvasArtboardDimensions(
+                state.canvasViewport,
+                {
+                  x:
+                    action.payload.x -
                     state.canvasViewport.x -
-                    state.canvasAnchor.coords.x * state.zoom)) *
-                (1 / state.zoom),
-              height:
-                (state.canvasViewport.height -
-                  (action.payload.y -
+                    state.canvasAnchor.coords.x * state.zoom,
+                  y:
+                    action.payload.y -
                     state.canvasViewport.y -
-                    state.canvasAnchor.coords.y * state.zoom)) *
-                (1 / state.zoom),
+                    state.canvasAnchor.coords.y * state.zoom,
+                },
+                state.zoom
+              ),
               x:
                 action.payload.x -
                 state.canvasViewport.x -
@@ -123,28 +138,17 @@ const canvasReducer = (state: CanvasState, action: Action): CanvasState => {
             },
           };
 
-    case 'rd/canvas/TRANSLATE':
-      return {
-        ...state,
-        canvasArtboard: {
-          ...state.canvasArtboard,
-          x: action.payload.x,
-          y: action.payload.y,
-        },
-      };
-
     case 'rd/canvas/ZOOM':
       return {
         ...state,
         zoom: action.payload,
         canvasArtboard: {
           ...state.canvasArtboard,
-          width:
-            (state.canvasViewport.width - state.canvasArtboard.x) *
-            (1 / action.payload),
-          height:
-            (state.canvasViewport.height - state.canvasArtboard.y) *
-            (1 / action.payload),
+          ...canvasArtboardDimensions(
+            state.canvasViewport,
+            state.canvasArtboard,
+            action.payload
+          ),
         },
       };
 
@@ -202,11 +206,6 @@ export const configViewport = (payload: void): CanvasAction => ({
 
 export const trackMovement = (payload: Coords): CanvasAction => ({
   type: 'rd/canvas/TRACK',
-  payload,
-});
-
-export const translate = (payload: Coords): CanvasAction => ({
-  type: 'rd/canvas/TRANSLATE',
   payload,
 });
 

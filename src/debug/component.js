@@ -4,7 +4,7 @@ import React from 'react';
 import style from 'styled-components';
 import { connect } from 'react-redux';
 import { undo, redo } from '../history/reducer';
-import { zoom, translate } from '../canvas/reducer';
+import { zoom } from '../canvas/reducer';
 
 import type { State } from '../diagram/reducer';
 import type { HistoryAction } from '../history/reducer';
@@ -26,7 +26,6 @@ type DebugProps = {
   undo: () => HistoryAction,
   redo: () => HistoryAction,
   zoom: number => CanvasAction,
-  translate: Coords => CanvasAction,
 };
 type DebugState = {
   zoomStep: number,
@@ -57,23 +56,12 @@ class Debug extends React.Component<DebugProps, DebugState> {
     this.props.zoom(this.zoomPhases[this.state.zoomStep]);
   };
 
-  moveAround = () => {
-    this.setState(prevState => ({
-      positionStep: (prevState.positionStep + 1) % this.positionPhases.length,
-    }));
-    this.props.translate({
-      x: this.positionPhases[this.state.positionStep][0],
-      y: this.positionPhases[this.state.positionStep][1],
-    });
-  };
-
   render() {
     return (
       <Panel>
         <button onClick={this.props.undo}>UNDO</button>
         <button onClick={this.props.redo}>REDO</button>
         <button onClick={this.toggleZoom}>zoom</button>
-        <button onClick={this.moveAround}>move around</button>
       </Panel>
     );
   }
@@ -81,7 +69,7 @@ class Debug extends React.Component<DebugProps, DebugState> {
 
 // Default export is <Debug /> component, to live inside of <CanvasViewport>.
 // It adds buttons to move history, zoom and pan.
-export default connect(null, { undo, redo, zoom, translate })(Debug);
+export default connect(null, { undo, redo, zoom })(Debug);
 
 // https://github.com/flowtype/flow-typed/issues/1269#issuecomment-332100335
 const mapStateToProps: MapStateToProps<any, any, any> = (state: State) => ({
