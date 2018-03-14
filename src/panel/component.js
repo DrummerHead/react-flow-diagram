@@ -33,10 +33,12 @@ const PanelTools = style.ul`
 const PanelTool = style.li`
   width: ${props => props.width}px;
   height: ${props => props.width}px;
-  background-color: #ddd;
-  cursor: pointer;
   padding: .6em;
+  ${props =>
+    props.separator ? 'border-top: 1px solid rgba(0, 0, 0, .25);' : ''}
+  background-color: #ddd;
   transition: background-color ease-in 80ms;
+  cursor: pointer;
 
   &:hover {
     background-color: #ccc;
