@@ -125,7 +125,6 @@ const Canvas = (props: CanvasProps) => (
         ))}
     </CanvasArtboard>
     <Panel zoomIn={props.zoomIn} zoomOut={props.zoomOut} />
-    <Debug />
   </CanvasViewport>
 );
 
