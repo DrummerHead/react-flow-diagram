@@ -1,6 +1,6 @@
 // @flow
 
-type getReturn = {
+type GetReturn = {
   width: number,
   height: number,
   x: number,
@@ -17,7 +17,7 @@ const elemLayout = (() => {
     elem = undefined;
   };
 
-  const get = (): getReturn => {
+  const get = (): GetReturn => {
     if (elem) {
       const { left, top, width, height } = elem.getBoundingClientRect();
       return {
