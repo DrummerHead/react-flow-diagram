@@ -1,9 +1,8 @@
-# <img src='https://i.imgur.com/7NGxZtJ.png' width='800' alt='React Flow Diagram' aria-label='Redux.js.org' />
+# <img src='https://camo.githubusercontent.com/190254ed78fd2f87c30ee53e398af3fd87e4f4eb/68747470733a2f2f692e696d6775722e636f6d2f374e47785a744a2e706e67' width='800' alt='React Flow Diagram' />
 
-Batteries included React Component for renderizing, creating and editing diagrams.
+Batteries included React Component for rendering, creating and editing diagrams.
 
-{{Animation gif that shows some of the features}}
-
+<img src='https://i.imgur.com/bTIp0KJ.gif' width='800' alt='React Flow Diagram demo' />
 
 ## Features
 
