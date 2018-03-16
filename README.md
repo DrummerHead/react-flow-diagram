@@ -2,7 +2,7 @@
 
 Batteries included React Component for rendering, creating and editing diagrams.
 
-<img src='https://i.imgur.com/bTIp0KJ.gif' width='800' alt='React Flow Diagram demo' />
+<img src='https://i.imgur.com/WSZQXa3.gif' width='800' alt='React Flow Diagram demo' />
 
 ## Features
 
