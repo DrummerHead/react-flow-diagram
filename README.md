@@ -1,6 +1,4 @@
-# React Flow Diagram
-
-{{Logo}}
+# <img src='https://i.imgur.com/7NGxZtJ.png' width='800' alt='React Flow Diagram' aria-label='Redux.js.org' />
 
 Batteries included React Component for renderizing, creating and editing diagrams.
 
