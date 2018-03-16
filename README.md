@@ -7,9 +7,12 @@ Batteries included React Component for rendering, creating and editing diagrams.
 ## Features
 
 - The data is the source of truth
-- Can add custom Components as entities
-- Continous feedback while editing
+- Can add custom Entities as React Components
+- Adding custom icons for these entities appear in Panel and Context Menu
+- Infinite canvas to work with; panning
+- Zooming for detail work or bird's eye view
 - Configurable grid, snap to grid (or no grid at all)
+- Continuous feedback while editing
 - History, undo, redo; keyboard shortcuts
 - Panel for adding new Entities, with drag or click
 - Automatic arrow placement
@@ -17,9 +20,8 @@ Batteries included React Component for rendering, creating and editing diagrams.
 
 ### Missing features (currently working on)
 
-- Editable arrow labels (From the UI, you can always edit the model)
-- Panning, zooming (viewport and camera as separate concepts)
-- Editable arrow paths (From the UI, you can always edit the model)
+- Editable arrow labels (From the UI; the model and render already contemplates this feature)
+- Editable arrow paths (From the UI; the model and render already contemplates this feature)
 - Select several entities
 - Copy and paste entities
 - Alignment tools
@@ -29,7 +31,7 @@ Batteries included React Component for rendering, creating and editing diagrams.
 
 It's easier to see the an example already working to explain what we need to add. Pull [react-flow-diagram-example](https://github.com/DrummerHead/react-flow-diagram-example) and follow along; consider it a finished state of following these instructions. You can also use this repo as a starting point for your own implementation.
 
-Let's assume a fresh [create-react-app](https://github.com/facebook/create-react-app) (which the example is created from) strucure, then:
+Let's assume a fresh [create-react-app](https://github.com/facebook/create-react-app) (which the example is created from) structure, then:
 
 ```
 yarn add react-flow-diagram
