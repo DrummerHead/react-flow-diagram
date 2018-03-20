@@ -62,7 +62,7 @@ And in it we create:
 
 The star of the show, the model that holds the data that will be represented as a diagram.
 
-You don't need to conciously know the structure of the model, since you can always start a diagram via the UI, save it and resume from the UI without ever touching the model. But you may need this information for your specific use case.
+You don't need to consciously know the structure of the model, since you can always start a diagram via the UI, save it and resume from the UI without ever touching the model. But you may need this information for your specific use case.
 
 The structure held in the `model` const can be defined in [flow types](https://flow.org/en/docs/types/) as (you don't really need to know flowtype to grasp this):
 
@@ -142,7 +142,7 @@ type ConfigEntityTypes = {
 };
 ```
 
-It's recommended to find an entitiy size that is a multiple of the grid size; however you're free to choose any positive `number`.
+It's recommended to find an entity size that is a multiple of the grid size; however you're free to choose any positive `number`.
 
 `customEntities` can be defined as:
 
@@ -158,7 +158,7 @@ type CustomEntities = {
 };
 ```
 
-The `component` attribute holds a reference to a [React Component](https://reactjs.org/docs/react-component.html) that will be provided `DiagComponentProps` props. The creation of your custom components is covered in {{TODO: Link to create custom entitiy components section}}
+The `component` attribute holds a reference to a [React Component](https://reactjs.org/docs/react-component.html) that will be provided `DiagComponentProps` props. The creation of your custom components is covered in [Creating our own Entities](#creating-our-own-entities)
 
 ```JavaScript
 type DiagComponentProps = {
@@ -313,11 +313,11 @@ With time I'll add more examples, namely:
 
 ## Some History
 
-In a [Trailblazer](http://trailblazer.to/) related project I had the task of creating an editing environment surrounding [bpmn-js](https://github.com/bpmn-io/bpmn-js) which was the first diagramming library we used. bpmn-js proved to be a feature rich library, but extending to add the features we wanted proved to be practically impossible, coupled with dwindling documentation. It's still a great option if you're not thinking of adding your own types of entites or swerving from the BPMN model at all.
+In a [Trailblazer](http://trailblazer.to/) related project I had the task of creating an editing environment surrounding [bpmn-js](https://github.com/bpmn-io/bpmn-js) which was the first diagramming library we used. bpmn-js proved to be a feature rich library, but extending to add the features we wanted proved to be practically impossible, coupled with dwindling documentation. It's still a great option if you're not thinking of adding your own types of entities or swerving from the BPMN model at all.
 
-After assessing many diagramming libraries available, my second go after bpmn-js was [react-diagrams](https://github.com/projectstorm/react-diagrams); which worked pretty well, had modern JS standards and was more extensible. However the source of truth (model) was scattered through many object's internal state and getting to the underlying data proved difficult in many scenarios. In my opinion, the code base was not idiomatic with React principles and it led to me implementing what I felt were many hacks to sync model state with UI representation.
+After assessing many diagramming libraries available, my second go after bpmn-js was [react-diagrams](https://github.com/projectstorm/react-diagrams); which worked pretty well, had modern JS standards and was more extensible. However the source of truth (model) was scattered through many object's internal state and getting to the underlying data proved difficult in many scenarios.
 
-I never set off to reinvent the wheel, I was quite happy with the idea of using a time-tested open source library. But the options available left me making the decission to build another alternative. And perhaps it'll be useful to you too!
+I was quite happy with the idea of using a time-tested open source library, but the options available left me making the decision to build an alternative. I hope it's useful for you!
 
 ## Contributing
 
@@ -325,8 +325,8 @@ TODO
 
 ## Companies using React Flow Diagram
 
-TODO
+<img src='https://i.imgur.com/3HUnZtH.png' width='200' alt='TRAILBLAZER' />
 
 ## Sponsored by
 
-TODO
+<img src='https://i.imgur.com/3HUnZtH.png' width='200' alt='TRAILBLAZER' />
