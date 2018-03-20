@@ -325,8 +325,9 @@ TODO
 
 ## Companies using React Flow Diagram
 
-<img src='https://i.imgur.com/3HUnZtH.png' width='200' alt='TRAILBLAZER' />
+<a href='http://trailblazer.to/'><img src='https://camo.githubusercontent.com/7a4c0bd3982e63dfdc47be5f66f58d9dd23d84bf/68747470733a2f2f692e696d6775722e636f6d2f3348556e5a74482e706e67' width='200' alt='TRAILBLAZER' /></a>
 
 ## Sponsored by
 
-<img src='https://i.imgur.com/3HUnZtH.png' width='200' alt='TRAILBLAZER' />
+<a href='http://trailblazer.to/'><img src='https://camo.githubusercontent.com/7a4c0bd3982e63dfdc47be5f66f58d9dd23d84bf/68747470733a2f2f692e696d6775722e636f6d2f3348556e5a74482e706e67' width='200' alt='TRAILBLAZER' /></a>
+
